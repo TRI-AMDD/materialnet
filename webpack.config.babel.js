@@ -1,4 +1,5 @@
 import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export default {
   entry: './src/index.js',
@@ -6,6 +7,11 @@ export default {
     path: path.resolve('dist'),
     filename: 'index.js'
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "TRI/Kitware MaterialNet Prototype"
+    })
+  ],
   module: {
     rules: [
       {

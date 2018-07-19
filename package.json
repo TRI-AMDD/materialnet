@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "npm run build -- --watch",
+    "start": "http-server dist/"
   },
   "babel": {
     "presets": [
@@ -27,6 +28,8 @@
     "@babel/preset-env": "^7.0.0-beta.54",
     "@babel/register": "^7.0.0-beta.54",
     "babel-loader": "^8.0.0-beta.4",
+    "html-webpack-plugin": "^3.2.0",
+    "http-server": "^0.11.1",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0"
   }
