@@ -3,6 +3,38 @@ import { select } from 'd3-selection';
 
 import html from './index.pug';
 
+const circleGeometry = new three.CircleBufferGeometry(1, 32);
+
+class Circle {
+  constructor ({color}) {
+    this.material = new three.MeshLambertMaterial({
+      color
+    });
+
+    this.circle = new three.Mesh(circleGeometry, this.material);
+  }
+
+  addToScene (scene) {
+    scene.add(this.circle);
+  }
+
+  get position () {
+    return this.circle.position;
+  }
+
+  get color () {
+    return this.material.color;
+  }
+
+  get radius () {
+    return this.circle.scale.x;
+  }
+
+  set radius (scale) {
+    this.circle.scale.x = this.circle.scale.y = scale;
+  }
+}
+
 const width = 960;
 const height = 540;
 document.write(html());
@@ -21,18 +53,31 @@ const material = new three.MeshLambertMaterial({
 const cube = new three.Mesh(geometry, material);
 scene.add(cube);
 
-const cGeom = new three.CircleBufferGeometry(50, 32);
-const circle = new three.Mesh(cGeom, material);
+const circle = new Circle({
+  color: 0xff0000
+});
+circle.radius = 80;
 circle.position.x = 200;
 circle.position.y = 200;
-scene.add(circle);
+circle.addToScene(scene);
 
-const circle2 = new three.Mesh(cGeom, material);
+const circle2 = new Circle({
+  color: 0x00ff00,
+  scene
+});
 circle2.position.x = 200;
 circle2.position.y = -200;
-circle2.scale.x = 0.5;
-circle2.scale.y = 0.5;
-scene.add(circle2);
+circle2.radius = 25;
+circle2.addToScene(scene);
+
+const circle3 = new Circle({
+  color: 0xddaa22,
+  scene
+});
+circle3.position.x = 200;
+circle3.position.y = -100;
+circle3.radius = 25;
+circle3.addToScene(scene);
 
 const dirLight = new three.DirectionalLight();
 dirLight.position.x = 0;
@@ -50,6 +95,7 @@ function animate () {
   cube.rotation.y += 0.02;
 
   material.color.b += factor * 0.01;
+  circle2.color.b += factor * 0.01;
   if(material.color.b >= 1.0) {
     factor = -1;
   } else if (material.color.b <= 0.0) {
@@ -57,8 +103,13 @@ function animate () {
   }
 
   circle.position.x -= 1;
+
   circle2.position.x -= 2;
   circle2.position.y += speed;
+
+  circle3.position.x -= 1;
+  circle3.position.y -= speed;
+
   speed += speedFactor * 0.1;
   if (speed <= -1.8) {
     speedFactor = 1;
