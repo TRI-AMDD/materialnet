@@ -1,0 +1,33 @@
+{
+  "name": "materialnet",
+  "version": "0.1.0",
+  "description": "Prototype visualization for TRI materials network data￼Edit",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arclamp/materialnet.git"
+  },
+  "author": "Kitware Inc.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/arclamp/materialnet/issues"
+  },
+  "homepage": "https://github.com/arclamp/materialnet#readme",
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.54",
+    "@babel/preset-env": "^7.0.0-beta.54",
+    "@babel/register": "^7.0.0-beta.54",
+    "babel-loader": "^8.0.0-beta.4",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.1.0"
+  }
+}
