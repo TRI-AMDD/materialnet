@@ -9,7 +9,7 @@ export default {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: "TRI/Kitware MaterialNet Prototype"
+      title: 'TRI/Kitware MaterialNet Prototype'
     })
   ],
   module: {
