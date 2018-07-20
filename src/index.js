@@ -32,7 +32,7 @@ function computeGraph (edges) {
   });
 
   // Create a version of the edges list that has indices instead of names.
-  const edgeIndex = edges.map(e => e.map(n => index[n]))
+  const edgeIndex = edges.map(e => e.map(n => index[n]));
 
   // Create a Cola layout to manipulate the objects.
   const layout = new cola.Layout()
@@ -172,10 +172,10 @@ function animate (e) {
   graph.layout.tick();
   renderer.render(scene, camera);
 
-  requestAnimationFrame(animate);
+  window.requestAnimationFrame(animate);
 }
 
-graph.layout.start(1,0,0,0,false);
+graph.layout.start(1, 0, 0, 0, false);
 graph.layout.on(cola.EventType.tick, e => {
   graph.layout.nodes().forEach((n, i) => {
     graph.circles[i].position.x = n.x;
