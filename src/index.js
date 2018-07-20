@@ -46,13 +46,6 @@ const renderer = new three.WebGLRenderer();
 renderer.setSize(width, height);
 select('#vis').append(() => renderer.domElement);
 
-const geometry = new three.BoxGeometry(100, 100, 100);
-const material = new three.MeshLambertMaterial({
-  color: 0x00ff00
-});
-const cube = new three.Mesh(geometry, material);
-scene.add(cube);
-
 const circle = new Circle({
   color: 0xff0000
 });
@@ -91,14 +84,10 @@ let speedFactor = 1;
 function animate () {
   requestAnimationFrame(animate);
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.02;
-
-  material.color.b += factor * 0.01;
   circle2.color.b += factor * 0.01;
-  if(material.color.b >= 1.0) {
+  if(circle2.color.b >= 1.0) {
     factor = -1;
-  } else if (material.color.b <= 0.0) {
+  } else if (circle2.color.b <= 0.0) {
     factor = 1;
   }
 
