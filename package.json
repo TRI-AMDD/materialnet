@@ -34,6 +34,7 @@
     "pug": "^2.0.3",
     "pug-loader": "^2.4.0",
     "three": "^0.94.0",
+    "webcola": "^3.3.8",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0"
   }
