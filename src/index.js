@@ -11,6 +11,7 @@ function computeGraph (edges) {
   // Create a node index table.
   let index = {};
   let circles = [];
+  let links = [];
   let count = 0;
   edges.forEach(e => {
     // Create an entry if the node hasn't been seen yet.
@@ -26,6 +27,8 @@ function computeGraph (edges) {
         circles.push(circ);
       }
     });
+
+    links.push(new Line());
   });
 
   // Create a version of the edges list that has indices instead of names.
@@ -47,6 +50,7 @@ function computeGraph (edges) {
     nodeIndex: index,
     edgeIndex,
     circles,
+    links,
     layout
   };
 }
@@ -83,6 +87,61 @@ class Circle {
   }
 }
 
+class Line {
+  constructor () {
+    this.material = new three.LineBasicMaterial({
+      color: 0xffffff,
+      linewidth: 2
+    });
+
+    this.geometry = new three.Geometry();
+    this.geometry.vertices.push(new three.Vector3(-100, 100, 0));
+    this.geometry.vertices.push(new three.Vector3(100, -100, 0));
+
+    this.line = new three.Line(this.geometry, this.material);
+  }
+
+  get x0 () {
+    return this.geometry.vertices[0].x;
+  }
+
+  get x1 () {
+    return this.geometry.vertices[1].x;
+  }
+
+  get y0 () {
+    return this.geometry.vertices[0].y;
+  }
+
+  get y1 () {
+    return this.geometry.vertices[1].y;
+  }
+
+  set x0 (x) {
+    this.geometry.vertices[0].setX(x);
+    this.geometry.verticesNeedUpdate = true;
+  }
+
+  set x1 (x) {
+    this.geometry.vertices[1].setX(x);
+    this.geometry.verticesNeedUpdate = true;
+  }
+
+  set y0 (y) {
+    this.geometry.vertices[0].setY(y);
+    this.geometry.verticesNeedUpdate = true;
+  }
+
+  set y1 (y) {
+    this.geometry.vertices[1].setY(y);
+    this.geometry.verticesNeedUpdate = true;
+  }
+
+  addToScene (scene) {
+    scene.add(this.line);
+  }
+}
+
 const width = 960;
 const height = 540;
 document.write(html());
@@ -90,7 +149,9 @@ document.write(html());
 const scene = new three.Scene();
 const camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
 
-const renderer = new three.WebGLRenderer();
+const renderer = new three.WebGLRenderer({
+  antialias: true
+});
 renderer.setSize(width, height);
 select('#vis').append(() => renderer.domElement);
 
@@ -105,6 +166,7 @@ const graph = computeGraph(edges);
 
 // Animate the graph.
 graph.circles.forEach(c => c.addToScene(scene));
+graph.links.forEach(l => l.addToScene(scene));
 
 function animate (e) {
   graph.layout.tick();
@@ -118,6 +180,13 @@ graph.layout.on(cola.EventType.tick, e => {
   graph.layout.nodes().forEach((n, i) => {
     graph.circles[i].position.x = n.x;
     graph.circles[i].position.y = n.y;
+  });
+
+  graph.layout.links().forEach((e, i) => {
+    graph.links[i].x0 = e.source.x;
+    graph.links[i].y0 = e.source.y;
+    graph.links[i].x1 = e.target.x;
+    graph.links[i].y1 = e.target.y;
   });
 });
 
