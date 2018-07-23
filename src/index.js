@@ -70,6 +70,10 @@ class Circle {
     scene.add(this.circle);
   }
 
+  get uuid () {
+    return this.circle.uuid;
+  }
+
   get position () {
     return this.circle.position;
   }
