@@ -155,6 +155,23 @@ const renderer = new three.WebGLRenderer({
 renderer.setSize(width, height);
 select('#vis').append(() => renderer.domElement);
 
+const raycaster = new three.Raycaster();
+const mouse = new three.Vector2();
+let hover = false;
+select(renderer.domElement)
+  .on('mousemove', () => {
+    hover = true;
+
+    const bbox = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - bbox.left) / width) * 2 - 1;
+    mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
+
+    console.log(mouse);
+  })
+  .on('mouseout', () => {
+    hover = false;
+  });
+
 const dirLight = new three.DirectionalLight();
 dirLight.position.x = 0;
 dirLight.position.y = 0;
@@ -170,6 +187,19 @@ graph.links.forEach(l => l.addToScene(scene));
 
 function animate (e) {
   graph.layout.tick();
+
+  if (hover) {
+    raycaster.setFromCamera(mouse, camera);
+    const isect = raycaster.intersectObjects(scene.children);
+    if (isect.length > 0) {
+      console.log(isect);
+      console.log(isect[0].object);
+      isect[0].object.material.color.r = Math.random();
+      isect[0].object.material.color.g = Math.random();
+      isect[0].object.material.color.b = Math.random();
+    }
+  }
+
   renderer.render(scene, camera);
 
   window.requestAnimationFrame(animate);
