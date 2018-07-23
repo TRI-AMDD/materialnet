@@ -22,8 +22,6 @@ def main():
 
     nodes = unique_nodes(edges)
 
-    print '%d unique nodes' % (len(nodes))
-
     node_sample = set(list(nodes)[:100])
 
     edge_sample = filter_edges(edges, node_sample)
