@@ -1,7 +1,11 @@
 import * as three from 'three';
 
-export class Line {
+import { SceneObject } from './SceneObject';
+
+export class Line extends SceneObject {
   constructor () {
+    super();
+
     this.material = new three.LineBasicMaterial({
       color: 0xffffff,
       linewidth: 2
@@ -11,7 +15,7 @@ export class Line {
     this.geometry.vertices.push(new three.Vector3(0, 0, -0.1));
     this.geometry.vertices.push(new three.Vector3(0, 0, -0.1));
 
-    this.line = new three.Line(this.geometry, this.material);
+    this.object = new three.Line(this.geometry, this.material);
   }
 
   get x0 () {
@@ -51,6 +55,6 @@ export class Line {
   }
 
   addToScene (scene) {
-    scene.add(this.line);
+    scene.add(this.object);
   }
 }

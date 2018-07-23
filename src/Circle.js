@@ -1,37 +1,41 @@
 import * as three from 'three';
 
+import { SceneObject } from './SceneObject';
+
 const circleGeometry = new three.CircleBufferGeometry(1, 32);
 
-export class Circle {
+export class Circle extends SceneObject {
   constructor () {
+    super();
+
     this.material = new three.MeshLambertMaterial({
       color: 0xffffff
     });
 
-    this.circle = new three.Mesh(circleGeometry, this.material);
+    this.object = new three.Mesh(circleGeometry, this.material);
   }
 
-  addToScene (scene) {
-    scene.add(this.circle);
-  }
+  // addToScene (scene) {
+    // scene.add(this.object);
+  // }
 
-  get uuid () {
-    return this.circle.uuid;
-  }
+  // get uuid () {
+    // return this.object.uuid;
+  // }
 
-  get position () {
-    return this.circle.position;
-  }
+  // get position () {
+    // return this.object.position;
+  // }
 
-  get color () {
-    return this.material.color;
-  }
+  // get color () {
+    // return this.material.color;
+  // }
 
   get radius () {
-    return this.circle.scale.x;
+    return this.object.scale.x;
   }
 
   set radius (scale) {
-    this.circle.scale.x = this.circle.scale.y = scale;
+    this.object.scale.x = this.object.scale.y = scale;
   }
 }

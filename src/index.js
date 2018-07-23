@@ -4,6 +4,7 @@ import * as cola from 'webcola';
 
 import html from './index.pug';
 import edges from './edges.json';
+import { SceneObject } from './SceneObject';
 import { Circle } from './Circle';
 import { Line } from './Line';
 
@@ -61,31 +62,80 @@ const width = 960;
 const height = 540;
 document.write(html());
 
-const scene = new three.Scene();
-const camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
+class SceneManager {
+  constructor ({el, width, height}) {
+    this.width = width;
+    this.height = height;
 
-const renderer = new three.WebGLRenderer({
-  antialias: true
+    this.scene = new three.Scene();
+    this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
+
+    this.renderer = new three.WebGLRenderer({
+      antialias: true
+    });
+    this.renderer.setSize(width, height);
+
+    this.el = this.renderer.domElement;
+    select(el).append(() => this.renderer.domElement);
+
+    this.raycaster = new three.Raycaster();
+    this.mouse = new three.Vector2();
+
+    this.hover = false;
+
+    this.table = {};
+  }
+
+  add (obj) {
+    if (obj instanceof SceneObject) {
+      if (this.table.hasOwnProperty(obj.uuid)) {
+        throw new Error(`error: cannot add object (uuid = ${obj.uuid}) twice`);
+      }
+
+      this.table[obj.uuid] = obj;
+
+      obj.addToScene(this.scene);
+    } else {
+      this.scene.add(obj);
+    }
+  }
+
+  on (eventType, cb) {
+    select(this.el).on(eventType, cb.bind(this));
+  }
+
+  render () {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  pick () {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const results = this.raycaster.intersectObjects(this.scene.children);
+    if (results.length > 0) {
+      return this.table[results[0].object.uuid];
+    }
+    return null;
+  }
+}
+
+const scene = new SceneManager({
+  el: '#vis',
+  width,
+  height
 });
-renderer.setSize(width, height);
-select('#vis').append(() => renderer.domElement);
+window.scene = scene;
 
-const raycaster = new three.Raycaster();
-const mouse = new three.Vector2();
-let hover = false;
-select(renderer.domElement)
-  .on('mousemove', () => {
-    hover = true;
+scene.on('mousemove', function () {
+  this.hover = true;
 
-    const bbox = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((event.clientX - bbox.left) / width) * 2 - 1;
-    mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
+  const bbox = this.el.getBoundingClientRect();
+  this.mouse.x = ((event.clientX - bbox.left) / width) * 2 - 1;
+  this.mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
+});
 
-    console.log(mouse);
-  })
-  .on('mouseout', () => {
-    hover = false;
-  });
+scene.on('mouseout', function () {
+  this.hover = false;
+});
 
 const dirLight = new three.DirectionalLight();
 dirLight.position.x = 0;
@@ -97,25 +147,22 @@ scene.add(dirLight);
 const graph = computeGraph(edges);
 
 // Animate the graph.
-graph.circles.forEach(c => c.addToScene(scene));
-graph.links.forEach(l => l.addToScene(scene));
+graph.circles.forEach(c => scene.add(c));
+graph.links.forEach(l => scene.add(l));
 
 function animate (e) {
   graph.layout.tick();
 
-  if (hover) {
-    raycaster.setFromCamera(mouse, camera);
-    const isect = raycaster.intersectObjects(scene.children);
-    if (isect.length > 0) {
-      console.log(isect);
-      console.log(isect[0].object);
-      isect[0].object.material.color.r = Math.random();
-      isect[0].object.material.color.g = Math.random();
-      isect[0].object.material.color.b = Math.random();
+  if (scene.hover) {
+    const obj = scene.pick();
+    if (obj) {
+      obj.material.color.r = Math.random();
+      obj.material.color.g = Math.random();
+      obj.material.color.b = Math.random();
     }
   }
 
-  renderer.render(scene, camera);
+  scene.render();
 
   window.requestAnimationFrame(animate);
 }
