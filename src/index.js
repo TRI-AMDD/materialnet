@@ -133,6 +133,13 @@ scene.on('mousemove', function () {
   this.mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
 });
 
+scene.on('click', function () {
+  const obj = this.pick();
+  if (obj && obj instanceof Circle) {
+    obj.material.color = new three.Color(Math.random(), Math.random(), Math.random());
+  }
+});
+
 scene.on('mouseout', function () {
   this.hover = false;
 });
@@ -152,16 +159,6 @@ graph.links.forEach(l => scene.add(l));
 
 function animate (e) {
   graph.layout.tick();
-
-  if (scene.hover) {
-    const obj = scene.pick();
-    if (obj) {
-      obj.material.color.r = Math.random();
-      obj.material.color.g = Math.random();
-      obj.material.color.b = Math.random();
-    }
-  }
-
   scene.render();
 
   window.requestAnimationFrame(animate);
