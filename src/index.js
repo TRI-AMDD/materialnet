@@ -95,8 +95,8 @@ class Line {
     });
 
     this.geometry = new three.Geometry();
-    this.geometry.vertices.push(new three.Vector3(-100, 100, 0));
-    this.geometry.vertices.push(new three.Vector3(100, -100, 0));
+    this.geometry.vertices.push(new three.Vector3(0, 0, -0.1));
+    this.geometry.vertices.push(new three.Vector3(0, 0, -0.1));
 
     this.line = new three.Line(this.geometry, this.material);
   }
