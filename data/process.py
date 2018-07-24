@@ -17,12 +17,21 @@ def filter_edges(edges, nodes):
 
 
 def main():
+    n = None
+    try:
+        n = int(sys.argv[1])
+    except IndexError:
+        n = 100
+    except ValueError:
+        print >>sys.stderr, 'usage: process.py <num_nodes:100>'
+        return 1
+
     reader = csv.reader(sys.stdin)
     edges = list(reader)
 
     nodes = unique_nodes(edges)
 
-    node_sample = set(list(nodes)[:100])
+    node_sample = set(list(nodes)[:n]) if n > 0 else set(list(nodes))
 
     edge_sample = filter_edges(edges, node_sample)
     print json.dumps(edge_sample, indent=2)
