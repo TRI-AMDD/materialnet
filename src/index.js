@@ -4,6 +4,9 @@ import * as cola from 'webcola';
 
 import html from './index.pug';
 import edges from './edges.json';
+import { SceneObject } from './SceneObject';
+import { Circle } from './Circle';
+import { Line } from './Line';
 
 function computeGraph (edges) {
   const radius = 20;
@@ -55,105 +58,108 @@ function computeGraph (edges) {
   };
 }
 
-const circleGeometry = new three.CircleBufferGeometry(1, 32);
-
-class Circle {
-  constructor () {
-    this.material = new three.MeshLambertMaterial({
-      color: 0xffffff
-    });
-
-    this.circle = new three.Mesh(circleGeometry, this.material);
-  }
-
-  addToScene (scene) {
-    scene.add(this.circle);
-  }
-
-  get position () {
-    return this.circle.position;
-  }
-
-  get color () {
-    return this.material.color;
-  }
-
-  get radius () {
-    return this.circle.scale.x;
-  }
-
-  set radius (scale) {
-    this.circle.scale.x = this.circle.scale.y = scale;
-  }
-}
-
-class Line {
-  constructor () {
-    this.material = new three.LineBasicMaterial({
-      color: 0xffffff,
-      linewidth: 2
-    });
-
-    this.geometry = new three.Geometry();
-    this.geometry.vertices.push(new three.Vector3(-100, 100, 0));
-    this.geometry.vertices.push(new three.Vector3(100, -100, 0));
-
-    this.line = new three.Line(this.geometry, this.material);
-  }
-
-  get x0 () {
-    return this.geometry.vertices[0].x;
-  }
-
-  get x1 () {
-    return this.geometry.vertices[1].x;
-  }
-
-  get y0 () {
-    return this.geometry.vertices[0].y;
-  }
-
-  get y1 () {
-    return this.geometry.vertices[1].y;
-  }
-
-  set x0 (x) {
-    this.geometry.vertices[0].setX(x);
-    this.geometry.verticesNeedUpdate = true;
-  }
-
-  set x1 (x) {
-    this.geometry.vertices[1].setX(x);
-    this.geometry.verticesNeedUpdate = true;
-  }
-
-  set y0 (y) {
-    this.geometry.vertices[0].setY(y);
-    this.geometry.verticesNeedUpdate = true;
-  }
-
-  set y1 (y) {
-    this.geometry.vertices[1].setY(y);
-    this.geometry.verticesNeedUpdate = true;
-  }
-
-  addToScene (scene) {
-    scene.add(this.line);
-  }
-}
-
 const width = 960;
 const height = 540;
 document.write(html());
 
-const scene = new three.Scene();
-const camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
+class SceneManager {
+  constructor ({el, width, height}) {
+    this.width = width;
+    this.height = height;
 
-const renderer = new three.WebGLRenderer({
-  antialias: true
+    this.scene = new three.Scene();
+    this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
+
+    this.renderer = new three.WebGLRenderer({
+      antialias: true
+    });
+    this.renderer.setSize(width, height);
+
+    this.el = this.renderer.domElement;
+    select(el).append(() => this.renderer.domElement);
+
+    this.raycaster = new three.Raycaster();
+    this.mouse = new three.Vector2();
+
+    this.hover = false;
+
+    this.table = {};
+  }
+
+  add (obj) {
+    if (obj instanceof SceneObject) {
+      if (this.table.hasOwnProperty(obj.uuid)) {
+        throw new Error(`error: cannot add object (uuid = ${obj.uuid}) twice`);
+      }
+
+      this.table[obj.uuid] = obj;
+
+      obj.addToScene(this.scene);
+    } else {
+      this.scene.add(obj);
+    }
+  }
+
+  on (eventType, cb) {
+    select(this.el).on(eventType, cb.bind(this));
+  }
+
+  render () {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  pick () {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const results = this.raycaster.intersectObjects(this.scene.children);
+    if (results.length > 0) {
+      return this.table[results[0].object.uuid];
+    }
+    return null;
+  }
+
+  get zoom () {
+    return this.camera.zoom;
+  }
+
+  set zoom (zoom) {
+    this.camera.zoom = zoom;
+    this.camera.updateProjectionMatrix();
+  }
+}
+
+const scene = new SceneManager({
+  el: '#vis',
+  width,
+  height
 });
-renderer.setSize(width, height);
-select('#vis').append(() => renderer.domElement);
+window.scene = scene;
+
+scene.on('mousemove', function () {
+  this.hover = true;
+
+  const bbox = this.el.getBoundingClientRect();
+  this.mouse.x = ((event.clientX - bbox.left) / width) * 2 - 1;
+  this.mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
+});
+
+scene.on('click', function () {
+  const obj = this.pick();
+  if (obj && obj instanceof Circle) {
+    obj.material.color = new three.Color(Math.random(), Math.random(), Math.random());
+  }
+});
+
+scene.on('mouseout', function () {
+  this.hover = false;
+});
+
+scene.on('wheel', function () {
+  event.preventDefault();
+  const delta = event.deltaY / -50;
+  const factor = delta < 0 ? 1 / -delta : delta;
+
+  this.zoom *= factor;
+});
 
 const dirLight = new three.DirectionalLight();
 dirLight.position.x = 0;
@@ -165,12 +171,12 @@ scene.add(dirLight);
 const graph = computeGraph(edges);
 
 // Animate the graph.
-graph.circles.forEach(c => c.addToScene(scene));
-graph.links.forEach(l => l.addToScene(scene));
+graph.circles.forEach(c => scene.add(c));
+graph.links.forEach(l => scene.add(l));
 
 function animate (e) {
   graph.layout.tick();
-  renderer.render(scene, camera);
+  scene.render();
 
   window.requestAnimationFrame(animate);
 }
