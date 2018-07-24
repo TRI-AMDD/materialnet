@@ -116,6 +116,15 @@ class SceneManager {
     }
     return null;
   }
+
+  get zoom () {
+    return this.camera.zoom;
+  }
+
+  set zoom (zoom) {
+    this.camera.zoom = zoom;
+    this.camera.updateProjectionMatrix();
+  }
 }
 
 const scene = new SceneManager({
@@ -142,6 +151,14 @@ scene.on('click', function () {
 
 scene.on('mouseout', function () {
   this.hover = false;
+});
+
+scene.on('wheel', function () {
+  event.preventDefault();
+  const delta = event.deltaY / -50;
+  const factor = delta < 0 ? 1 / -delta : delta;
+
+  this.zoom *= factor;
 });
 
 const dirLight = new three.DirectionalLight();
