@@ -54,10 +54,16 @@ function computeGraph (edges) {
       n.width = n.height = 2 * radius;
     });
   } else if (layoutEngine === 'd3') {
+    const total = circles.length;
+    const tau = 2 * Math.PI;
+    const r = 1000;
     layout = forceSimulation()
-      .nodes(circles.map(() => ({})))
-      // .force('charge', forceManyBody().strength(-80))
-      .force('link', forceLink(edgeIndex.map(e => ({ source: e[0], target: e[1] }))).distance(200).strength(1).iterations(10))
+      .nodes(circles.map((d, i) => ({
+        x: r * Math.cos(i * tau / total),
+        y: r * Math.sin(i * tau / total)
+      })))
+      .force('charge', forceManyBody().strength(-80))
+      .force('link', forceLink(edgeIndex.map(e => ({ source: e[0], target: e[1] }))).distance(1000).strength(1).iterations(10))
       .force('center', forceCenter(0, 0))
       .force('collision', forceCollide(2 * radius))
       .velocityDecay(0.9)
