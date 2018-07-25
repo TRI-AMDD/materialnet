@@ -9,7 +9,7 @@ export class Circle extends SceneObject {
     super();
 
     this.material = new three.MeshLambertMaterial({
-      color: 0xffffff
+      color: 0x808080
     });
 
     this.object = new three.Mesh(circleGeometry, this.material);

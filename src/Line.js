@@ -8,7 +8,7 @@ export class Line extends SceneObject {
 
     this.material = new three.LineBasicMaterial({
       color: 0xffffff,
-      linewidth: 2
+      linewidth: 1
     });
 
     this.geometry = new three.Geometry();

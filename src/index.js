@@ -1,12 +1,15 @@
 import * as three from 'three';
 import { select } from 'd3-selection';
 import * as cola from 'webcola';
+import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force';
 
 import html from './index.pug';
 import edges from './edges.json';
 import { SceneObject } from './SceneObject';
 import { Circle } from './Circle';
 import { Line } from './Line';
+
+const layoutEngine = 'd3';
 
 function computeGraph (edges) {
   const radius = 20;
@@ -37,17 +40,29 @@ function computeGraph (edges) {
   // Create a version of the edges list that has indices instead of names.
   const edgeIndex = edges.map(e => e.map(n => index[n]));
 
-  // Create a Cola layout to manipulate the objects.
-  const layout = new cola.Layout()
-    .linkDistance(3 * radius)
-    .avoidOverlaps(true)
-    .links(edgeIndex.map(e => ({
-      source: e[0],
-      target: e[1]
-    })));
-  layout.nodes().forEach(n => {
-    n.width = n.height = 2 * radius;
-  });
+  let layout;
+  if (layoutEngine === 'webcola') {
+    // Create a Cola layout to manipulate the objects.
+    layout = new cola.Layout()
+      .linkDistance(3 * radius)
+      .avoidOverlaps(true)
+      .links(edgeIndex.map(e => ({
+        source: e[0],
+        target: e[1]
+      })));
+    layout.nodes().forEach(n => {
+      n.width = n.height = 2 * radius;
+    });
+  } else if (layoutEngine === 'd3') {
+    layout = forceSimulation()
+      .nodes(circles.map(() => ({})))
+      // .force('charge', forceManyBody().strength(-80))
+      .force('link', forceLink(edgeIndex.map(e => ({ source: e[0], target: e[1] }))).distance(200).strength(1).iterations(10))
+      .force('center', forceCenter(0, 0))
+      .force('collision', forceCollide(2 * radius))
+      .velocityDecay(0.9)
+      .stop();
+  }
 
   return {
     nodeIndex: index,
@@ -175,25 +190,53 @@ graph.circles.forEach(c => scene.add(c));
 graph.links.forEach(l => scene.add(l));
 
 function animate (e) {
-  graph.layout.tick();
   scene.render();
-
   window.requestAnimationFrame(animate);
 }
 
-graph.layout.start(1, 0, 0, 0, false);
-graph.layout.on(cola.EventType.tick, e => {
-  graph.layout.nodes().forEach((n, i) => {
-    graph.circles[i].position.x = n.x;
-    graph.circles[i].position.y = n.y;
-  });
+if (layoutEngine === 'webcola') {
+  console.log('initializing');
+  const start = window.performance.now()
+  graph.layout.start(1, 0, 0, 0, false);
+  const end = window.performance.now()
+  console.log('time', end - start);
 
-  graph.layout.links().forEach((e, i) => {
-    graph.links[i].x0 = e.source.x;
-    graph.links[i].y0 = e.source.y;
-    graph.links[i].x1 = e.target.x;
-    graph.links[i].y1 = e.target.y;
-  });
-});
+  graph.layout.on(cola.EventType.tick, e => {
+    graph.layout.nodes().forEach((n, i) => {
+      graph.circles[i].position.x = n.x;
+      graph.circles[i].position.y = n.y;
+    });
 
-animate();
+    graph.layout.links().forEach((e, i) => {
+      graph.links[i].x0 = e.source.x;
+      graph.links[i].y0 = e.source.y;
+      graph.links[i].x1 = e.target.x;
+      graph.links[i].y1 = e.target.y;
+    });
+  });
+} else if (layoutEngine === 'd3') {
+
+}
+
+function tickLayout () {
+  if (layoutEngine === 'webcola') {
+    graph.layout.tick();
+  } else if (layoutEngine === 'd3') {
+    graph.layout.tick();
+
+    graph.layout.nodes().forEach((n, i) => {
+      graph.circles[i].position.x = n.x;
+      graph.circles[i].position.y = n.y;
+    });
+
+    graph.layout.force('link').links().forEach((e, i) => {
+      graph.links[i].x0 = e.source.x;
+      graph.links[i].y0 = e.source.y;
+      graph.links[i].x1 = e.target.x;
+      graph.links[i].y1 = e.target.y;
+    });
+  }
+}
+
+window.setInterval(tickLayout, 0);
+window.requestAnimationFrame(animate);
