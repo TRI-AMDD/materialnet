@@ -15,22 +15,6 @@ export class Circle extends SceneObject {
     this.object = new three.Mesh(circleGeometry, this.material);
   }
 
-  // addToScene (scene) {
-    // scene.add(this.object);
-  // }
-
-  // get uuid () {
-    // return this.object.uuid;
-  // }
-
-  // get position () {
-    // return this.object.position;
-  // }
-
-  // get color () {
-    // return this.material.color;
-  // }
-
   get radius () {
     return this.object.scale.x;
   }

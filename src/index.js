@@ -5,6 +5,7 @@ import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } 
 
 import html from './index.pug';
 import edges from './edges.json';
+import positions from './positions.json';
 import { SceneObject } from './SceneObject';
 import { Circle } from './Circle';
 import { Line } from './Line';
@@ -54,13 +55,10 @@ function computeGraph (edges) {
       n.width = n.height = 2 * radius;
     });
   } else if (layoutEngine === 'd3') {
-    const total = circles.length;
-    const tau = 2 * Math.PI;
-    const r = 1000;
     layout = forceSimulation()
       .nodes(circles.map((d, i) => ({
-        x: r * Math.cos(i * tau / total),
-        y: r * Math.sin(i * tau / total)
+        x: positions[i].x,
+        y: positions[i].y
       })))
       .force('charge', forceManyBody().strength(-80))
       .force('link', forceLink(edgeIndex.map(e => ({ source: e[0], target: e[1] }))).distance(1000).strength(1).iterations(10))
@@ -228,8 +226,6 @@ function tickLayout () {
   if (layoutEngine === 'webcola') {
     graph.layout.tick();
   } else if (layoutEngine === 'd3') {
-    graph.layout.tick();
-
     graph.layout.nodes().forEach((n, i) => {
       graph.circles[i].position.x = n.x;
       graph.circles[i].position.y = n.y;
@@ -244,5 +240,8 @@ function tickLayout () {
   }
 }
 
-window.setInterval(tickLayout, 0);
+window.tickLayout = tickLayout;
+window.tick = () => graph.layout.tick();
+
+tickLayout();
 window.requestAnimationFrame(animate);

@@ -4,6 +4,7 @@
   "description": "Prototype visualization for TRI materials network data￼Edit",
   "main": "index.js",
   "scripts": {
+    "layout": "babel-node data/layout.js",
     "build": "webpack --mode development",
     "watch": "npm run build -- --watch",
     "lint": "semistandard | snazzy",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.54",
+    "@babel/node": "^7.0.0-beta.54",
     "@babel/preset-env": "^7.0.0-beta.54",
     "@babel/register": "^7.0.0-beta.54",
     "babel-loader": "^8.0.0-beta.4",
