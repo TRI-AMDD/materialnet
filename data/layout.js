@@ -39,27 +39,13 @@ edges.forEach(e => {
   });
 });
 
-// Initialize the positions of the nodes to lie along a circle.
-const r = 1000;
-const tau = 2 * Math.PI;
-nodes.forEach((n, i) => {
-  n.x = r * Math.cos(i * tau / nodes.length);
-  n.y = r * Math.sin(i * tau / nodes.length);
-});
-
 // Create a force simulation object.
 const radius = 20;
 const layout = d3.forceSimulation()
   .nodes(nodes)
-  .force('charge', d3.forceManyBody()
-    .strength(-80))
-  .force('link', d3.forceLink(links)
-    .distance(1000)
-    .strength(1)
-    .iterations(10))
+  .force('charge', d3.forceManyBody())
+  .force('link', d3.forceLink(links).distance(300).strength(1))
   .force('center', d3.forceCenter())
-  .force('collision', d3.forceCollide(2 * radius))
-  .velocityDecay(0.9)
   .stop();
 
 let cycle = 0;
@@ -76,15 +62,7 @@ layout.on('tick', () => {
 });
 
 layout.on('end', () => {
-  let coords = {};
-  nodes.forEach((n, i) => {
-    coords[reverseIndex[i]] = {
-      x: n.x,
-      y: n.y
-    };
-  });
-
-  console.log(JSON.stringify(coords, null, 2));
+  console.log(JSON.stringify(nodes.map(n => ({x: n.x, y: n.y}))));
 });
 
 layout.restart();
