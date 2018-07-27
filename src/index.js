@@ -85,6 +85,7 @@ class SceneManager2 {
     this.raycaster.params.Points.threshold = this.threshold;
 
     this.mouse = new three.Vector2();
+    this.pixel = new three.Vector2();
 
     this.renderer = new three.WebGLRenderer({
       antialias: true
@@ -249,13 +250,22 @@ const scene2 = new SceneManager2({
   lines: edgeIndex
 });
 
-scene2.on('mousemove', function () {
+scene2.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
-  this.mouse.x = ((event.clientX - bbox.left) / width) * 2 - 1;
-  this.mouse.y = -(((event.clientY - bbox.top) / height) * 2 - 1);
+
+  this.pixel.x = event.clientX - bbox.left;
+  this.pixel.y = event.clientY - bbox.top;
+
+  this.mouse.x = (this.pixel.x / width) * 2 - 1;
+  this.mouse.y = -((this.pixel.y / height) * 2 - 1);
 });
 
 scene2.on('click', function () {
+  if (this.dragged) {
+    this.dragged = false;
+    return;
+  }
+
   const obj = this.pick();
   console.log(obj);
   if (obj) {
@@ -264,6 +274,8 @@ scene2.on('click', function () {
     this.geometry.attributes.color.array[3 * obj.index + 2] = Math.random();
     this.geometry.attributes.color.needsUpdate = true;
   }
+
+  this.dragged = false;
 });
 
 scene2.on('wheel', function () {
@@ -272,6 +284,37 @@ scene2.on('wheel', function () {
   const factor = delta < 0 ? 1 / -delta : delta;
 
   this.zoom *= factor;
+});
+
+scene2.on('mousedown', function () {
+  this.dragging = true;
+  this.dragPoint = {...this.pixel};
+});
+
+scene2.on('mousemove.drag', function () {
+  if (!this.dragging) {
+    return;
+  }
+
+  this.dragged = true;
+
+  const delta = {
+    x: this.pixel.x - this.dragPoint.x,
+    y: this.pixel.y - this.dragPoint.y
+  };
+
+  this.dragPoint = {...this.pixel};
+
+  // this.camera.position += new three.Vector3(delta.x, delta.y, 0);
+  this.camera.left -= delta.x / this.zoom;
+  this.camera.right -= delta.x / this.zoom;
+  this.camera.top += delta.y / this.zoom;
+  this.camera.bottom += delta.y / this.zoom;
+  this.camera.updateProjectionMatrix();
+});
+
+scene2.on('mouseup', function () {
+  this.dragging = false;
 });
 
 const dirLight = new three.DirectionalLight();
