@@ -1,19 +1,12 @@
 import * as three from 'three';
 
 import { select } from 'd3-selection';
-import * as cola from 'webcola';
-import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force';
 
 import html from './index.pug';
 import edges from './edges.json';
 import positions from './positions.json';
-import { SceneObject } from './SceneObject';
-import { Circle } from './Circle';
-import { Line } from './Line';
 import vertShader from './circle-vert.glsl';
 import fragShader from './circle-frag.glsl';
-
-const layoutEngine = 'd3';
 
 function computeGraph (edges) {
   const radius = 20;
@@ -36,33 +29,6 @@ function computeGraph (edges) {
   // Create a version of the edges list that has indices instead of names.
   const edgeIndex = edges.map(e => e.map(n => index[n]));
 
-  // let layout;
-  // if (layoutEngine === 'webcola') {
-    // // Create a Cola layout to manipulate the objects.
-    // layout = new cola.Layout()
-      // .linkDistance(3 * radius)
-      // .avoidOverlaps(true)
-      // .links(edgeIndex.map(e => ({
-        // source: e[0],
-        // target: e[1]
-      // })));
-    // layout.nodes().forEach(n => {
-      // n.width = n.height = 2 * radius;
-    // });
-  // } else if (layoutEngine === 'd3') {
-    // layout = forceSimulation()
-      // .nodes(circles.map((d, i) => ({
-        // x: positions[i].x,
-        // y: positions[i].y
-      // })))
-      // .force('charge', forceManyBody().strength(-80))
-      // .force('link', forceLink(edgeIndex.map(e => ({ source: e[0], target: e[1] }))).distance(1000).strength(1).iterations(10))
-      // .force('center', forceCenter(0, 0))
-      // .force('collision', forceCollide(2 * radius))
-      // .velocityDecay(0.9)
-      // .stop();
-  // }
-
   return {
     nodeIndex: index,
     edgeIndex,
@@ -72,7 +38,7 @@ const width = 960;
 const height = 540;
 document.write(html());
 
-class SceneManager2 {
+class SceneManager {
   constructor ({el, width, height, points, lines}) {
     this.width = width;
     this.height = height;
@@ -183,74 +149,9 @@ class SceneManager2 {
   }
 }
 
-class SceneManager {
-  constructor ({el, width, height}) {
-    this.width = width;
-    this.height = height;
-
-    this.scene = new three.Scene();
-    this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1000, 1000);
-
-    this.renderer = new three.WebGLRenderer({
-      antialias: true
-    });
-    this.renderer.setSize(width, height);
-
-    this.el = this.renderer.domElement;
-    select(el).append(() => this.renderer.domElement);
-
-    this.raycaster = new three.Raycaster();
-    this.mouse = new three.Vector2();
-
-    this.hover = false;
-
-    this.table = {};
-  }
-
-  add (obj) {
-    if (obj instanceof SceneObject) {
-      if (this.table.hasOwnProperty(obj.uuid)) {
-        throw new Error(`error: cannot add object (uuid = ${obj.uuid}) twice`);
-      }
-
-      this.table[obj.uuid] = obj;
-
-      obj.addToScene(this.scene);
-    } else {
-      this.scene.add(obj);
-    }
-  }
-
-  on (eventType, cb) {
-    select(this.el).on(eventType, cb.bind(this));
-  }
-
-  render () {
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  pick () {
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const results = this.raycaster.intersectObjects(this.scene.children);
-    if (results.length > 0) {
-      return this.table[results[0].object.uuid];
-    }
-    return null;
-  }
-
-  get zoom () {
-    return this.camera.zoom;
-  }
-
-  set zoom (zoom) {
-    this.camera.zoom = zoom;
-    this.camera.updateProjectionMatrix();
-  }
-}
-
 const { edgeIndex } = computeGraph(edges);
 
-const scene2 = new SceneManager2({
+const scene = new SceneManager({
   el: '#vis',
   width,
   height,
@@ -258,7 +159,7 @@ const scene2 = new SceneManager2({
   lines: edgeIndex
 });
 
-scene2.on('mousemove.always', function () {
+scene.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
 
   this.pixel.x = event.clientX - bbox.left;
@@ -268,7 +169,7 @@ scene2.on('mousemove.always', function () {
   this.mouse.y = -((this.pixel.y / height) * 2 - 1);
 });
 
-scene2.on('click', function () {
+scene.on('click', function () {
   if (this.dragged) {
     this.dragged = false;
     return;
@@ -289,7 +190,7 @@ scene2.on('click', function () {
   this.dragged = false;
 });
 
-scene2.on('wheel', function () {
+scene.on('wheel', function () {
   event.preventDefault();
   const delta = event.deltaY / -50;
   const factor = delta < 0 ? 1 / -delta : delta;
@@ -297,12 +198,12 @@ scene2.on('wheel', function () {
   this.zoom *= factor;
 });
 
-scene2.on('mousedown', function () {
+scene.on('mousedown', function () {
   this.dragging = true;
   this.dragPoint = {...this.pixel};
 });
 
-scene2.on('mousemove.drag', function () {
+scene.on('mousemove.drag', function () {
   if (!this.dragging) {
     return;
   }
@@ -324,7 +225,7 @@ scene2.on('mousemove.drag', function () {
   this.camera.updateProjectionMatrix();
 });
 
-scene2.on('mouseup', function () {
+scene.on('mouseup', function () {
   this.dragging = false;
 });
 
@@ -332,57 +233,11 @@ const dirLight = new three.DirectionalLight();
 dirLight.position.x = 0;
 dirLight.position.y = 0;
 dirLight.position.z = 200;
-scene2.scene.add(dirLight);
+scene.scene.add(dirLight);
 
 function animate (e) {
-  scene2.render();
+  scene.render();
   window.requestAnimationFrame(animate);
 }
 
-// if (layoutEngine === 'webcola') {
-  // console.log('initializing');
-  // const start = window.performance.now()
-  // graph.layout.start(1, 0, 0, 0, false);
-  // const end = window.performance.now()
-  // console.log('time', end - start);
-
-  // graph.layout.on(cola.EventType.tick, e => {
-    // graph.layout.nodes().forEach((n, i) => {
-      // graph.circles[i].position.x = n.x;
-      // graph.circles[i].position.y = n.y;
-    // });
-
-    // graph.layout.links().forEach((e, i) => {
-      // graph.links[i].x0 = e.source.x;
-      // graph.links[i].y0 = e.source.y;
-      // graph.links[i].x1 = e.target.x;
-      // graph.links[i].y1 = e.target.y;
-    // });
-  // });
-// } else if (layoutEngine === 'd3') {
-
-// }
-
-function tickLayout () {
-  if (layoutEngine === 'webcola') {
-    graph.layout.tick();
-  } else if (layoutEngine === 'd3') {
-    graph.layout.nodes().forEach((n, i) => {
-      graph.circles[i].position.x = n.x;
-      graph.circles[i].position.y = n.y;
-    });
-
-    graph.layout.force('link').links().forEach((e, i) => {
-      graph.links[i].x0 = e.source.x;
-      graph.links[i].y0 = e.source.y;
-      graph.links[i].x1 = e.target.x;
-      graph.links[i].y1 = e.target.y;
-    });
-  }
-}
-
-window.tickLayout = tickLayout;
-window.tick = () => graph.layout.tick();
-
-// tickLayout();
 window.requestAnimationFrame(animate);
