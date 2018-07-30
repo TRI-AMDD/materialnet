@@ -90,7 +90,6 @@ class SceneManager {
     let sizes = [];
     points.forEach((p, i) => {
       positions.push(p.x, p.y, 0);
-      // colors.push(0, 0, 0.5);
       colors.push(0, 0, i / points.length);
       sizes.push(i * 10 / points.length);
     });
@@ -125,6 +124,50 @@ class SceneManager {
       return results[0];
     }
     return null;
+  }
+
+  setColor (idx, r, g, b, update = true) {
+    this.geometry.attributes.color.array[3 * idx + 0] = r;
+    this.geometry.attributes.color.array[3 * idx + 1] = g;
+    this.geometry.attributes.color.array[3 * idx + 2] = b;
+
+    if (update) {
+      this.updateColor();
+    }
+  }
+
+  updateColor () {
+    this.geometry.attributes.color.needsUpdate = true;
+  }
+
+  getPosition (idx) {
+    const pos = this.geometry.attributes.position.array;
+    return new three.Vector2(pos[3 * idx + 0], pos[3 * idx + 1]);
+  }
+
+  setPosition (idx, x, y, update = true) {
+    this.geometry.attributes.position.array[3 * idx + 0] = x;
+    this.geometry.attributes.position.array[3 * idx + 1] = y;
+
+    if (update) {
+      this.updatePosition();
+    }
+  }
+
+  updatePosition () {
+    this.geometry.attributes.position.needsUpdate = true;
+  }
+
+  setSize (idx, s, update = true) {
+    this.geometry.attributes.size.array[idx] = s;
+
+    if (update) {
+      this.updateSize();
+    }
+  }
+
+  updateSize () {
+    this.geometry.attributes.size.needsUpdate = true;
   }
 
   render () {
@@ -172,13 +215,11 @@ scene.on('click', function () {
   const obj = this.pick();
   console.log(obj);
   if (obj) {
-    this.geometry.attributes.color.array[3 * obj.index + 0] = Math.random();
-    this.geometry.attributes.color.array[3 * obj.index + 1] = Math.random();
-    this.geometry.attributes.color.array[3 * obj.index + 2] = Math.random();
-    this.geometry.attributes.color.needsUpdate = true;
+    this.setColor(obj.index, Math.random(), Math.random(), Math.random());
+    this.setSize(obj.index, Math.random() * 5 + 5);
 
-    this.geometry.attributes.size.array[obj.index] = Math.random() * 5 + 5;
-    this.geometry.attributes.size.needsUpdate = true;
+    const pos = this.getPosition(obj.index);
+    this.setPosition(obj.index, pos.x + (Math.random() - 0.5) * 5, pos.y + (Math.random() - 0.5) * 5);
   }
 
   this.dragged = false;
