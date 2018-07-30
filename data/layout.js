@@ -26,7 +26,7 @@ let count = 0;
 edges.forEach(e => {
   e.forEach(n => {
     if (!index.hasOwnProperty(n)) {
-      index[n] = count
+      index[n] = count;
       reverseIndex[count] = n;
       count++;
       nodes.push({});
@@ -40,7 +40,6 @@ edges.forEach(e => {
 });
 
 // Create a force simulation object.
-const radius = 20;
 const layout = d3.forceSimulation()
   .nodes(nodes)
   .force('charge', d3.forceManyBody())

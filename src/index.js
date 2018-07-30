@@ -9,12 +9,8 @@ import vertShader from './circle-vert.glsl';
 import fragShader from './circle-frag.glsl';
 
 function computeGraph (edges) {
-  const radius = 20;
-
   // Create a node index table.
   let index = {};
-  let circles = [];
-  let links = [];
   let count = 0;
   edges.forEach(e => {
     // Create an entry if the node hasn't been seen yet.
@@ -31,8 +27,9 @@ function computeGraph (edges) {
 
   return {
     nodeIndex: index,
-    edgeIndex,
-  }; }
+    edgeIndex
+  };
+}
 
 const width = 960;
 const height = 540;
@@ -66,7 +63,6 @@ class SceneManager {
     // Initialize edge geometry.
     let positions = [];
     let colors = [];
-    let color = new three.Color();
 
     lines.forEach(e => {
       positions.push(points[e[0]].x, points[e[0]].y, -0.1);
@@ -162,8 +158,8 @@ const scene = new SceneManager({
 scene.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
 
-  this.pixel.x = event.clientX - bbox.left;
-  this.pixel.y = event.clientY - bbox.top;
+  this.pixel.x = window.event.clientX - bbox.left;
+  this.pixel.y = window.event.clientY - bbox.top;
 
   this.mouse.x = (this.pixel.x / width) * 2 - 1;
   this.mouse.y = -((this.pixel.y / height) * 2 - 1);
@@ -191,8 +187,8 @@ scene.on('click', function () {
 });
 
 scene.on('wheel', function () {
-  event.preventDefault();
-  const delta = event.deltaY / -50;
+  window.event.preventDefault();
+  const delta = window.event.deltaY / -50;
   const factor = delta < 0 ? 1 / -delta : delta;
 
   this.zoom *= factor;
