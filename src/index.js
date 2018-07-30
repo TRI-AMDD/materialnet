@@ -223,12 +223,6 @@ scene.on('mouseup', function () {
   this.dragging = false;
 });
 
-const dirLight = new three.DirectionalLight();
-dirLight.position.x = 0;
-dirLight.position.y = 0;
-dirLight.position.z = 200;
-scene.scene.add(dirLight);
-
 function animate (e) {
   scene.render();
   window.requestAnimationFrame(animate);
