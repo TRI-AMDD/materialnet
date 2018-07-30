@@ -10,6 +10,8 @@ import positions from './positions.json';
 import { SceneObject } from './SceneObject';
 import { Circle } from './Circle';
 import { Line } from './Line';
+import vertShader from './circle-vert.glsl';
+import fragShader from './circle-frag.glsl';
 
 const layoutEngine = 'd3';
 
@@ -134,10 +136,13 @@ class SceneManager2 {
     this.geometry.addAttribute('color', new three.Float32BufferAttribute(colors, 3).setDynamic(true));
     this.geometry.computeBoundingSphere();
 
-    this.material = new three.PointsMaterial({
-      size: 10,
+    this.material = new three.ShaderMaterial({
       vertexColors: three.VertexColors,
-      sizeAttenuation: false
+      uniforms: {
+        color: new three.Color(1.0, 0.0, 0.0)
+      },
+      vertexShader: vertShader,
+      fragmentShader: fragShader
     });
 
     this.points = new three.Points(this.geometry, this.material);
