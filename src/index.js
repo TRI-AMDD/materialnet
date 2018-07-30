@@ -123,7 +123,6 @@ class SceneManager {
     const results = this.raycaster.intersectObjects(this.scene.children);
     if (results.length > 0) {
       return results[0];
-      // return this.table[results[0].object.uuid];
     }
     return null;
   }
