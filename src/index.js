@@ -141,7 +141,6 @@ class SceneManager {
     this.camera.updateProjectionMatrix();
 
     this.raycaster.params.Points.threshold = this.threshold / zoom;
-    console.log(this.camera.zoom, this.raycaster.params.Points.threshold);
   }
 }
 
