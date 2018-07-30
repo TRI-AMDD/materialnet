@@ -29,6 +29,10 @@ export default {
       {
         test: /\.pug$/,
         use: ['pug-loader']
+      },
+      {
+        test: /\.glsl$/,
+        use: ['raw-loader']
       }
     ]
   }

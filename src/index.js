@@ -10,6 +10,8 @@ import positions from './positions.json';
 import { SceneObject } from './SceneObject';
 import { Circle } from './Circle';
 import { Line } from './Line';
+import vertShader from './circle-vert.glsl';
+import fragShader from './circle-frag.glsl';
 
 const layoutEngine = 'd3';
 
@@ -123,21 +125,27 @@ class SceneManager2 {
     // Initialize point geometry.
     positions.length = 0;
     colors.length = 0;
+    let sizes = [];
     points.forEach((p, i) => {
       positions.push(p.x, p.y, 0);
       // colors.push(0, 0, 0.5);
       colors.push(0, 0, i / points.length);
+      sizes.push(i * 10 / points.length);
     });
 
     this.geometry = new three.BufferGeometry();
     this.geometry.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
     this.geometry.addAttribute('color', new three.Float32BufferAttribute(colors, 3).setDynamic(true));
+    this.geometry.addAttribute('size', new three.Float32BufferAttribute(sizes, 1).setDynamic(true));
     this.geometry.computeBoundingSphere();
 
-    this.material = new three.PointsMaterial({
-      size: 10,
+    this.material = new three.ShaderMaterial({
       vertexColors: three.VertexColors,
-      sizeAttenuation: false
+      uniforms: {
+        color: new three.Color(1.0, 0.0, 0.0)
+      },
+      vertexShader: vertShader,
+      fragmentShader: fragShader
     });
 
     this.points = new three.Points(this.geometry, this.material);
@@ -273,6 +281,9 @@ scene2.on('click', function () {
     this.geometry.attributes.color.array[3 * obj.index + 1] = Math.random();
     this.geometry.attributes.color.array[3 * obj.index + 2] = Math.random();
     this.geometry.attributes.color.needsUpdate = true;
+
+    this.geometry.attributes.size.array[obj.index] = Math.random() * 5 + 5;
+    this.geometry.attributes.size.needsUpdate = true;
   }
 
   this.dragged = false;
