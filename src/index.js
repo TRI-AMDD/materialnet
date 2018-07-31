@@ -31,8 +31,8 @@ function computeGraph (edges) {
   };
 }
 
-const width = 960;
-const height = 540;
+const width = 1920;
+const height = 1080;
 document.write(html());
 
 class SceneManager {
