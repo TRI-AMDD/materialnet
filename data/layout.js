@@ -44,7 +44,7 @@ const layout = d3.forceSimulation()
   .nodes(nodes)
   .force('charge', d3.forceManyBody())
   .force('link', d3.forceLink(links).distance(300).strength(1))
-  .force('center', d3.forceCenter())
+  // .force('center', d3.forceCenter())
   .stop();
 
 let cycle = 0;
