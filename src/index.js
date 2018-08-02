@@ -31,8 +31,8 @@ function computeGraph (edges) {
   };
 }
 
-const width = 960;
-const height = 540;
+const width = 1920;
+const height = 1080;
 document.write(html());
 
 class SceneManager {
@@ -41,7 +41,7 @@ class SceneManager {
     this.height = height;
 
     this.scene = new three.Scene();
-    this.scene.background = new three.Color(0x000000);
+    this.scene.background = new three.Color(0xffffff);
 
     this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1, 1);
 
@@ -76,9 +76,9 @@ class SceneManager {
     this.edgeGeom.computeBoundingSphere();
 
     this.lineMaterial = new three.LineBasicMaterial({
-      color: 0xaaaaaa,
+      color: 0x000000,
       transparent: true,
-      opacity: 0.01
+      opacity: 0.05
     });
 
     this.lines = new three.LineSegments(this.edgeGeom, this.lineMaterial);
@@ -90,8 +90,8 @@ class SceneManager {
     let sizes = [];
     points.forEach((p, i) => {
       positions.push(p.x, p.y, 0);
-      colors.push(0, 0, i / points.length);
-      sizes.push(i * 10 / points.length);
+      colors.push(65 / 255, 105 / 255, 225 / 255);
+      sizes.push(10);
     });
 
     this.geometry = new three.BufferGeometry();
@@ -213,13 +213,8 @@ scene.on('click', function () {
   }
 
   const obj = this.pick();
-  console.log(obj);
   if (obj) {
     this.setColor(obj.index, Math.random(), Math.random(), Math.random());
-    this.setSize(obj.index, Math.random() * 5 + 5);
-
-    const pos = this.getPosition(obj.index);
-    this.setPosition(obj.index, pos.x + (Math.random() - 0.5) * 5, pos.y + (Math.random() - 0.5) * 5);
   }
 
   this.dragged = false;
