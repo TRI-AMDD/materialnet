@@ -29,7 +29,9 @@ edges.forEach(e => {
       index[n] = count;
       reverseIndex[count] = n;
       count++;
-      nodes.push({});
+      nodes.push({
+        name: n
+      });
     }
   });
 
@@ -61,7 +63,7 @@ layout.on('tick', () => {
 });
 
 layout.on('end', () => {
-  console.log(JSON.stringify(nodes.map(n => ({x: n.x, y: n.y}))));
+  console.log(JSON.stringify(nodes.map(n => ({x: n.x, y: n.y, name: n.name}))));
 });
 
 layout.restart();
