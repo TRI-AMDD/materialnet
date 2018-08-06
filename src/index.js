@@ -123,10 +123,9 @@ class SceneManager {
       if (nodes.hasOwnProperty(p.name)) {
         color = d3Color(cmap(nodes[p.name].discovery));
       } else {
-        color = {r: 255, g: 255, b: 255};
+        color = d3Color('#de2d26');
       }
 
-      // colors.push(65 / 255, 105 / 255, 225 / 255);
       colors.push(color.r / 255, color.g / 255, color.b / 255);
 
       if (nodes.hasOwnProperty(p.name)) {
