@@ -1,12 +1,35 @@
 import * as three from 'three';
 
 import { select } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { color as d3Color } from 'd3-color';
 
 import html from './index.pug';
 import edges from './edges.json';
+import nodes from './nodes.json';
 import positions from './positions.json';
 import vertShader from './circle-vert.glsl';
 import fragShader from './circle-frag.glsl';
+
+function minmax (arr) {
+  let min = Infinity;
+  let max = -Infinity;
+
+  arr.forEach(v => {
+    if (v < min) {
+      min = v;
+    }
+
+    if (v > max) {
+      max = v;
+    }
+  });
+
+  return {
+    min,
+    max
+  };
+}
 
 function computeGraph (edges) {
   // Create a node index table.
@@ -84,14 +107,33 @@ class SceneManager {
     this.lines = new three.LineSegments(this.edgeGeom, this.lineMaterial);
     this.scene.add(this.lines);
 
+    // Create a sequential colormap.
+    const cmap = scaleLinear()
+      .domain([1945, 2015])
+      .range(['#3182bd', '#31a354']);
+
     // Initialize point geometry.
     positions.length = 0;
     colors.length = 0;
     let sizes = [];
     points.forEach((p, i) => {
       positions.push(p.x, p.y, 0);
-      colors.push(65 / 255, 105 / 255, 225 / 255);
-      sizes.push(10);
+
+      let color;
+      if (nodes.hasOwnProperty(p.name)) {
+        color = d3Color(cmap(nodes[p.name].discovery));
+      } else {
+        color = {r: 255, g: 255, b: 255};
+      }
+
+      // colors.push(65 / 255, 105 / 255, 225 / 255);
+      colors.push(color.r / 255, color.g / 255, color.b / 255);
+
+      if (nodes.hasOwnProperty(p.name)) {
+        sizes.push(10 + Math.sqrt(nodes[p.name].degree));
+      } else {
+        sizes.push(10);
+      }
     });
 
     this.geometry = new three.BufferGeometry();
