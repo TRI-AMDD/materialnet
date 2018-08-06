@@ -255,7 +255,9 @@ scene.on('click', function () {
 
   const obj = this.pick();
   if (obj) {
-    this.setColor(obj.index, Math.random(), Math.random(), Math.random());
+    const name = positions[obj.index].name;
+
+    console.log(name, nodes[name]);
   }
 
   this.dragged = false;
