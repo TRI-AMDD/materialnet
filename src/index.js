@@ -54,8 +54,8 @@ function computeGraph (edges) {
   };
 }
 
-const width = 1920;
-const height = 1080;
+const width = 960;
+const height =540;
 document.write(html());
 
 class SceneManager {
@@ -64,7 +64,7 @@ class SceneManager {
     this.height = height;
 
     this.scene = new three.Scene();
-    this.scene.background = new three.Color(0xffffff);
+    this.scene.background = new three.Color(0xeeeeee);
 
     this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1, 1);
 
@@ -105,10 +105,11 @@ class SceneManager {
     });
 
     this.lines = new three.LineSegments(this.edgeGeom, this.lineMaterial);
+    this._linksVisible = true;
     this.scene.add(this.lines);
 
     // Create a sequential colormap.
-    const cmap = scaleLinear()
+    this.cmap = scaleLinear()
       .domain([1945, 2015])
       .range(['#3182bd', '#31a354']);
 
@@ -121,7 +122,7 @@ class SceneManager {
 
       let color;
       if (nodes.hasOwnProperty(p.name)) {
-        color = d3Color(cmap(nodes[p.name].discovery));
+        color = d3Color(this.cmap(nodes[p.name].discovery));
       } else {
         color = d3Color('#de2d26');
       }
@@ -152,6 +153,54 @@ class SceneManager {
 
     this.points = new three.Points(this.geometry, this.material);
     this.scene.add(this.points);
+  }
+
+  linksVisible (vis) {
+    this._linksVisible = vis;
+    this.lines.visible = this._linksVisible;
+  }
+
+  setConstSize (s) {
+    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+      this.setSize(i, s);
+    }
+
+    this.updateSize();
+  }
+
+  setDegreeSize () {
+    positions.forEach((p, i) => {
+      if (nodes.hasOwnProperty(p.name)) {
+        this.setSize(i, 10 + Math.sqrt(nodes[p.name].degree));
+      } else {
+        this.setSize(i, 10);
+      }
+    });
+
+    this.updateSize();
+  }
+
+  setConstColor (r, g, b) {
+    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+      this.setColor(i, r, g, b);
+    }
+
+    this.updateColor();
+  }
+
+  setDiscoveryColor () {
+    positions.forEach((p, i) => {
+      let color;
+      if (nodes.hasOwnProperty(p.name)) {
+        color = d3Color(this.cmap(nodes[p.name].discovery));
+      } else {
+        color = d3Color('#de2d26');
+      }
+
+      this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
+    });
+
+    this.updateColor();
   }
 
   on (eventType, cb) {
@@ -255,7 +304,18 @@ scene.on('click', function () {
 
   const obj = this.pick();
   if (obj) {
-    this.setColor(obj.index, Math.random(), Math.random(), Math.random());
+    if (obj.index < positions.length) {
+      const name = positions[obj.index].name;
+      const data = nodes[name];
+
+      if (data) {
+        select('#name').text(`${name} (${nodes[name].discovery})`);
+        select('#degree').html(` ${nodes[name].degree} derived materials`);
+      } else {
+        select('#name').text(`${name}`);
+        select('#degree').text('');
+      }
+    }
   }
 
   this.dragged = false;
@@ -300,9 +360,56 @@ scene.on('mouseup', function () {
   this.dragging = false;
 });
 
+select('#links').on('change', function () {
+  const me = select(this);
+  const visible = me.property('checked');
+
+  scene.linksVisible(visible);
+});
+
+select('#color').on('change', function () {
+  const menu = select(this).node();
+  const choice = select(menu.options[menu.selectedIndex]);
+  const mode = choice.attr('data-name');
+
+  switch(mode) {
+    case 'none':
+      scene.setConstColor(0.2, 0.3, 0.8);
+    break;
+
+    case 'discovery':
+      scene.setDiscoveryColor();
+    break;
+
+    default:
+      throw new Error(`illegal size option: "${mode}"`);
+  }
+});
+
+select('#size').on('change', function () {
+  const menu = select(this).node();
+  const choice = select(menu.options[menu.selectedIndex]);
+  const mode = choice.attr('data-name');
+
+  switch(mode) {
+    case 'none':
+      scene.setConstSize(10);
+    break;
+
+    case 'degree':
+      scene.setDegreeSize();
+    break;
+
+    default:
+      throw new Error(`illegal size option: "${mode}"`);
+  }
+});
+
 function animate (e) {
   scene.render();
   window.requestAnimationFrame(animate);
 }
 
 window.requestAnimationFrame(animate);
+
+window.scene = scene;
