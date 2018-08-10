@@ -109,7 +109,7 @@ class SceneManager {
     this.scene.add(this.lines);
 
     // Create a sequential colormap.
-    const cmap = scaleLinear()
+    this.cmap = scaleLinear()
       .domain([1945, 2015])
       .range(['#3182bd', '#31a354']);
 
@@ -122,7 +122,7 @@ class SceneManager {
 
       let color;
       if (nodes.hasOwnProperty(p.name)) {
-        color = d3Color(cmap(nodes[p.name].discovery));
+        color = d3Color(this.cmap(nodes[p.name].discovery));
       } else {
         color = d3Color('#de2d26');
       }
@@ -178,6 +178,29 @@ class SceneManager {
     });
 
     this.updateSize();
+  }
+
+  setConstColor (r, g, b) {
+    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+      this.setColor(i, r, g, b);
+    }
+
+    this.updateColor();
+  }
+
+  setDiscoveryColor () {
+    positions.forEach((p, i) => {
+      let color;
+      if (nodes.hasOwnProperty(p.name)) {
+        color = d3Color(this.cmap(nodes[p.name].discovery));
+      } else {
+        color = d3Color('#de2d26');
+      }
+
+      this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
+    });
+
+    this.updateColor();
   }
 
   on (eventType, cb) {
@@ -342,6 +365,25 @@ select('#links').on('change', function () {
   const visible = me.property('checked');
 
   scene.linksVisible(visible);
+});
+
+select('#color').on('change', function () {
+  const menu = select(this).node();
+  const choice = select(menu.options[menu.selectedIndex]);
+  const mode = choice.attr('data-name');
+
+  switch(mode) {
+    case 'none':
+      scene.setConstColor(0.2, 0.3, 0.8);
+    break;
+
+    case 'discovery':
+      scene.setDiscoveryColor();
+    break;
+
+    default:
+      throw new Error(`illegal size option: "${mode}"`);
+  }
 });
 
 select('#size').on('change', function () {
