@@ -54,8 +54,8 @@ function computeGraph (edges) {
   };
 }
 
-const width = 1920;
-const height = 1080;
+const width = 960;
+const height =540;
 document.write(html());
 
 class SceneManager {
@@ -255,9 +255,18 @@ scene.on('click', function () {
 
   const obj = this.pick();
   if (obj) {
-    const name = positions[obj.index].name;
+    if (obj.index < positions.length) {
+      const name = positions[obj.index].name;
+      const data = nodes[name];
 
-    console.log(name, nodes[name]);
+      if (data) {
+        select('#name').text(`${name} (${nodes[name].discovery})`);
+        select('#degree').html(` ${nodes[name].degree} derived materials`);
+      } else {
+        select('#name').text(`${name}`);
+        select('#degree').text('');
+      }
+    }
   }
 
   this.dragged = false;
