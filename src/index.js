@@ -160,6 +160,26 @@ class SceneManager {
     this.lines.visible = this._linksVisible;
   }
 
+  setConstSize (s) {
+    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+      this.setSize(i, s);
+    }
+
+    this.updateSize();
+  }
+
+  setDegreeSize () {
+    positions.forEach((p, i) => {
+      if (nodes.hasOwnProperty(p.name)) {
+        this.setSize(i, 10 + Math.sqrt(nodes[p.name].degree));
+      } else {
+        this.setSize(i, 10);
+      }
+    });
+
+    this.updateSize();
+  }
+
   on (eventType, cb) {
     select(this.el).on(eventType, cb.bind(this));
   }
@@ -322,6 +342,25 @@ select('#links').on('change', function () {
   const visible = me.property('checked');
 
   scene.linksVisible(visible);
+});
+
+select('#size').on('change', function () {
+  const menu = select(this).node();
+  const choice = select(menu.options[menu.selectedIndex]);
+  const mode = choice.attr('data-name');
+
+  switch(mode) {
+    case 'none':
+      scene.setConstSize(10);
+    break;
+
+    case 'degree':
+      scene.setDegreeSize();
+    break;
+
+    default:
+      throw new Error(`illegal size option: "${mode}"`);
+  }
 });
 
 function animate (e) {

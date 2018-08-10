@@ -6,8 +6,23 @@ body
   div#vis
 
   div
-    input#links(type="checkbox" checked)
-    label(for="links") Links
+    table(cellpadding="10")
+      tr
+        td
+          span Node Color
+          br
+          select#color
+            option(data-name="none") (none)
+            option(selected data-name="discovery") Year of Discovery
+        td
+          span Node Size
+          br
+          select#size
+            option(data-name="none") (none)
+            option(selected data-name="degree") Degree
+        td
+          input#links(type="checkbox" checked)
+          label(for="links") Links
 
   div
     h1#name
