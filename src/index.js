@@ -64,7 +64,7 @@ class SceneManager {
     this.height = height;
 
     this.scene = new three.Scene();
-    this.scene.background = new three.Color(0xffffff);
+    this.scene.background = new three.Color(0xeeeeee);
 
     this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1, 1);
 
@@ -105,6 +105,7 @@ class SceneManager {
     });
 
     this.lines = new three.LineSegments(this.edgeGeom, this.lineMaterial);
+    this._linksVisible = true;
     this.scene.add(this.lines);
 
     // Create a sequential colormap.
@@ -152,6 +153,11 @@ class SceneManager {
 
     this.points = new three.Points(this.geometry, this.material);
     this.scene.add(this.points);
+  }
+
+  linksVisible (vis) {
+    this._linksVisible = vis;
+    this.lines.visible = this._linksVisible;
   }
 
   on (eventType, cb) {
@@ -311,9 +317,18 @@ scene.on('mouseup', function () {
   this.dragging = false;
 });
 
+select('#links').on('change', function () {
+  const me = select(this);
+  const visible = me.property('checked');
+
+  scene.linksVisible(visible);
+});
+
 function animate (e) {
   scene.render();
   window.requestAnimationFrame(animate);
 }
 
 window.requestAnimationFrame(animate);
+
+window.scene = scene;
