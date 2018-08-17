@@ -322,11 +322,34 @@ scene.on('click', function () {
 });
 
 scene.on('wheel', function () {
+  // Don't scroll the webpage.
   window.event.preventDefault();
+
+  // Compute the amount of the roll.
   const delta = window.event.deltaY / -50;
   const factor = delta < 0 ? 1 / -delta : delta;
 
+  // Prevent a zoom operation if it would exceed the zoom slider range.
+  const slider = select('#zoom').node();
+  const step = slider.valueAsNumber;
+  if ((factor > 1 && step === 113) || (factor < 1 && step === 0)) {
+    return;
+  }
+
+  // Adjust the zoom level.
   this.zoom *= factor;
+
+  // And move the zoom slider.
+  const steps = Math.round(Math.log(factor) / Math.log(1.06));
+  if (steps > 0) {
+    for (let i = 0; i < steps; i++) {
+      slider.stepUp();
+    }
+  } else {
+    for (let i = 0; i < -steps; i++) {
+      slider.stepDown();
+    }
+  }
 });
 
 scene.on('mousedown', function () {
@@ -403,6 +426,15 @@ select('#size').on('change', function () {
     default:
       throw new Error(`illegal size option: "${mode}"`);
   }
+});
+
+select('#zoom').node().valueAsNumber = 35;
+select('#zoom').on('input', function () {
+  const slider = select(this).node();
+  const value = slider.valueAsNumber;
+  const zoom = 0.125 * Math.pow(1.06, value);
+
+  scene.zoom = zoom;
 });
 
 function animate (e) {
