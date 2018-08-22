@@ -5,11 +5,11 @@ import { scaleLinear } from 'd3-scale';
 import { color as d3Color } from 'd3-color';
 
 import html from './index.pug';
-import edges from './edges.json';
-import nodes from './nodes.json';
-import positions from './positions.json';
-import vertShader from './circle-vert.glsl';
-import fragShader from './circle-frag.glsl';
+import edges from './data/edges.json';
+import nodes from './data/nodes.json';
+import positions from './data/positions.json';
+import vertShader from './shader/circle-vert.glsl';
+import fragShader from './shader/circle-frag.glsl';
 
 function minmax (arr) {
   let min = Infinity;
