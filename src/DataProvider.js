@@ -78,4 +78,8 @@ export class DiskDataProvider extends DataProvider {
   nodeProperty (name, prop) {
     return this.nodes[name][prop];
   }
+
+  nodeExists (name) {
+    return this.nodes[name].discovery !== null;
+  }
 }

@@ -5,6 +5,8 @@ import { scaleLinear } from 'd3-scale';
 import { color as d3Color } from 'd3-color';
 
 import html from './index.pug';
+import infopanel from './infopanel.pug';
+
 import edges from './data/edges.json';
 import nodes from './data/nodes.json';
 import { DiskDataProvider } from './DataProvider';
@@ -282,17 +284,14 @@ scene.on('click', function () {
     if (obj.index < this.dp.nodeNames().length) {
       const name = this.dp.nodeNames()[obj.index];
       const data = {
+        name,
         degree: this.dp.nodeProperty(name, 'degree'),
         discovery: this.dp.nodeProperty(name, 'discovery'),
+        formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+        synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability')
       };
 
-      if (data.discovery !== null) {
-        select('#name').text(`${name} (${data.discovery})`);
-      } else {
-        select('#name').text(`${name}`);
-      }
-
-      select('#degree').html(` ${data.degree} derived materials`);
+      select('#infopanel').html(infopanel(data));
     }
   }
 
