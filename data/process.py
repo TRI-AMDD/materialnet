@@ -18,6 +18,11 @@ def filter_edges(edges, nodes):
 
 def extract(rec):
     val = {'degree': rec['deg'][-1],
+           'eigen_cent': rec['eigen_cent'][-1],
+           'deg_cent': rec['deg_cent'][-1],
+           'shortest_path': rec['shortest_path'][-1],
+           'deg_neigh': rec['deg_neigh'][-1],
+           'clus_coeff': rec['clus_coeff'][-1],
            'discovery': rec['discovery'],
            'x': rec['x'],
            'y': rec['y']}

@@ -288,7 +288,12 @@ scene.on('click', function () {
         degree: this.dp.nodeProperty(name, 'degree'),
         discovery: this.dp.nodeProperty(name, 'discovery'),
         formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-        synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability')
+        synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+        clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+        eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+        degCent: this.dp.nodeProperty(name, 'deg_cent'),
+        shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+        degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
       };
 
       select('#infopanel').html(infopanel(data));
