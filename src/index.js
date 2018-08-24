@@ -5,11 +5,13 @@ import { scaleLinear } from 'd3-scale';
 import { color as d3Color } from 'd3-color';
 
 import html from './index.pug';
-import edges from './edges.json';
-import nodes from './nodes.json';
-import positions from './positions.json';
-import vertShader from './circle-vert.glsl';
-import fragShader from './circle-frag.glsl';
+import infopanel from './infopanel.pug';
+
+import edges from './data/edges.json';
+import nodes from './data/nodes.json';
+import { DiskDataProvider } from './DataProvider';
+import vertShader from './shader/circle-vert.glsl';
+import fragShader from './shader/circle-frag.glsl';
 
 function minmax (arr) {
   let min = Infinity;
@@ -31,37 +33,15 @@ function minmax (arr) {
   };
 }
 
-function computeGraph (edges) {
-  // Create a node index table.
-  let index = {};
-  let count = 0;
-  edges.forEach(e => {
-    // Create an entry if the node hasn't been seen yet.
-    e.forEach(n => {
-      if (!index.hasOwnProperty(n)) {
-        // Record the index.
-        index[n] = count++;
-      }
-    });
-  });
-
-  // Create a version of the edges list that has indices instead of names.
-  const edgeIndex = edges.map(e => e.map(n => index[n]));
-
-  return {
-    nodeIndex: index,
-    edgeIndex
-  };
-}
-
 const width = 960;
 const height =540;
 document.write(html());
 
 class SceneManager {
-  constructor ({el, width, height, points, lines}) {
+  constructor ({el, width, height, dp}) {
     this.width = width;
     this.height = height;
+    this.dp = dp;
 
     this.scene = new three.Scene();
     this.scene.background = new three.Color(0xeeeeee);
@@ -87,11 +67,13 @@ class SceneManager {
     let positions = [];
     let colors = [];
 
-    lines.forEach(e => {
-      positions.push(points[e[0]].x, points[e[0]].y, -0.1);
-      positions.push(points[e[1]].x, points[e[1]].y, -0.1);
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const edgePos = this.dp.edgePosition(i);
+      positions.push(edgePos[0].x, edgePos[0].y, -0.1);
+      positions.push(edgePos[1].x, edgePos[1].y, -0.1);
+
       colors.push(1, 1, 1);
-    });
+    }
 
     this.edgeGeom = new three.BufferGeometry();
     this.edgeGeom.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
@@ -117,23 +99,23 @@ class SceneManager {
     positions.length = 0;
     colors.length = 0;
     let sizes = [];
-    points.forEach((p, i) => {
+
+    this.dp.nodeNames().forEach(name => {
+      const p = this.dp.nodePosition(name);
+
       positions.push(p.x, p.y, 0);
 
       let color;
-      if (nodes.hasOwnProperty(p.name)) {
-        color = d3Color(this.cmap(nodes[p.name].discovery));
+      const discovery = this.dp.nodeProperty(name, 'discovery');
+      if (discovery !== null) {
+        color = d3Color(this.cmap(discovery));
       } else {
         color = d3Color('#de2d26');
       }
 
       colors.push(color.r / 255, color.g / 255, color.b / 255);
 
-      if (nodes.hasOwnProperty(p.name)) {
-        sizes.push(10 + Math.sqrt(nodes[p.name].degree));
-      } else {
-        sizes.push(10);
-      }
+      sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
     });
 
     this.geometry = new three.BufferGeometry();
@@ -169,12 +151,8 @@ class SceneManager {
   }
 
   setDegreeSize () {
-    positions.forEach((p, i) => {
-      if (nodes.hasOwnProperty(p.name)) {
-        this.setSize(i, 10 + Math.sqrt(nodes[p.name].degree));
-      } else {
-        this.setSize(i, 10);
-      }
+    this.dp.nodeNames().forEach((name, i) => {
+      this.setSize(i, 10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
     });
 
     this.updateSize();
@@ -189,10 +167,12 @@ class SceneManager {
   }
 
   setDiscoveryColor () {
-    positions.forEach((p, i) => {
+    this.dp.nodeNames().forEach((name, i) => {
+      const discovery = this.dp.nodeProperty(name, 'discovery');
+
       let color;
-      if (nodes.hasOwnProperty(p.name)) {
-        color = d3Color(this.cmap(nodes[p.name].discovery));
+      if (discovery !== null) {
+        color = d3Color(this.cmap(discovery));
       } else {
         color = d3Color('#de2d26');
       }
@@ -276,14 +256,11 @@ class SceneManager {
   }
 }
 
-const { edgeIndex } = computeGraph(edges);
-
 const scene = new SceneManager({
   el: '#vis',
   width,
   height,
-  points: positions,
-  lines: edgeIndex
+  dp: new DiskDataProvider(nodes, edges)
 });
 
 scene.on('mousemove.always', function () {
@@ -304,17 +281,22 @@ scene.on('click', function () {
 
   const obj = this.pick();
   if (obj) {
-    if (obj.index < positions.length) {
-      const name = positions[obj.index].name;
-      const data = nodes[name];
+    if (obj.index < this.dp.nodeNames().length) {
+      const name = this.dp.nodeNames()[obj.index];
+      const data = {
+        name,
+        degree: this.dp.nodeProperty(name, 'degree'),
+        discovery: this.dp.nodeProperty(name, 'discovery'),
+        formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+        synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+        clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+        eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+        degCent: this.dp.nodeProperty(name, 'deg_cent'),
+        shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+        degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+      };
 
-      if (data) {
-        select('#name').text(`${name} (${nodes[name].discovery})`);
-        select('#degree').html(` ${nodes[name].degree} derived materials`);
-      } else {
-        select('#name').text(`${name}`);
-        select('#degree').text('');
-      }
+      select('#infopanel').html(infopanel(data));
     }
   }
 
