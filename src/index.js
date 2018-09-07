@@ -130,7 +130,10 @@ class SceneManager {
     this.material = new three.ShaderMaterial({
       vertexColors: three.VertexColors,
       uniforms: {
-        color: new three.Color(1.0, 0.0, 0.0)
+        color: new three.Color(1.0, 0.0, 0.0),
+        zoom: {
+          value: this.zoom
+        }
       },
       vertexShader: vertShader,
       fragmentShader: fragShader
@@ -255,7 +258,9 @@ class SceneManager {
     this.camera.zoom = zoom;
     this.camera.updateProjectionMatrix();
 
-    this.raycaster.params.Points.threshold = this.threshold / zoom;
+    this.material.uniforms.zoom.value = zoom;
+
+    this.raycaster.params.Points.threshold = this.threshold;
   }
 }
 
