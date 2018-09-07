@@ -3,6 +3,7 @@ import * as three from 'three';
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
 import { color as d3Color } from 'd3-color';
+import { defineCustomElements as defineMolecule } from '@openchemistry/molecule';
 
 import html from './index.pug';
 import infopanel from './infopanel.pug';
@@ -12,6 +13,8 @@ import nodes from './data/nodes.json';
 import { DiskDataProvider } from './DataProvider';
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
+
+import testStructure from './testMolecule.json';
 
 function minmax (arr) {
   let min = Infinity;
@@ -425,5 +428,8 @@ function animate (e) {
 }
 
 window.requestAnimationFrame(animate);
+
+defineMolecule(window);
+select('#structure').node().cjson = testStructure;
 
 window.scene = scene;
