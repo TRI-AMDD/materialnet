@@ -102,6 +102,7 @@ class SceneManager {
     positions.length = 0;
     colors.length = 0;
     let sizes = [];
+    let selected = [];
 
     this.dp.nodeNames().forEach(name => {
       const p = this.dp.nodePosition(name);
@@ -119,12 +120,14 @@ class SceneManager {
       colors.push(color.r / 255, color.g / 255, color.b / 255);
 
       sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
+      selected.push(0);
     });
 
     this.geometry = new three.BufferGeometry();
     this.geometry.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
     this.geometry.addAttribute('color', new three.Float32BufferAttribute(colors, 3).setDynamic(true));
     this.geometry.addAttribute('size', new three.Float32BufferAttribute(sizes, 1).setDynamic(true));
+    this.geometry.addAttribute('selected', new three.Float32BufferAttribute(selected, 1).setDynamic(true));
     this.geometry.computeBoundingSphere();
 
     this.material = new three.ShaderMaterial({
