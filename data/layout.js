@@ -6,8 +6,13 @@ import { performance } from 'perf_hooks';
 // Grab the edgefile off the command line args.
 const edgefile = process.argv[2];
 if (!edgefile) {
-  console.error('usage: layout.js <edgefile>');
+  console.error('usage: layout.js <edgefile> <iterations=300>');
   process.exit(1);
+}
+
+let iterations = process.argv[3];
+if (iterations === undefined) {
+  iterations = 300;
 }
 
 // Parse out the edge JSON.
@@ -51,19 +56,24 @@ const layout = d3.forceSimulation()
 
 let cycle = 0;
 const start = performance.now();
-layout.on('tick', () => {
+const tick = () => {
   ++cycle;
 
   const now = performance.now();
   const elapsed = now - start;
 
-  const est = Math.floor(0.01 * elapsed / cycle * (300 - cycle)) / 10;
+  const est = Math.floor(0.01 * elapsed / cycle * (iterations - cycle)) / 10;
 
-  process.stderr.write(`\r${cycle} / 300 (${Math.floor(0.01 * elapsed) / 10}s elapsed, ~${est}s remaining)`);
-});
+  process.stderr.write(`\r${cycle} / ${iterations} (${Math.floor(0.01 * elapsed) / 10}s elapsed, ~${est}s remaining)`);
+};
 
-layout.on('end', () => {
+const end = () => {
   console.log(JSON.stringify(nodes.map(n => ({x: n.x, y: n.y, name: n.name}))));
-});
+};
 
-layout.restart();
+for (let i = 0; i < iterations; i++) {
+  layout.tick();
+  tick();
+}
+
+end();
