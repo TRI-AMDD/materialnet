@@ -208,7 +208,7 @@ class SceneManager {
 
   pick () {
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const results = this.raycaster.intersectObjects(this.scene.children);
+    const results = this.raycaster.intersectObject(this.points);
     if (results.length > 0) {
       return results[0];
     }
