@@ -35,7 +35,7 @@ export class DiskDataProvider extends DataProvider {
     this.edges = edges;
 
     const graph = computeGraph(edges);
-    this.nodeIndex = graph.nodeIndex;
+    this._nodeIndex = graph.nodeIndex;
     this.edgeIndex = graph.edgeIndex;
 
     this._names = Object.keys(this.nodes);
@@ -73,6 +73,10 @@ export class DiskDataProvider extends DataProvider {
       x: node.x,
       y: node.y
     };
+  }
+
+  nodeIndex (name) {
+    return this._nodeIndex[name];
   }
 
   nodeProperty (name, prop) {
