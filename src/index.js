@@ -247,6 +247,24 @@ class SceneManager {
     this.geometry.attributes.position.needsUpdate = true;
   }
 
+  getEdgePosition (idx, which) {
+    const pos = this.edgeGeom.attributes.position.array;
+    return new three.Vector2(pos[3 * (2 * idx + which) + 0], pos[3 * (2 * idx + which) + 1]);
+  }
+
+  setEdgePosition (idx, which, x, y, update = true) {
+    this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 0] = x;
+    this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 1] = y;
+
+    if (update) {
+      this.updateEdgePosition();
+    }
+  }
+
+  updateEdgePosition () {
+    this.edgeGeom.attributes.position.needsUpdate = true;
+  }
+
   setSize (idx, s, update = true) {
     this.geometry.attributes.size.array[idx] = s;
 
@@ -266,6 +284,54 @@ class SceneManager {
     this.geometry.attributes.selected.array[this.selected] = 1;
 
     this.geometry.attributes.selected.needsUpdate = true;
+  }
+
+  center () {
+    // Compute the mean.
+    const count = this.geometry.attributes.selected.count;
+
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < count; i++) {
+      const pos = this.getPosition(i);
+      x += pos.x;
+      y += pos.y;
+    }
+    x /= count;
+    y /= count;
+
+    for (let i = 0; i < count; i++) {
+      const pos = this.getPosition (i);
+      this.setPosition(i, pos.x - x, pos.y - y, false);
+    }
+    this.updatePosition();
+
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const pos0 = this.getEdgePosition(i, 0);
+      this.setEdgePosition(i, 0, pos0.x - x, pos0.y - y, false);
+
+      const pos1 = this.getEdgePosition(i, 1);
+      this.setEdgePosition(i, 1, pos1.x - x, pos1.y - y, false);
+    }
+    this.updateEdgePosition();
+  }
+
+  expand (m) {
+    const nodeCount = this.geometry.attributes.selected.count;
+    for (let i = 0; i < nodeCount; i++) {
+      const pos = this.getPosition(i);
+      this.setPosition(i, pos.x * m, pos.y * m, false);
+    }
+    this.updatePosition();
+
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const pos0 = this.getEdgePosition(i, 0);
+      this.setEdgePosition(i, 0, pos0.x * m, pos0.y * m, false);
+
+      const pos1 = this.getEdgePosition(i, 1);
+      this.setEdgePosition(i, 1, pos1.x * m, pos1.y * m, false);
+    }
+    this.updateEdgePosition();
   }
 
   render () {
@@ -292,6 +358,7 @@ const scene = new SceneManager({
   height,
   dp: new DiskDataProvider(nodes, edges)
 });
+window.scene = scene;
 
 scene.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
