@@ -148,6 +148,10 @@ class SceneManager {
     this.lines.visible = this._linksVisible;
   }
 
+  setLinkOpacity (o) {
+    this.lineMaterial.opacity = o;
+  }
+
   setConstSize (s) {
     for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
       this.setSize(i, s);
@@ -425,6 +429,15 @@ select('#zoom').on('input', function () {
   const zoom = 0.125 * Math.pow(1.06, value);
 
   scene.zoom = zoom;
+});
+
+select('#opacity').node().valueAsNumber = 5;
+select('#opacity').on('input', function () {
+  const slider = select(this).node();
+  const value = slider.valueAsNumber;
+  const opacity = value / 100;
+
+  scene.setLinkOpacity(opacity);
 });
 
 function animate (e) {
