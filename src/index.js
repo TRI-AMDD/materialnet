@@ -130,7 +130,10 @@ class SceneManager {
     this.material = new three.ShaderMaterial({
       vertexColors: three.VertexColors,
       uniforms: {
-        color: new three.Color(1.0, 0.0, 0.0)
+        color: new three.Color(1.0, 0.0, 0.0),
+        zoom: {
+          value: this.zoom
+        }
       },
       vertexShader: vertShader,
       fragmentShader: fragShader
@@ -143,6 +146,10 @@ class SceneManager {
   linksVisible (vis) {
     this._linksVisible = vis;
     this.lines.visible = this._linksVisible;
+  }
+
+  setLinkOpacity (o) {
+    this.lineMaterial.opacity = o;
   }
 
   setConstSize (s) {
@@ -255,7 +262,9 @@ class SceneManager {
     this.camera.zoom = zoom;
     this.camera.updateProjectionMatrix();
 
-    this.raycaster.params.Points.threshold = this.threshold / zoom;
+    this.material.uniforms.zoom.value = zoom;
+
+    this.raycaster.params.Points.threshold = this.threshold;
   }
 }
 
@@ -420,6 +429,15 @@ select('#zoom').on('input', function () {
   const zoom = 0.125 * Math.pow(1.06, value);
 
   scene.zoom = zoom;
+});
+
+select('#opacity').node().valueAsNumber = 5;
+select('#opacity').on('input', function () {
+  const slider = select(this).node();
+  const value = slider.valueAsNumber;
+  const opacity = value / 100;
+
+  scene.setLinkOpacity(opacity);
 });
 
 function animate (e) {
