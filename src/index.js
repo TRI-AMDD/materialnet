@@ -518,11 +518,11 @@ select('#zoom').on('input', function () {
   scene.zoom = zoom;
 });
 
-select('#opacity').node().valueAsNumber = 5;
+select('#opacity').node().valueAsNumber = 50;
 select('#opacity').on('input', function () {
   const slider = select(this).node();
   const value = slider.valueAsNumber;
-  const opacity = value / 100;
+  const opacity = value / 1000;
 
   scene.setLinkOpacity(opacity);
 });
