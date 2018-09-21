@@ -58,6 +58,8 @@ class SceneManager {
     this.mouse = new three.Vector2();
     this.pixel = new three.Vector2();
 
+    this.expansion = 1;
+
     this.renderer = new three.WebGLRenderer({
       antialias: true
     });
@@ -247,6 +249,24 @@ class SceneManager {
     this.geometry.attributes.position.needsUpdate = true;
   }
 
+  getEdgePosition (idx, which) {
+    const pos = this.edgeGeom.attributes.position.array;
+    return new three.Vector2(pos[3 * (2 * idx + which) + 0], pos[3 * (2 * idx + which) + 1]);
+  }
+
+  setEdgePosition (idx, which, x, y, update = true) {
+    this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 0] = x;
+    this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 1] = y;
+
+    if (update) {
+      this.updateEdgePosition();
+    }
+  }
+
+  updateEdgePosition () {
+    this.edgeGeom.attributes.position.needsUpdate = true;
+  }
+
   setSize (idx, s, update = true) {
     this.geometry.attributes.size.array[idx] = s;
 
@@ -266,6 +286,57 @@ class SceneManager {
     this.geometry.attributes.selected.array[this.selected] = 1;
 
     this.geometry.attributes.selected.needsUpdate = true;
+  }
+
+  center () {
+    // Compute the mean.
+    const count = this.geometry.attributes.selected.count;
+
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < count; i++) {
+      const pos = this.getPosition(i);
+      x += pos.x;
+      y += pos.y;
+    }
+    x /= count;
+    y /= count;
+
+    for (let i = 0; i < count; i++) {
+      const pos = this.getPosition (i);
+      this.setPosition(i, pos.x - x, pos.y - y, false);
+    }
+    this.updatePosition();
+
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const pos0 = this.getEdgePosition(i, 0);
+      this.setEdgePosition(i, 0, pos0.x - x, pos0.y - y, false);
+
+      const pos1 = this.getEdgePosition(i, 1);
+      this.setEdgePosition(i, 1, pos1.x - x, pos1.y - y, false);
+    }
+    this.updateEdgePosition();
+  }
+
+  expand (m) {
+    const factor = m / this.expansion;
+    this.expansion = m;
+
+    const nodeCount = this.geometry.attributes.selected.count;
+    for (let i = 0; i < nodeCount; i++) {
+      const pos = this.getPosition(i);
+      this.setPosition(i, pos.x * factor, pos.y * factor, false);
+    }
+    this.updatePosition();
+
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const pos0 = this.getEdgePosition(i, 0);
+      this.setEdgePosition(i, 0, pos0.x * factor, pos0.y * factor, false);
+
+      const pos1 = this.getEdgePosition(i, 1);
+      this.setEdgePosition(i, 1, pos1.x * factor, pos1.y * factor, false);
+    }
+    this.updateEdgePosition();
   }
 
   render () {
@@ -292,6 +363,7 @@ const scene = new SceneManager({
   height,
   dp: new DiskDataProvider(nodes, edges)
 });
+window.scene = scene;
 
 scene.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
@@ -451,13 +523,21 @@ select('#zoom').on('input', function () {
   scene.zoom = zoom;
 });
 
-select('#opacity').node().valueAsNumber = 5;
+select('#opacity').node().valueAsNumber = 50;
 select('#opacity').on('input', function () {
   const slider = select(this).node();
   const value = slider.valueAsNumber;
-  const opacity = value / 100;
+  const opacity = value / 1000;
 
   scene.setLinkOpacity(opacity);
+});
+
+select('#spacing').node().valueAsNumber = 1;
+select('#spacing').on('input', function () {
+  const slider = select(this).node();
+  const expansion = slider.valueAsNumber;
+
+  scene.expand(expansion);
 });
 
 function animate (e) {
