@@ -13,6 +13,8 @@ import nodes from './data/nodes.json';
 import { DiskDataProvider } from './DataProvider';
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
+import lineVertShader from './shader/line-vert.glsl';
+import lineFragShader from './shader/line-frag.glsl';
 
 import testStructure from './testMolecule.json';
 
@@ -85,11 +87,16 @@ class SceneManager {
     this.edgeGeom.addAttribute('color', new three.Float32BufferAttribute(colors, 3).setDynamic(true));
     this.edgeGeom.computeBoundingSphere();
 
-    this.lineMaterial = new three.LineBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.05
+    this.lineMaterial = new three.ShaderMaterial({
+      uniforms: {
+        opacity: {
+          value: 0.05
+        }
+      },
+      vertexShader: lineVertShader,
+      fragmentShader: lineFragShader
     });
+    this.lineMaterial.transparent = true;
 
     this.lines = new three.LineSegments(this.edgeGeom, this.lineMaterial);
     this._linksVisible = true;
@@ -160,7 +167,7 @@ class SceneManager {
   }
 
   setLinkOpacity (o) {
-    this.lineMaterial.opacity = o;
+    this.lineMaterial.uniforms.opacity.value = o;
   }
 
   setConstSize (s) {
