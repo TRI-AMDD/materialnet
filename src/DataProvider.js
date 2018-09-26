@@ -62,6 +62,11 @@ export class DiskDataProvider extends DataProvider {
     return val;
   }
 
+  edgeNodes (idx) {
+    const edge = this.edges[idx];
+    return edge;
+  }
+
   nodeNames () {
     return this._names;
   }
