@@ -83,11 +83,14 @@ class SceneManager {
       positions.push(edgePos[1].x, edgePos[1].y, -0.1);
 
       focus.push(1.0, 1.0);
+
+      hidden.push(0, 0);
     }
 
     this.edgeGeom = new three.BufferGeometry();
     this.edgeGeom.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
     this.edgeGeom.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
+    this.edgeGeom.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
     this.edgeGeom.computeBoundingSphere();
 
     this.lineMaterial = new three.ShaderMaterial({
@@ -401,8 +404,15 @@ class SceneManager {
 
     // Hide just the nodes that are named in the list;
     nodes.forEach(d => this.hideNode(d, true, false));
-
     this.updateHideNode();
+
+    // Hide all edges touching a hidden node.
+    const set = new Set(nodes);
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const ends = this.dp.edgeNodes(i);
+      this.hideEdge(i, set.has(ends[0]) || set.has(ends[1]), false);
+    }
+    this.updateHideEdge();
   }
 
   hideNode (name, hide, update = true) {
@@ -414,6 +424,19 @@ class SceneManager {
 
   updateHideNode () {
     this.geometry.attributes.hidden.needsUpdate = true;
+  }
+
+  hideEdge (idx, hide, update = true) {
+    this.edgeGeom.attributes.hidden.array[2 * idx + 0] = hide;
+    this.edgeGeom.attributes.hidden.array[2 * idx + 1] = hide;
+
+    if (update) {
+      this.updateHideEdge();
+    }
+  }
+
+  updateHideEdge () {
+    this.edgeGeom.attributes.hidden.needsUpdate = true;
   }
 
   center () {
