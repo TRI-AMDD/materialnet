@@ -708,6 +708,44 @@ select('#filter').on('change', function () {
   }
 });
 
+let callback = null;
+const autoplay = function () {
+  const years = [1945, 1950, 1955, 1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015];
+
+  const advance = (idx) => () => {
+    const year = years[idx];
+    if (year === undefined) {
+      select('option[value="all"]').property('selected', true);
+      scene.hideNodes([]);
+      end();
+    } else {
+      select(`option[value="${year}"]`).property('selected', true);
+      scene.hideAfter(year);
+
+      callback = window.setTimeout(advance(idx + 1), 1000);
+    }
+  };
+
+  const end = () => {
+    callback = null;
+    button.text('Autoplay');
+  }
+
+  const button = select(this);
+
+  if (button.text() === 'Autoplay') {
+    button.text('Stop');
+    advance(0)();
+  } else {
+    if (callback) {
+      window.clearTimeout(callback);
+    }
+    end();
+  }
+}
+
+select('#autoplay').on('click', autoplay);
+
 function animate (e) {
   scene.render();
   window.requestAnimationFrame(animate);
