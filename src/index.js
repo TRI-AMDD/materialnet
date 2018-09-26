@@ -697,6 +697,17 @@ select('#spacing').on('input', function () {
   scene.expand(expansion);
 });
 
+select('#filter').on('change', function () {
+  let year = select(this).node().value;
+
+  if (year === 'all') {
+    scene.hideNodes([]);
+  } else {
+    year = +year;
+    scene.hideAfter(year);
+  }
+});
+
 function animate (e) {
   scene.render();
   window.requestAnimationFrame(animate);
