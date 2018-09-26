@@ -74,6 +74,7 @@ class SceneManager {
     // Initialize edge geometry.
     let positions = [];
     let focus = [];
+    let hidden = [];
 
     this.linkIndex = {};
     for (let i = 0; i < this.dp.edgeCount(); i++) {
@@ -82,11 +83,14 @@ class SceneManager {
       positions.push(edgePos[1].x, edgePos[1].y, -0.1);
 
       focus.push(1.0, 1.0);
+
+      hidden.push(0, 0);
     }
 
     this.edgeGeom = new three.BufferGeometry();
     this.edgeGeom.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
     this.edgeGeom.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
+    this.edgeGeom.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
     this.edgeGeom.computeBoundingSphere();
 
     this.lineMaterial = new three.ShaderMaterial({
@@ -112,6 +116,7 @@ class SceneManager {
     // Initialize point geometry.
     positions.length = 0;
     focus.length = 0;
+    hidden.length = 0;
     let colors = [];
     let sizes = [];
     let selected = [];
@@ -138,6 +143,7 @@ class SceneManager {
       sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
       selected.push(0);
       focus.push(1);
+      hidden.push(0);
     });
 
     this.selected = 0;
@@ -148,6 +154,7 @@ class SceneManager {
     this.geometry.addAttribute('size', new three.Float32BufferAttribute(sizes, 1).setDynamic(true));
     this.geometry.addAttribute('selected', new three.Float32BufferAttribute(selected, 1).setDynamic(true));
     this.geometry.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
+    this.geometry.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
     this.geometry.computeBoundingSphere();
 
     this.material = new three.ShaderMaterial({
@@ -377,6 +384,59 @@ class SceneManager {
 
     this.updateFocus();
     this.updateEdgeFocus();
+  }
+
+  hideAfter (year) {
+    // Collect all the nodes with discovery year after the specified year; these
+    // will be hidden next.
+    const toHide = this.dp.nodeNames().filter(d => !this.dp.nodeExists(d) || this.dp.nodeProperty(d, 'discovery') > year);
+
+    // Unhide all nodes.
+    this.hideNodes([]);
+
+    // Hide the ones post year.
+    this.hideNodes(toHide);
+  }
+
+  hideNodes (nodes) {
+    // Unhide all nodes.
+    this.dp.nodeNames().forEach(d => this.hideNode(d, false, false));
+
+    // Hide just the nodes that are named in the list;
+    nodes.forEach(d => this.hideNode(d, true, false));
+    this.updateHideNode();
+
+    // Hide all edges touching a hidden node.
+    const set = new Set(nodes);
+    for (let i = 0; i < this.dp.edgeCount(); i++) {
+      const ends = this.dp.edgeNodes(i);
+      this.hideEdge(i, set.has(ends[0]) || set.has(ends[1]), false);
+    }
+    this.updateHideEdge();
+  }
+
+  hideNode (name, hide, update = true) {
+    this.geometry.attributes.hidden.array[this.index[name]] = hide;
+    if (update) {
+      this.updateHideNode();
+    }
+  }
+
+  updateHideNode () {
+    this.geometry.attributes.hidden.needsUpdate = true;
+  }
+
+  hideEdge (idx, hide, update = true) {
+    this.edgeGeom.attributes.hidden.array[2 * idx + 0] = hide;
+    this.edgeGeom.attributes.hidden.array[2 * idx + 1] = hide;
+
+    if (update) {
+      this.updateHideEdge();
+    }
+  }
+
+  updateHideEdge () {
+    this.edgeGeom.attributes.hidden.needsUpdate = true;
   }
 
   center () {
@@ -636,6 +696,55 @@ select('#spacing').on('input', function () {
 
   scene.expand(expansion);
 });
+
+select('#filter').on('change', function () {
+  let year = select(this).node().value;
+
+  if (year === 'all') {
+    scene.hideNodes([]);
+  } else {
+    year = +year;
+    scene.hideAfter(year);
+  }
+});
+
+let callback = null;
+const autoplay = function () {
+  const years = [1945, 1950, 1955, 1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015];
+
+  const advance = (idx) => () => {
+    const year = years[idx];
+    if (year === undefined) {
+      select('option[value="all"]').property('selected', true);
+      scene.hideNodes([]);
+      end();
+    } else {
+      select(`option[value="${year}"]`).property('selected', true);
+      scene.hideAfter(year);
+
+      callback = window.setTimeout(advance(idx + 1), 1000);
+    }
+  };
+
+  const end = () => {
+    callback = null;
+    button.text('Autoplay');
+  }
+
+  const button = select(this);
+
+  if (button.text() === 'Autoplay') {
+    button.text('Stop');
+    advance(0)();
+  } else {
+    if (callback) {
+      window.clearTimeout(callback);
+    }
+    end();
+  }
+}
+
+select('#autoplay').on('click', autoplay);
 
 function animate (e) {
   scene.render();
