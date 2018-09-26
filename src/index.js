@@ -74,6 +74,7 @@ class SceneManager {
     // Initialize edge geometry.
     let positions = [];
     let focus = [];
+    let hidden = [];
 
     this.linkIndex = {};
     for (let i = 0; i < this.dp.edgeCount(); i++) {
@@ -112,6 +113,7 @@ class SceneManager {
     // Initialize point geometry.
     positions.length = 0;
     focus.length = 0;
+    hidden.length = 0;
     let colors = [];
     let sizes = [];
     let selected = [];
@@ -138,6 +140,7 @@ class SceneManager {
       sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
       selected.push(0);
       focus.push(1);
+      hidden.push(0);
     });
 
     this.selected = 0;
@@ -148,6 +151,7 @@ class SceneManager {
     this.geometry.addAttribute('size', new three.Float32BufferAttribute(sizes, 1).setDynamic(true));
     this.geometry.addAttribute('selected', new three.Float32BufferAttribute(selected, 1).setDynamic(true));
     this.geometry.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
+    this.geometry.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
     this.geometry.computeBoundingSphere();
 
     this.material = new three.ShaderMaterial({
@@ -377,6 +381,39 @@ class SceneManager {
 
     this.updateFocus();
     this.updateEdgeFocus();
+  }
+
+  hideAfter (year) {
+    // Collect all the nodes with discovery year after the specified year; these
+    // will be hidden next.
+    const toHide = this.dp.nodeNames().filter(d => !this.dp.nodeExists(d) || this.dp.nodeProperty(d, 'discovery') > year);
+
+    // Unhide all nodes.
+    this.hideNodes([]);
+
+    // Hide the ones post year.
+    this.hideNodes(toHide);
+  }
+
+  hideNodes (nodes) {
+    // Unhide all nodes.
+    this.dp.nodeNames().forEach(d => this.hideNode(d, false, false));
+
+    // Hide just the nodes that are named in the list;
+    nodes.forEach(d => this.hideNode(d, true, false));
+
+    this.updateHideNode();
+  }
+
+  hideNode (name, hide, update = true) {
+    this.geometry.attributes.hidden.array[this.index[name]] = hide;
+    if (update) {
+      this.updateHideNode();
+    }
+  }
+
+  updateHideNode () {
+    this.geometry.attributes.hidden.needsUpdate = true;
   }
 
   center () {
