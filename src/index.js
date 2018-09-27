@@ -146,7 +146,7 @@ class SceneManager {
       hidden.push(0);
     });
 
-    this.selected = 0;
+    this.selected = null;
 
     this.geometry = new three.BufferGeometry();
     this.geometry.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
@@ -325,7 +325,9 @@ class SceneManager {
   }
 
   select (name) {
-    this.geometry.attributes.selected.array[this.selected] = 0;
+    if (this.selected !== null) {
+      this.geometry.attributes.selected.array[this.selected] = 0;
+    }
 
     this.selected = this.index[name];
     this.geometry.attributes.selected.array[this.selected] = 1;
@@ -336,6 +338,8 @@ class SceneManager {
   unselect () {
     this.geometry.attributes.selected.array[this.selected] = 0;
     this.geometry.attributes.selected.needsUpdate = true;
+
+    this.selected = null;
   }
 
   focus (name, edges = true) {
