@@ -38,9 +38,21 @@ function minmax (arr) {
   };
 }
 
-const width = 960;
-const height =540;
-document.write(html());
+function getWidthHeight () {
+  const u = new window.URLSearchParams(window.location.search);
+
+  if (u.get('large') !== null) {
+    return [1920, 1080];
+  } else {
+    return [960, 540];
+  }
+}
+
+const [width, height] = getWidthHeight();
+document.write(html({
+  width,
+  height
+}));
 
 class SceneManager {
   constructor ({el, width, height, dp}) {
@@ -110,8 +122,8 @@ class SceneManager {
 
     // Create a sequential colormap.
     this.cmap = scaleLinear()
-      .domain([1945, 2015])
-      .range(['#3182bd', '#31a354']);
+      .domain([1945, 1980, 2015])
+      .range(['#7570b3', '#d95f02', '#1b9e77']);
 
     // Initialize point geometry.
     positions.length = 0;
@@ -146,7 +158,7 @@ class SceneManager {
       hidden.push(0);
     });
 
-    this.selected = 0;
+    this.selected = null;
 
     this.geometry = new three.BufferGeometry();
     this.geometry.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
@@ -325,7 +337,9 @@ class SceneManager {
   }
 
   select (name) {
-    this.geometry.attributes.selected.array[this.selected] = 0;
+    if (this.selected !== null) {
+      this.geometry.attributes.selected.array[this.selected] = 0;
+    }
 
     this.selected = this.index[name];
     this.geometry.attributes.selected.array[this.selected] = 1;
@@ -336,6 +350,8 @@ class SceneManager {
   unselect () {
     this.geometry.attributes.selected.array[this.selected] = 0;
     this.geometry.attributes.selected.needsUpdate = true;
+
+    this.selected = null;
   }
 
   focus (name, edges = true) {
@@ -717,13 +733,12 @@ const autoplay = function () {
     if (year === undefined) {
       select('option[value="all"]').property('selected', true);
       scene.hideNodes([]);
-      end();
     } else {
       select(`option[value="${year}"]`).property('selected', true);
       scene.hideAfter(year);
-
-      callback = window.setTimeout(advance(idx + 1), 1000);
     }
+
+    callback = window.setTimeout(advance((idx + 1) % (years.length + 1)), 1000);
   };
 
   const end = () => {
