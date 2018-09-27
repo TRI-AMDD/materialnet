@@ -38,9 +38,21 @@ function minmax (arr) {
   };
 }
 
-const width = 960;
-const height =540;
-document.write(html());
+function getWidthHeight () {
+  const u = new window.URLSearchParams(window.location.search);
+
+  if (u.get('large') !== null) {
+    return [1920, 1080];
+  } else {
+    return [960, 540];
+  }
+}
+
+const [width, height] = getWidthHeight();
+document.write(html({
+  width,
+  height
+}));
 
 class SceneManager {
   constructor ({el, width, height, dp}) {
