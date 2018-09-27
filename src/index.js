@@ -721,13 +721,12 @@ const autoplay = function () {
     if (year === undefined) {
       select('option[value="all"]').property('selected', true);
       scene.hideNodes([]);
-      end();
     } else {
       select(`option[value="${year}"]`).property('selected', true);
       scene.hideAfter(year);
-
-      callback = window.setTimeout(advance(idx + 1), 1000);
     }
+
+    callback = window.setTimeout(advance((idx + 1) % (years.length + 1)), 1000);
   };
 
   const end = () => {
