@@ -110,8 +110,8 @@ class SceneManager {
 
     // Create a sequential colormap.
     this.cmap = scaleLinear()
-      .domain([1945, 2015])
-      .range(['#3182bd', '#31a354']);
+      .domain([1945, 1980, 2015])
+      .range(['#7570b3', '#d95f02', '#1b9e77']);
 
     // Initialize point geometry.
     positions.length = 0;
