@@ -831,7 +831,7 @@ const autoplay = function () {
     slider.node().dispatchEvent(new Event('input'));
 
     let nextYear = year + 1;
-    let timeout = 200;
+    let timeout = 1;
     if (nextYear === 2017) {
       nextYear = 1945;
       timeout = 1000;
