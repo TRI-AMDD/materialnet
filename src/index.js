@@ -624,7 +624,7 @@ function sortStringsLength (a, b) {
 
 select('#materials')
   .selectAll('option')
-  .data(scene.dp.nodeNames().sort(sortStringsLength))
+  .data(scene.dp.nodeNames().slice().sort(sortStringsLength))
   .enter()
   .append('option')
   .attr('value', d => d);
