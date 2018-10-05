@@ -152,7 +152,7 @@ class SceneManager {
 
       colors.push(color.r / 255, color.g / 255, color.b / 255);
 
-      sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
+      sizes.push(10);
       selected.push(0);
       focus.push(1);
       hidden.push(0);
@@ -184,6 +184,8 @@ class SceneManager {
 
     this.points = new three.Points(this.geometry, this.material);
     this.scene.add(this.points);
+
+    this.setDegreeSize(2017);
   }
 
   linksVisible (vis) {
