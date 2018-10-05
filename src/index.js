@@ -352,6 +352,10 @@ class SceneManager {
     this.geometry.attributes.selected.needsUpdate = true;
 
     this.selected = null;
+
+    select('#infopanel')
+      .selectAll('*')
+      .remove();
   }
 
   focus (name, edges = true) {
@@ -400,6 +404,37 @@ class SceneManager {
 
     this.updateFocus();
     this.updateEdgeFocus();
+  }
+
+  display (name) {
+    if (!this.index.hasOwnProperty(name)) {
+      return false;
+    }
+
+    const data = {
+      name,
+      degree: this.dp.nodeProperty(name, 'degree'),
+      discovery: this.dp.nodeProperty(name, 'discovery'),
+      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+      degCent: this.dp.nodeProperty(name, 'deg_cent'),
+      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+    };
+
+    select('#infopanel').html(infopanel(data));
+
+    if (this.selected !== this.index[name]) {
+      scene.select(name);
+      scene.focus(name);
+    } else {
+      scene.unselect();
+      scene.unfocus();
+    }
+
+    return true;
   }
 
   hideAfter (year) {
@@ -532,6 +567,13 @@ const scene = new SceneManager({
 });
 window.scene = scene;
 
+select('#materials')
+  .selectAll('option')
+  .data(scene.dp.nodeNames())
+  .enter()
+  .append('option')
+  .attr('value', d => d);
+
 scene.on('mousemove.always', function () {
   const bbox = this.el.getBoundingClientRect();
 
@@ -552,28 +594,7 @@ scene.on('click', function () {
   if (obj) {
     if (obj.index < this.dp.nodeNames().length) {
       const name = this.dp.nodeNames()[obj.index];
-      const data = {
-        name,
-        degree: this.dp.nodeProperty(name, 'degree'),
-        discovery: this.dp.nodeProperty(name, 'discovery'),
-        formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-        synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
-        clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
-        eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
-        degCent: this.dp.nodeProperty(name, 'deg_cent'),
-        shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-        degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
-      };
-
-      select('#infopanel').html(infopanel(data));
-
-      if (this.selected !== this.index[name]) {
-        scene.select(name);
-        scene.focus(name);
-      } else {
-        scene.unselect();
-        scene.unfocus();
-      }
+      scene.display(name);
     }
   }
 
@@ -760,6 +781,11 @@ const autoplay = function () {
 }
 
 select('#autoplay').on('click', autoplay);
+
+select('#search').on('change', function () {
+  const term = select(this).property('value');
+  scene.display(term);
+});
 
 function animate (e) {
   scene.render();
