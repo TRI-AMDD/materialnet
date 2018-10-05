@@ -776,32 +776,35 @@ select('#spacing').on('input', function () {
   scene.expand(expansion);
 });
 
-select('#filter').on('change', function () {
-  let year = select(this).node().value;
+select('#filter').on('input', function () {
+  const year = select(this).node().value;
+  const text = select('#filterlabel');
 
-  if (year === 'all') {
+  if (year === '2016') {
     scene.hideNodes([]);
+    text.text('Show all materials');
   } else {
-    year = +year;
     scene.hideAfter(year);
+    text.text(`Show materials up to ${year}`);
   }
 });
 
 let callback = null;
 const autoplay = function () {
-  const years = [1945, 1950, 1955, 1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015];
+  const slider = select('#filter');
 
-  const advance = (idx) => () => {
-    const year = years[idx];
-    if (year === undefined) {
-      select('option[value="all"]').property('selected', true);
-      scene.hideNodes([]);
-    } else {
-      select(`option[value="${year}"]`).property('selected', true);
-      scene.hideAfter(year);
+  const advance = (year) => () => {
+    slider.property('value', year);
+    slider.node().dispatchEvent(new Event('input'));
+
+    let nextYear = year + 1;
+    let timeout = 200;
+    if (nextYear === 2017) {
+      nextYear = 1945;
+      timeout = 1000;
     }
 
-    callback = window.setTimeout(advance((idx + 1) % (years.length + 1)), 1000);
+    callback = window.setTimeout(advance(nextYear), timeout);
   };
 
   const end = () => {
@@ -813,7 +816,7 @@ const autoplay = function () {
 
   if (button.text() === 'Autoplay') {
     button.text('Stop');
-    advance(0)();
+    advance(1945)();
   } else {
     if (callback) {
       window.clearTimeout(callback);
@@ -830,7 +833,10 @@ select('#search').on('change', function () {
 });
 
 select('#coloryear').on('input', function () {
-  scene.setColorYear(select(this).node().valueAsNumber);
+  const year = select(this).node().valueAsNumber;
+
+  select('#coloryeardisplay').text(year);
+  scene.setColorYear(year);
 });
 
 function animate (e) {

@@ -26,7 +26,8 @@ body
             option(data-name="boolean") Discovered/Hypothetical
             option(data-name="undiscovered") Discovered/Undiscovered
           br
-          input#coloryear(type="range" min="1945" max="2015" step="5" value="1945")
+          input#coloryear(type="range" min="1945" max="2015" step="1" value="1945")
+          span#coloryeardisplay 1945
         td
           span Node Size
           br
@@ -53,12 +54,9 @@ body
           input#spacing(type="range" min="1" max="10")
 
         td
-          label(for="filter") Show materials
+          label#filterlabel(for="filter") Show all materials
           br
-          select#filter
-            for year in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(x => x * 5 + 1945)
-              option(value=year) Up to #{year}
-            option(value='all' selected) All
+          input#filter(type="range" min="1945" max="2016" value="2016")
           br
           button#autoplay Autoplay
 
