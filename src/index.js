@@ -851,6 +851,8 @@ select('#autoplay').on('click', autoplay);
 select('#search').on('change', function () {
   const term = select(this).property('value');
   scene.display(term);
+
+  select(this).property('value', '');
 });
 
 select('#coloryear').on('input', function () {
