@@ -830,7 +830,10 @@ select('#search').on('change', function () {
 });
 
 select('#coloryear').on('input', function () {
-  scene.setColorYear(select(this).node().valueAsNumber);
+  const year = select(this).node().valueAsNumber;
+
+  select('#coloryeardisplay').text(year);
+  scene.setColorYear(year);
 });
 
 function animate (e) {
