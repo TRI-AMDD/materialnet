@@ -236,6 +236,17 @@ class SceneManager {
     this.updateColor();
   }
 
+  setBooleanColor () {
+    this.dp.nodeNames().forEach((name, i) => {
+      const exists = this.dp.nodeExists(name);
+      const color = exists ? d3Color('rgb(81,96,204)') : d3Color('#de2d26');
+
+      this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
+    });
+
+    this.updateColor();
+  }
+
   on (eventType, cb) {
     select(this.el).on(eventType, cb.bind(this));
   }
@@ -682,6 +693,10 @@ select('#color').on('change', function () {
 
     case 'discovery':
       scene.setDiscoveryColor();
+    break;
+
+    case 'boolean':
+      scene.setBooleanColor();
     break;
 
     default:
