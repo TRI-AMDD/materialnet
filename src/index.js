@@ -196,6 +196,8 @@ class SceneManager {
   }
 
   setConstSize (s) {
+    this.degreeSize = false;
+
     for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
       this.setSize(i, s);
     }
@@ -203,9 +205,13 @@ class SceneManager {
     this.updateSize();
   }
 
-  setDegreeSize () {
+  setDegreeSize (year) {
+    this.degreeSize = true;
+
+    const degrees = this.dp.nodeDegrees(year);
+
     this.dp.nodeNames().forEach((name, i) => {
-      this.setSize(i, 10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
+      this.setSize(i, 10 + Math.sqrt(degrees[name]));
     });
 
     this.updateSize();
@@ -763,7 +769,7 @@ select('#size').on('change', function () {
     break;
 
     case 'degree':
-      scene.setDegreeSize();
+      scene.setDegreeSize(select('#filter').node().valueAsNumber);
     break;
 
     default:
@@ -807,6 +813,10 @@ select('#filter').on('input', function () {
   } else {
     scene.hideAfter(year);
     text.text(`Show materials up to ${year}`);
+  }
+
+  if (scene.degreeSize) {
+    scene.setDegreeSize(year);
   }
 });
 
