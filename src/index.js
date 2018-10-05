@@ -152,7 +152,7 @@ class SceneManager {
 
       colors.push(color.r / 255, color.g / 255, color.b / 255);
 
-      sizes.push(10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
+      sizes.push(10);
       selected.push(0);
       focus.push(1);
       hidden.push(0);
@@ -184,6 +184,8 @@ class SceneManager {
 
     this.points = new three.Points(this.geometry, this.material);
     this.scene.add(this.points);
+
+    this.setDegreeSize(2017);
   }
 
   linksVisible (vis) {
@@ -196,6 +198,8 @@ class SceneManager {
   }
 
   setConstSize (s) {
+    this.degreeSize = false;
+
     for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
       this.setSize(i, s);
     }
@@ -203,9 +207,13 @@ class SceneManager {
     this.updateSize();
   }
 
-  setDegreeSize () {
+  setDegreeSize (year) {
+    this.degreeSize = true;
+
+    const degrees = this.dp.nodeDegrees(year);
+
     this.dp.nodeNames().forEach((name, i) => {
-      this.setSize(i, 10 + Math.sqrt(this.dp.nodeProperty(name, 'degree')));
+      this.setSize(i, 10 + Math.sqrt(degrees[name]));
     });
 
     this.updateSize();
@@ -624,7 +632,7 @@ function sortStringsLength (a, b) {
 
 select('#materials')
   .selectAll('option')
-  .data(scene.dp.nodeNames().sort(sortStringsLength))
+  .data(scene.dp.nodeNames().slice().sort(sortStringsLength))
   .enter()
   .append('option')
   .attr('value', d => d);
@@ -763,7 +771,7 @@ select('#size').on('change', function () {
     break;
 
     case 'degree':
-      scene.setDegreeSize();
+      scene.setDegreeSize(select('#filter').node().valueAsNumber);
     break;
 
     default:
@@ -808,6 +816,10 @@ select('#filter').on('input', function () {
     scene.hideAfter(year);
     text.text(`Show materials up to ${year}`);
   }
+
+  if (scene.degreeSize) {
+    scene.setDegreeSize(year);
+  }
 });
 
 let callback = null;
@@ -819,7 +831,7 @@ const autoplay = function () {
     slider.node().dispatchEvent(new Event('input'));
 
     let nextYear = year + 1;
-    let timeout = 200;
+    let timeout = 1;
     if (nextYear === 2017) {
       nextYear = 1945;
       timeout = 1000;
