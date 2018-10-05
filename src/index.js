@@ -458,17 +458,26 @@ class SceneManager {
       degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
     };
 
-    select('#infopanel').html(infopanel(data));
+    select('#infopanel')
+      .html(infopanel(data))
+      .select('#clear')
+      .on('click', () => this.undisplay());
 
     if (this.selected !== this.index[name]) {
       scene.select(name);
       scene.focus(name);
     } else {
-      scene.unselect();
-      scene.unfocus();
+      scene.undisplay();
     }
 
     return true;
+  }
+
+  undisplay () {
+    console.log('helloo');
+
+    scene.unselect();
+    scene.unfocus();
   }
 
   hideAfter (year) {
