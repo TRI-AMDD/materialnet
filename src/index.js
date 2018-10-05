@@ -220,6 +220,8 @@ class SceneManager {
   }
 
   setDiscoveryColor () {
+    this.undiscoveredColor = false;
+
     this.dp.nodeNames().forEach((name, i) => {
       const discovery = this.dp.nodeProperty(name, 'discovery');
 
@@ -237,6 +239,8 @@ class SceneManager {
   }
 
   setBooleanColor () {
+    this.undiscoveredColor = false;
+
     this.dp.nodeNames().forEach((name, i) => {
       const exists = this.dp.nodeExists(name);
       const color = exists ? d3Color('rgb(81,96,204)') : d3Color('#de2d26');
@@ -245,6 +249,25 @@ class SceneManager {
     });
 
     this.updateColor();
+  }
+
+  setUndiscoveredColor (year) {
+    this.undiscoveredColor = true;
+
+    this.dp.nodeNames().forEach((name, i) => {
+      const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
+      const color = existsYet ? d3Color('rgb(81,96,204)') : d3Color('#de2d26');
+
+      this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
+    });
+
+    this.updateColor();
+  }
+
+  setColorYear (year) {
+    if (this.undiscoveredColor) {
+      this.setUndiscoveredColor(year);
+    }
   }
 
   on (eventType, cb) {
@@ -699,6 +722,10 @@ select('#color').on('change', function () {
       scene.setBooleanColor();
     break;
 
+    case 'undiscovered':
+      scene.setUndiscoveredColor(select('#coloryear').node().valueAsNumber);
+    break;
+
     default:
       throw new Error(`illegal size option: "${mode}"`);
   }
@@ -800,6 +827,10 @@ select('#autoplay').on('click', autoplay);
 select('#search').on('change', function () {
   const term = select(this).property('value');
   scene.display(term);
+});
+
+select('#coloryear').on('input', function () {
+  scene.setColorYear(select(this).node().valueAsNumber);
 });
 
 function animate (e) {
