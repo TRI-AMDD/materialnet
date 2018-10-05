@@ -776,14 +776,16 @@ select('#spacing').on('input', function () {
   scene.expand(expansion);
 });
 
-select('#filter').on('change', function () {
-  let year = select(this).node().value;
+select('#filter').on('input', function () {
+  const year = select(this).node().value;
+  const text = select('#filterlabel');
 
-  if (year === 'all') {
+  if (year === '2016') {
     scene.hideNodes([]);
+    text.text('Show all materials');
   } else {
-    year = +year;
     scene.hideAfter(year);
+    text.text(`Show materials up to ${year}`);
   }
 });
 
