@@ -474,8 +474,6 @@ class SceneManager {
   }
 
   undisplay () {
-    console.log('helloo');
-
     scene.unselect();
     scene.unfocus();
   }
@@ -610,9 +608,23 @@ const scene = new SceneManager({
 });
 window.scene = scene;
 
+function sortStringsAlpha (a, b) {
+  return a < b ? -1 : (a > b ? 1 : 0);
+}
+
+function sortStringsLength (a, b) {
+  if (a.length < b.length) {
+    return -1;
+  } else if (a.length > b.length) {
+    return 1;
+  } else {
+    return sortStringsAlpha(a, b);
+  }
+}
+
 select('#materials')
   .selectAll('option')
-  .data(scene.dp.nodeNames())
+  .data(scene.dp.nodeNames().sort(sortStringsLength))
   .enter()
   .append('option')
   .attr('value', d => d);
@@ -839,6 +851,8 @@ select('#autoplay').on('click', autoplay);
 select('#search').on('change', function () {
   const term = select(this).property('value');
   scene.display(term);
+
+  select(this).property('value', '');
 });
 
 select('#coloryear').on('input', function () {
