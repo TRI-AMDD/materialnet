@@ -33,6 +33,9 @@ def extract(rec):
     if 'formation_energy' in rec:
         val['formation_energy'] = rec['formation_energy']
 
+    if 'discovery_prec' in rec:
+        val['discovery'] = min(rec['discovery_prec'])
+
     return val
 
 
