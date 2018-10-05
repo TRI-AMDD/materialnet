@@ -474,8 +474,6 @@ class SceneManager {
   }
 
   undisplay () {
-    console.log('helloo');
-
     scene.unselect();
     scene.unfocus();
   }
