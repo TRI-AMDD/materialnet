@@ -16,7 +16,7 @@ import fragShader from './shader/circle-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
-import testStructure from './testMolecule.json';
+import testStructure from './testMolecule2.json';
 
 function minmax (arr) {
   let min = Infinity;
