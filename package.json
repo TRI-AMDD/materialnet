@@ -36,7 +36,7 @@
     "@babel/node": "^7.0.0-beta.54",
     "@babel/preset-env": "^7.0.0-beta.54",
     "@babel/register": "^7.0.0-beta.54",
-    "@openchemistry/molecule": "^0.3.1",
+    "@openchemistry/molecule": "0.4.5",
     "babel-loader": "^8.0.0-beta.4",
     "d3-force": "^1.1.0",
     "d3-scale": "^2.1.0",

@@ -3,7 +3,7 @@ import * as three from 'three';
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
 import { color as d3Color } from 'd3-color';
-import { defineCustomElements as defineMolecule } from '@openchemistry/molecule';
+import { defineCustomElements as defineMolecule } from '@openchemistry/molecule/dist/loader';
 
 import html from './index.pug';
 import infopanel from './infopanel.pug';
@@ -16,7 +16,7 @@ import fragShader from './shader/circle-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
-import testStructure from './testMolecule.json';
+import testStructure from './testMolecule2.json';
 
 function minmax (arr) {
   let min = Infinity;
