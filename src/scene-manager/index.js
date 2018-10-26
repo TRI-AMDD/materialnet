@@ -1,5 +1,8 @@
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
+import { color as d3Color } from 'd3-color';
+
+import * as three from 'three';
 
 import infopanel from './infopanel.pug';
 
