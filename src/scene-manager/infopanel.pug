@@ -1,0 +1,30 @@
+- const hypothetical = discovery === null;
+
+h1 #{name} (#{hypothetical ? "undiscovered" : discovery}) #[button#clear Clear selection]
+
+h2 Material Properties
+
+p #{degree} derived material#{degree !== 1 ? "s" : ""}
+
+if (formationEnergy !== undefined)
+  p Formation energy: #{formationEnergy.toFixed(3)} eV/atom
+
+if (hypothetical)
+  p Synthesis probability: #{(synthesisProbability * 100).toFixed(1)}%
+
+h2 Network Properties
+
+if (clusCoeff !== undefined)
+  p Clustering coefficient: #{clusCoeff.toFixed(3)}
+
+if (eigenCent !== undefined)
+  p Eigenvector centrality: #{eigenCent.toFixed(3)}
+
+if (degCent !== undefined)
+  p Degree centrality: #{degCent.toFixed(3)}
+
+if (shortestPath !== undefined)
+  p Shortest path: #{shortestPath.toFixed(3)}
+
+if (degNeigh !== undefined)
+  p Degree neighborhood: #{degNeigh.toFixed(3)}
