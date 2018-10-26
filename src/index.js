@@ -11,6 +11,8 @@ import infopanel from './infopanel.pug';
 import { DiskDataProvider } from './DataProvider';
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
+import vertHighlightShader from './shader/circle-highlight-vert.glsl';
+import fragHighlightShader from './shader/circle-highlight-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
@@ -182,9 +184,11 @@ class SceneManager {
           value: this.zoom
         }
       },
-      vertexShader: vertShader,
-      fragmentShader: fragShader
-    });
+      // vertexShader: vertShader,
+      // fragmentShader: fragShader
+      vertexShader: vertHighlightShader,
+      fragmentShader: fragHighlightShader
+ });
     this.material.transparent = true;
 
     this.points = new three.Points(this.geometry, this.material);
