@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import produce from "immer"
+
 import {
   Select,
   MenuItem,
@@ -13,6 +15,7 @@ import {
 } from '@material-ui/core';
 
 import { Slider } from '@material-ui/lab';
+import MySlider from './slider';
 
 import { SceneManager } from '../../scene-manager';
 import { DiskDataProvider } from '../../data-provider';
@@ -22,6 +25,38 @@ class GraphVisComponent extends Component {
   scene;
   data;
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      zoom: {
+        value: 40,
+        min: 0,
+        max: 100
+      },
+      spacing: {
+        value: 1,
+        min: 0.1,
+        max: 10
+      },
+      opacity: {
+        value: 50,
+        min: 0,
+        max: 100
+      },
+      year: {
+        value: 2016,
+        min: 1945,
+        max: 2016
+      }
+    }
+
+    this.sceneSetters = {
+      zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
+      spacing: (val) => { this.scene.expand(val); },
+      year: (val) => { this.scene.hideAfter(val); }
+    }
+  }
 
   componentDidMount() {
     const { edges, nodes } = this.props;
@@ -33,6 +68,7 @@ class GraphVisComponent extends Component {
       dp: this.data
     });
 
+    this.setDefaults();
     this.scene.linksVisible(false);
 
     const animate = (e) => {
@@ -43,7 +79,40 @@ class GraphVisComponent extends Component {
     window.requestAnimationFrame(animate);
   }
 
+  setDefaults() {
+    for (let key in this.state) {
+      const value = this.state[key].value;
+      this.onValueChanged(value, key);
+    }
+  }
+
+  onValueChanged = (value, key) => {
+    if (key in this.state) {
+      const newState = produce(this.state, draft => {
+        draft[key]['value'] = value;
+        return draft;
+      })
+      this.setState(newState);
+    }
+    if (key in this.sceneSetters) {
+      this.sceneSetters[key](value);
+    }
+  }
+
+  onVisZoom = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? -1 : 1;
+    this.onValueChanged(this.state.zoom.value + delta, 'zoom');
+  }
+
   render() {
+    const {
+      zoom,
+      spacing,
+      opacity,
+      year
+    } = this.state;
+
     return (
       <div>
         <Table>
@@ -59,22 +128,35 @@ class GraphVisComponent extends Component {
             <TableRow>
               <TableCell>
                 <FormControl fullWidth>
-                  <Slider/>
+                  <MySlider
+                    params={zoom}
+                    onChange={(val) => {this.onValueChanged(val, 'zoom')}}
+                  />
                 </FormControl>
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Slider/>
+                  <MySlider
+                    params={opacity}
+                    onChange={(val) => {this.onValueChanged(val, 'opacity')}}
+                  />
                 </FormControl>
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Slider/>
+                  <MySlider
+                    params={spacing}
+                    onChange={(val) => {this.onValueChanged(val, 'spacing')}}
+                  />
                 </FormControl>
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Slider/>
+                  <MySlider
+                    params={year}
+                    onChange={(val) => {this.onValueChanged(val, 'year')}}
+                    digits={0}
+                  />
                 </FormControl>
               </TableCell>
             </TableRow>
@@ -112,7 +194,10 @@ class GraphVisComponent extends Component {
             </TableRow>
           </TableBody>
         </Table>
-        <div ref={ref => {this.visElement = ref}}></div>
+        <div
+          ref={ref => {this.visElement = ref}}
+          onWheel={this.onVisZoom}
+        />
       </div>
     );
   }
