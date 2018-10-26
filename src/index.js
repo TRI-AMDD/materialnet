@@ -11,6 +11,8 @@ import infopanel from './infopanel.pug';
 import { DiskDataProvider } from './DataProvider';
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
+import vertHighlightShader from './shader/circle-highlight-vert.glsl';
+import fragHighlightShader from './shader/circle-highlight-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
@@ -60,10 +62,11 @@ function minmax (arr) {
 }
 
 class SceneManager {
-  constructor ({el, width, height, dp}) {
+  constructor ({el, width, height, dp, highlight}) {
     this.width = width;
     this.height = height;
     this.dp = dp;
+    this.highlight = highlight;
 
     this.scene = new three.Scene();
     this.scene.background = new three.Color(0xeeeeee);
@@ -182,9 +185,9 @@ class SceneManager {
           value: this.zoom
         }
       },
-      vertexShader: vertShader,
-      fragmentShader: fragShader
-    });
+      vertexShader: highlight ? vertHighlightShader : vertShader,
+      fragmentShader: highlight ? fragHighlightShader : fragShader
+ });
     this.material.transparent = true;
 
     this.points = new three.Points(this.geometry, this.material);
@@ -637,7 +640,8 @@ Promise.all([edgePromise, nodePromise]).then((values) => {
     el: '#vis',
     width,
     height,
-    dp: new DiskDataProvider(nodes, edges)
+    dp: new DiskDataProvider(nodes, edges),
+    highlight: query.get('highlight') !== null
   });
   window.scene = scene;
 
