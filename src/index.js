@@ -62,10 +62,11 @@ function minmax (arr) {
 }
 
 class SceneManager {
-  constructor ({el, width, height, dp}) {
+  constructor ({el, width, height, dp, highlight}) {
     this.width = width;
     this.height = height;
     this.dp = dp;
+    this.highlight = highlight;
 
     this.scene = new three.Scene();
     this.scene.background = new three.Color(0xeeeeee);
@@ -184,10 +185,8 @@ class SceneManager {
           value: this.zoom
         }
       },
-      // vertexShader: vertShader,
-      // fragmentShader: fragShader
-      vertexShader: vertHighlightShader,
-      fragmentShader: fragHighlightShader
+      vertexShader: highlight ? vertHighlightShader : vertShader,
+      fragmentShader: highlight ? fragHighlightShader : fragShader
  });
     this.material.transparent = true;
 
@@ -641,7 +640,8 @@ Promise.all([edgePromise, nodePromise]).then((values) => {
     el: '#vis',
     width,
     height,
-    dp: new DiskDataProvider(nodes, edges)
+    dp: new DiskDataProvider(nodes, edges),
+    highlight: query.get('highlight') !== null
   });
   window.scene = scene;
 
