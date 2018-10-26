@@ -16,6 +16,29 @@ import lineFragShader from './shader/line-frag.glsl';
 
 import testStructure from './testMolecule2.json';
 
+const query = new window.URLSearchParams(window.location.search);
+
+function getDataFilenames () {
+  const node = query.get('node') || 'nodes';
+  const edge = query.get('edge') || 'edges';
+
+  return [`data/${edge}.json`, `data/${node}.json`];
+}
+
+function getWidthHeight (large) {
+  if (large) {
+    return [1920, 1080];
+  } else {
+    return [960, 540];
+  }
+}
+
+const [width, height] = getWidthHeight(query.get('large') !== null);
+document.write(html({
+  width,
+  height
+}));
+
 function minmax (arr) {
   let min = Infinity;
   let max = -Infinity;
@@ -35,22 +58,6 @@ function minmax (arr) {
     max
   };
 }
-
-function getWidthHeight () {
-  const u = new window.URLSearchParams(window.location.search);
-
-  if (u.get('large') !== null) {
-    return [1920, 1080];
-  } else {
-    return [960, 540];
-  }
-}
-
-const [width, height] = getWidthHeight();
-document.write(html({
-  width,
-  height
-}));
 
 class SceneManager {
   constructor ({el, width, height, dp}) {
@@ -606,8 +613,10 @@ class SceneManager {
   }
 }
 
-let edgePromise = fetch('data/edges.json');
-let nodePromise = fetch('data/nodes.json');
+const [edgefile, nodefile] = getDataFilenames();
+
+let edgePromise = fetch(edgefile);
+let nodePromise = fetch(nodefile);
 
 Promise.all([edgePromise, nodePromise]).then((values) => {
   return Promise.all(values.map(x => x.json()));
