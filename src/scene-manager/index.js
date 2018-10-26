@@ -11,8 +11,6 @@ import fragShader from './shader/circle-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
-import * as three from 'three';
-
 export class SceneManager {
   constructor ({el, width, height, dp}) {
     this.width = width;
@@ -431,18 +429,18 @@ export class SceneManager {
       .on('click', () => this.undisplay());
 
     if (this.selected !== this.index[name]) {
-      scene.select(name);
-      scene.focus(name);
+      this.scene.select(name);
+      this.scene.focus(name);
     } else {
-      scene.undisplay();
+      this.scene.undisplay();
     }
 
     return true;
   }
 
   undisplay () {
-    scene.unselect();
-    scene.unfocus();
+    this.scene.unselect();
+    this.scene.unfocus();
   }
 
   hideAfter (year) {
