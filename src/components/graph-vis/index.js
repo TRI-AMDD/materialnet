@@ -1,5 +1,19 @@
 import React, { Component } from 'react';
 
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  Input,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead
+} from '@material-ui/core';
+
+import { Slider } from '@material-ui/lab';
+
 import { SceneManager } from '../../scene-manager';
 import { DiskDataProvider } from '../../data-provider';
 
@@ -12,7 +26,6 @@ class GraphVisComponent extends Component {
   componentDidMount() {
     const { edges, nodes } = this.props;
     this.data = new DiskDataProvider(nodes, edges);
-    console.log('DATAMANAGER', this.data);
     this.scene = new SceneManager({
       el: this.visElement,
       width: 1000,
@@ -32,7 +45,75 @@ class GraphVisComponent extends Component {
 
   render() {
     return (
-      <div ref={ref => {this.visElement = ref}}></div>
+      <div>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Zoom</TableCell>
+              <TableCell>Link opacity</TableCell>
+              <TableCell>Node spacing</TableCell>
+              <TableCell>Discovered before</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Slider/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Slider/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Slider/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Slider/>
+                </FormControl>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+          <TableHead>
+            <TableRow>
+              <TableCell>Search</TableCell>
+              <TableCell>Node color</TableCell>
+              <TableCell>Node size</TableCell>
+              <TableCell>Show links</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Input/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Select/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Select/>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Select/>
+                </FormControl>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        <div ref={ref => {this.visElement = ref}}></div>
+      </div>
     );
   }
 }
