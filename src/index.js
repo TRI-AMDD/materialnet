@@ -8,8 +8,6 @@ import { defineCustomElements as defineMolecule } from '@openchemistry/molecule/
 import html from './index.pug';
 import infopanel from './infopanel.pug';
 
-import edges from './data/edges.json';
-import nodes from './data/nodes.json';
 import { DiskDataProvider } from './DataProvider';
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
@@ -608,280 +606,289 @@ class SceneManager {
   }
 }
 
-const scene = new SceneManager({
-  el: '#vis',
-  width,
-  height,
-  dp: new DiskDataProvider(nodes, edges)
-});
-window.scene = scene;
+let edgePromise = fetch('data/edges.json');
+let nodePromise = fetch('data/nodes.json');
 
-function sortStringsAlpha (a, b) {
-  return a < b ? -1 : (a > b ? 1 : 0);
-}
+Promise.all([edgePromise, nodePromise]).then((values) => {
+  return Promise.all(values.map(x => x.json()));
+}).then((values) => {
+  const [edges, nodes] = values;
 
-function sortStringsLength (a, b) {
-  if (a.length < b.length) {
-    return -1;
-  } else if (a.length > b.length) {
-    return 1;
-  } else {
-    return sortStringsAlpha(a, b);
+  const scene = new SceneManager({
+    el: '#vis',
+    width,
+    height,
+    dp: new DiskDataProvider(nodes, edges)
+  });
+  window.scene = scene;
+
+  function sortStringsAlpha (a, b) {
+    return a < b ? -1 : (a > b ? 1 : 0);
   }
-}
 
-select('#materials')
-  .selectAll('option')
-  .data(scene.dp.nodeNames().slice().sort(sortStringsLength))
-  .enter()
-  .append('option')
-  .attr('value', d => d);
+  function sortStringsLength (a, b) {
+    if (a.length < b.length) {
+      return -1;
+    } else if (a.length > b.length) {
+      return 1;
+    } else {
+      return sortStringsAlpha(a, b);
+    }
+  }
 
-scene.on('mousemove.always', function () {
-  const bbox = this.el.getBoundingClientRect();
+  select('#materials')
+    .selectAll('option')
+    .data(scene.dp.nodeNames().slice().sort(sortStringsLength))
+    .enter()
+    .append('option')
+    .attr('value', d => d);
 
-  this.pixel.x = window.event.clientX - bbox.left;
-  this.pixel.y = window.event.clientY - bbox.top;
+  scene.on('mousemove.always', function () {
+    const bbox = this.el.getBoundingClientRect();
 
-  this.mouse.x = (this.pixel.x / width) * 2 - 1;
-  this.mouse.y = -((this.pixel.y / height) * 2 - 1);
-});
+    this.pixel.x = window.event.clientX - bbox.left;
+    this.pixel.y = window.event.clientY - bbox.top;
 
-scene.on('click', function () {
-  if (this.dragged) {
+    this.mouse.x = (this.pixel.x / width) * 2 - 1;
+    this.mouse.y = -((this.pixel.y / height) * 2 - 1);
+  });
+
+  scene.on('click', function () {
+    if (this.dragged) {
+      this.dragged = false;
+      return;
+    }
+
+    const obj = this.pick();
+    if (obj) {
+      if (obj.index < this.dp.nodeNames().length) {
+        const name = this.dp.nodeNames()[obj.index];
+        scene.display(name);
+      }
+    }
+
     this.dragged = false;
-    return;
-  }
+  });
 
-  const obj = this.pick();
-  if (obj) {
-    if (obj.index < this.dp.nodeNames().length) {
-      const name = this.dp.nodeNames()[obj.index];
-      scene.display(name);
+  scene.on('wheel', function () {
+    // Don't scroll the webpage.
+    window.event.preventDefault();
+
+    // Compute the amount of the roll.
+    const delta = window.event.deltaY / -50;
+    const factor = delta < 0 ? 1 / -delta : delta;
+
+    // Prevent a zoom operation if it would exceed the zoom slider range.
+    const slider = select('#zoom').node();
+    const step = slider.valueAsNumber;
+    if ((factor > 1 && step === 113) || (factor < 1 && step === 0)) {
+      return;
+    }
+
+    // Adjust the zoom level.
+    this.zoom *= factor;
+
+    // And move the zoom slider.
+    const steps = Math.round(Math.log(factor) / Math.log(1.06));
+    if (steps > 0) {
+      for (let i = 0; i < steps; i++) {
+        slider.stepUp();
+      }
+    } else {
+      for (let i = 0; i < -steps; i++) {
+        slider.stepDown();
+      }
+    }
+  });
+
+  scene.on('mousedown', function () {
+    this.dragging = true;
+    this.dragPoint = {...this.pixel};
+  });
+
+  scene.on('mousemove.drag', function () {
+    if (!this.dragging) {
+      return;
+    }
+
+    this.dragged = true;
+
+    const delta = {
+      x: this.pixel.x - this.dragPoint.x,
+      y: this.pixel.y - this.dragPoint.y
+    };
+
+    this.dragPoint = {...this.pixel};
+
+    // this.camera.position += new three.Vector3(delta.x, delta.y, 0);
+    this.camera.left -= delta.x / this.zoom;
+    this.camera.right -= delta.x / this.zoom;
+    this.camera.top += delta.y / this.zoom;
+    this.camera.bottom += delta.y / this.zoom;
+    this.camera.updateProjectionMatrix();
+  });
+
+  scene.on('mouseup', function () {
+    this.dragging = false;
+  });
+
+  select('#links').on('change', function () {
+    const me = select(this);
+    const visible = me.property('checked');
+
+    scene.linksVisible(visible);
+  });
+
+  select('#color').on('change', function () {
+    const menu = select(this).node();
+    const choice = select(menu.options[menu.selectedIndex]);
+    const mode = choice.attr('data-name');
+
+    switch(mode) {
+      case 'none':
+        scene.setConstColor(0.2, 0.3, 0.8);
+      break;
+
+      case 'discovery':
+        scene.setDiscoveryColor();
+      break;
+
+      case 'boolean':
+        scene.setBooleanColor();
+      break;
+
+      case 'undiscovered':
+        scene.setUndiscoveredColor(select('#coloryear').node().valueAsNumber);
+      break;
+
+      default:
+        throw new Error(`illegal size option: "${mode}"`);
+    }
+  });
+
+  select('#size').on('change', function () {
+    const menu = select(this).node();
+    const choice = select(menu.options[menu.selectedIndex]);
+    const mode = choice.attr('data-name');
+
+    switch(mode) {
+      case 'none':
+        scene.setConstSize(10);
+      break;
+
+      case 'degree':
+        scene.setDegreeSize(select('#filter').node().valueAsNumber);
+      break;
+
+      default:
+        throw new Error(`illegal size option: "${mode}"`);
+    }
+  });
+
+  select('#zoom').node().valueAsNumber = 35;
+  select('#zoom').on('input', function () {
+    const slider = select(this).node();
+    const value = slider.valueAsNumber;
+    const zoom = 0.125 * Math.pow(1.06, value);
+
+    scene.zoom = zoom;
+  });
+
+  select('#opacity').node().valueAsNumber = 50;
+  select('#opacity').on('input', function () {
+    const slider = select(this).node();
+    const value = slider.valueAsNumber;
+    const opacity = value / 1000;
+
+    scene.setLinkOpacity(opacity);
+  });
+
+  select('#spacing').node().valueAsNumber = 1;
+  select('#spacing').on('input', function () {
+    const slider = select(this).node();
+    const expansion = slider.valueAsNumber;
+
+    scene.expand(expansion);
+  });
+
+  select('#filter').on('input', function () {
+    const year = select(this).node().value;
+    const text = select('#filterlabel');
+
+    if (year === '2016') {
+      scene.hideNodes([]);
+      text.text('Show all materials');
+    } else {
+      scene.hideAfter(year);
+      text.text(`Show materials up to ${year}`);
+    }
+
+    if (scene.degreeSize) {
+      scene.setDegreeSize(year);
+    }
+  });
+
+  let callback = null;
+  const autoplay = function () {
+    const slider = select('#filter');
+
+    const advance = (year) => () => {
+      slider.property('value', year);
+      slider.node().dispatchEvent(new Event('input'));
+
+      let nextYear = year + 1;
+      let timeout = 1;
+      if (nextYear === 2017) {
+        nextYear = 1945;
+        timeout = 1000;
+      }
+
+      callback = window.setTimeout(advance(nextYear), timeout);
+    };
+
+    const end = () => {
+      callback = null;
+      button.text('Autoplay');
+    }
+
+    const button = select(this);
+
+    if (button.text() === 'Autoplay') {
+      button.text('Stop');
+      advance(1945)();
+    } else {
+      if (callback) {
+        window.clearTimeout(callback);
+      }
+      end();
     }
   }
 
-  this.dragged = false;
-});
+  select('#autoplay').on('click', autoplay);
 
-scene.on('wheel', function () {
-  // Don't scroll the webpage.
-  window.event.preventDefault();
+  select('#search').on('change', function () {
+    const term = select(this).property('value');
+    scene.display(term);
 
-  // Compute the amount of the roll.
-  const delta = window.event.deltaY / -50;
-  const factor = delta < 0 ? 1 / -delta : delta;
+    select(this).property('value', '');
+  });
 
-  // Prevent a zoom operation if it would exceed the zoom slider range.
-  const slider = select('#zoom').node();
-  const step = slider.valueAsNumber;
-  if ((factor > 1 && step === 113) || (factor < 1 && step === 0)) {
-    return;
+  select('#coloryear').on('input', function () {
+    const year = select(this).node().valueAsNumber;
+
+    select('#coloryeardisplay').text(year);
+    scene.setColorYear(year);
+  });
+
+  function animate (e) {
+    scene.render();
+    window.requestAnimationFrame(animate);
   }
 
-  // Adjust the zoom level.
-  this.zoom *= factor;
-
-  // And move the zoom slider.
-  const steps = Math.round(Math.log(factor) / Math.log(1.06));
-  if (steps > 0) {
-    for (let i = 0; i < steps; i++) {
-      slider.stepUp();
-    }
-  } else {
-    for (let i = 0; i < -steps; i++) {
-      slider.stepDown();
-    }
-  }
-});
-
-scene.on('mousedown', function () {
-  this.dragging = true;
-  this.dragPoint = {...this.pixel};
-});
-
-scene.on('mousemove.drag', function () {
-  if (!this.dragging) {
-    return;
-  }
-
-  this.dragged = true;
-
-  const delta = {
-    x: this.pixel.x - this.dragPoint.x,
-    y: this.pixel.y - this.dragPoint.y
-  };
-
-  this.dragPoint = {...this.pixel};
-
-  // this.camera.position += new three.Vector3(delta.x, delta.y, 0);
-  this.camera.left -= delta.x / this.zoom;
-  this.camera.right -= delta.x / this.zoom;
-  this.camera.top += delta.y / this.zoom;
-  this.camera.bottom += delta.y / this.zoom;
-  this.camera.updateProjectionMatrix();
-});
-
-scene.on('mouseup', function () {
-  this.dragging = false;
-});
-
-select('#links').on('change', function () {
-  const me = select(this);
-  const visible = me.property('checked');
-
-  scene.linksVisible(visible);
-});
-
-select('#color').on('change', function () {
-  const menu = select(this).node();
-  const choice = select(menu.options[menu.selectedIndex]);
-  const mode = choice.attr('data-name');
-
-  switch(mode) {
-    case 'none':
-      scene.setConstColor(0.2, 0.3, 0.8);
-    break;
-
-    case 'discovery':
-      scene.setDiscoveryColor();
-    break;
-
-    case 'boolean':
-      scene.setBooleanColor();
-    break;
-
-    case 'undiscovered':
-      scene.setUndiscoveredColor(select('#coloryear').node().valueAsNumber);
-    break;
-
-    default:
-      throw new Error(`illegal size option: "${mode}"`);
-  }
-});
-
-select('#size').on('change', function () {
-  const menu = select(this).node();
-  const choice = select(menu.options[menu.selectedIndex]);
-  const mode = choice.attr('data-name');
-
-  switch(mode) {
-    case 'none':
-      scene.setConstSize(10);
-    break;
-
-    case 'degree':
-      scene.setDegreeSize(select('#filter').node().valueAsNumber);
-    break;
-
-    default:
-      throw new Error(`illegal size option: "${mode}"`);
-  }
-});
-
-select('#zoom').node().valueAsNumber = 35;
-select('#zoom').on('input', function () {
-  const slider = select(this).node();
-  const value = slider.valueAsNumber;
-  const zoom = 0.125 * Math.pow(1.06, value);
-
-  scene.zoom = zoom;
-});
-
-select('#opacity').node().valueAsNumber = 50;
-select('#opacity').on('input', function () {
-  const slider = select(this).node();
-  const value = slider.valueAsNumber;
-  const opacity = value / 1000;
-
-  scene.setLinkOpacity(opacity);
-});
-
-select('#spacing').node().valueAsNumber = 1;
-select('#spacing').on('input', function () {
-  const slider = select(this).node();
-  const expansion = slider.valueAsNumber;
-
-  scene.expand(expansion);
-});
-
-select('#filter').on('input', function () {
-  const year = select(this).node().value;
-  const text = select('#filterlabel');
-
-  if (year === '2016') {
-    scene.hideNodes([]);
-    text.text('Show all materials');
-  } else {
-    scene.hideAfter(year);
-    text.text(`Show materials up to ${year}`);
-  }
-
-  if (scene.degreeSize) {
-    scene.setDegreeSize(year);
-  }
-});
-
-let callback = null;
-const autoplay = function () {
-  const slider = select('#filter');
-
-  const advance = (year) => () => {
-    slider.property('value', year);
-    slider.node().dispatchEvent(new Event('input'));
-
-    let nextYear = year + 1;
-    let timeout = 1;
-    if (nextYear === 2017) {
-      nextYear = 1945;
-      timeout = 1000;
-    }
-
-    callback = window.setTimeout(advance(nextYear), timeout);
-  };
-
-  const end = () => {
-    callback = null;
-    button.text('Autoplay');
-  }
-
-  const button = select(this);
-
-  if (button.text() === 'Autoplay') {
-    button.text('Stop');
-    advance(1945)();
-  } else {
-    if (callback) {
-      window.clearTimeout(callback);
-    }
-    end();
-  }
-}
-
-select('#autoplay').on('click', autoplay);
-
-select('#search').on('change', function () {
-  const term = select(this).property('value');
-  scene.display(term);
-
-  select(this).property('value', '');
-});
-
-select('#coloryear').on('input', function () {
-  const year = select(this).node().valueAsNumber;
-
-  select('#coloryeardisplay').text(year);
-  scene.setColorYear(year);
-});
-
-function animate (e) {
-  scene.render();
   window.requestAnimationFrame(animate);
-}
 
-window.requestAnimationFrame(animate);
+  defineMolecule(window);
+  select('#structure').node().cjson = testStructure;
 
-defineMolecule(window);
-select('#structure').node().cjson = testStructure;
-
-window.scene = scene;
+  window.scene = scene;
+});
