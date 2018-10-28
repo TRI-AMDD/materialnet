@@ -5,7 +5,8 @@ const MySlider = (props) => {
   const {
     onChange,
     params,
-    digits
+    digits,
+    children
   } = props;
 
   return (
@@ -13,14 +14,16 @@ const MySlider = (props) => {
       <div>
         {params.value.toFixed(Number.isInteger(digits) ? digits : 3)}
       </div>
-      <div style={{flexGrow: 1, paddingRight: 16}}>
+      <div style={{flexGrow: 1, paddingRight: 16, paddingLeft: 16}}>
         <Slider
           value={params.value}
           min={params.min}
           max={params.max}
+          step={params.step}
           onChange={(e, val) => {onChange(val);}}
         />
       </div>
+      {children}
     </div>
   );
 }
