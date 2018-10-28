@@ -7,12 +7,16 @@ import {
   MenuItem,
   FormControl,
   Input,
+  IconButton,
   Table,
   TableBody,
   TableRow,
   TableCell,
   TableHead
 } from '@material-ui/core';
+
+// import { Play, Pause } from '@material-ui/icons';
+import { PlayArrow, Pause } from '@material-ui/icons'
 
 import { Slider } from '@material-ui/lab';
 import MySlider from './slider';
@@ -47,7 +51,10 @@ class GraphVisComponent extends Component {
       year: {
         value: 2016,
         min: 1945,
-        max: 2016
+        max: 2016,
+        step: 1,
+        play: false,
+        interval: null
       }
     }
 
@@ -105,6 +112,35 @@ class GraphVisComponent extends Component {
     this.onValueChanged(this.state.zoom.value + delta, 'zoom');
   }
 
+  toggleAutoplay = () => {
+    const {year} = this.state;
+    let interval = year.interval;
+    let play = !year.play;
+
+    if (year.play && year.interval) {
+      clearInterval(year.interval);
+      interval = null;
+    }
+
+    if (!year.play) {
+      interval = setInterval(() => {
+        const {year} = this.state;
+        let nextYear = year.value + 1;
+        if (year.value === year.max) {
+          nextYear = year.min;
+        }
+        this.onValueChanged(nextYear, 'year');
+      }, 1000);
+    }
+
+    const newState = produce(this.state, draft => {
+      draft.year.play = play;
+      draft.year.interval = interval;
+      return draft;
+    });
+    this.setState(newState);
+  }
+
   render() {
     const {
       zoom,
@@ -156,7 +192,13 @@ class GraphVisComponent extends Component {
                     params={year}
                     onChange={(val) => {this.onValueChanged(val, 'year')}}
                     digits={0}
-                  />
+                  >
+                    <IconButton
+                      onClick={this.toggleAutoplay}
+                    >
+                      { year.play ? <Pause/> : <PlayArrow/>}
+                    </IconButton>
+                  </MySlider>
                 </FormControl>
               </TableCell>
             </TableRow>
