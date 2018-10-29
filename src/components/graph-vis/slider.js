@@ -16,6 +16,7 @@ const MySlider = (props) => {
       </div>
       <div style={{flexGrow: 1, paddingRight: 16, paddingLeft: 16}}>
         <Slider
+          {...props}
           value={params.value}
           min={params.min}
           max={params.max}

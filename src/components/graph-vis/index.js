@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import produce from "immer"
 
 import {
+  Checkbox,
   Select,
   MenuItem,
   FormControl,
@@ -78,6 +79,9 @@ class GraphVisComponent extends Component {
           {label: 'None', value: 'none'},
           {label: 'Degree', value: 'degree'}
         ]
+      },
+      showLinks: {
+        value: false
       }
     }
 
@@ -86,7 +90,8 @@ class GraphVisComponent extends Component {
       spacing: (val) => { this.scene.expand(val); },
       year: (val) => { this.scene.hideAfter(val); },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
-      search: (val) => { this.scene.display(val); }
+      search: (val) => { this.scene.display(val); },
+      showLinks: (val) => { this.scene.linksVisible(val) }
     }
   }
 
@@ -102,7 +107,6 @@ class GraphVisComponent extends Component {
     });
 
     this.setDefaults();
-    this.scene.linksVisible(false);
 
     const animate = (e) => {
       this.scene.render();
@@ -175,7 +179,8 @@ class GraphVisComponent extends Component {
       year,
       search,
       size,
-      color
+      color,
+      showLinks
     } = this.state;
 
     return (
@@ -184,7 +189,7 @@ class GraphVisComponent extends Component {
           <TableHead>
             <TableRow>
               <TableCell>Zoom</TableCell>
-              <TableCell>Link opacity</TableCell>
+              <TableCell>Link opacity / display</TableCell>
               <TableCell>Node spacing</TableCell>
               <TableCell>Discovered before</TableCell>
             </TableRow>
@@ -202,9 +207,12 @@ class GraphVisComponent extends Component {
               <TableCell>
                 <FormControl fullWidth>
                   <MySlider
+                    disabled={!showLinks.value}
                     params={opacity}
                     onChange={(val) => {this.onValueChanged(val, 'opacity')}}
-                  />
+                  >
+                    <Checkbox checked={showLinks.value} onChange={(e, val) => {this.onValueChanged(val, 'showLinks')}}/>
+                  </MySlider>
                 </FormControl>
               </TableCell>
               <TableCell>
