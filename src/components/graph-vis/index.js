@@ -81,6 +81,12 @@ class GraphVisComponent extends Component {
           {label: 'Discovered/Undiscovered', value: 'undiscovered'}
         ]
       },
+      colorYear: {
+        value: 2016,
+        min: 1945,
+        max: 2016,
+        step: 1
+      },
       size: {
         value: 'normal',
         options: [
@@ -107,7 +113,37 @@ class GraphVisComponent extends Component {
       opacity: (val) => { this.scene.setLinkOpacity(val); },
       search: (val) => { this.scene.display(val); },
       showLinks: (val) => { this.scene.linksVisible(val) },
-      size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); }
+      size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); },
+      color: (val) => {
+        switch (val) {
+          case 'boolean':
+            this.scene.setBooleanColor();
+            break;
+
+          case 'discovery':
+            this.scene.setDiscoveryColor();
+            break;
+
+          case 'undiscovered':
+            this.scene.setUndiscoveredColor(this.state.colorYear.value);
+            break;
+        }
+      },
+      colorYear: (val) => {
+        switch (this.state.color.value) {
+          case 'boolean':
+            this.scene.setBooleanColor();
+            break;
+
+          case 'discovery':
+            this.scene.setDiscoveryColor();
+            break;
+
+          case 'undiscovered':
+            this.scene.setUndiscoveredColor(val);
+            break;
+        }
+      }
     }
   }
 
@@ -216,6 +252,7 @@ class GraphVisComponent extends Component {
       search,
       size,
       color,
+      colorYear,
       showLinks
     } = this.state;
 
@@ -279,9 +316,9 @@ class GraphVisComponent extends Component {
           <TableHead>
             <TableRow>
               <TableCell>Search</TableCell>
-              <TableCell>Node color</TableCell>
               <TableCell>Node size</TableCell>
-              <TableCell>Show links</TableCell>
+              <TableCell>Node color</TableCell>
+              <TableCell>Color year</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -293,13 +330,6 @@ class GraphVisComponent extends Component {
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Select value={color.value} onChange={(e) => {this.onValueChanged(e.target.value, 'color')}}>
-                    {color.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
                   <Select value={size.value} onChange={(e) => {this.onValueChanged(e.target.value, 'size')}}>
                     {size.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
                   </Select>
@@ -307,6 +337,19 @@ class GraphVisComponent extends Component {
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
+                  <Select value={color.value} onChange={(e) => {this.onValueChanged(e.target.value, 'color')}}>
+                    {color.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <MySlider
+                    params={colorYear}
+                    onChange={(val) => {this.onValueChanged(val, 'colorYear')}}
+                    disabled={color.value !== 'undiscovered'}
+                    digits={0}
+                  />
                 </FormControl>
               </TableCell>
             </TableRow>
