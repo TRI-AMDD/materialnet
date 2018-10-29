@@ -262,13 +262,53 @@ export class SceneManager {
     select(this.el).on(eventType, cb.bind(this));
   }
 
-  pick () {
+  pick ({x, y}) {
+    const bbox = this.parent.getBoundingClientRect();
+    const pixel = {
+      x: x - bbox.left,
+      y: y - bbox.top
+    }
+
+    this.mouse.x = (pixel.x / this.parent.clientWidth) * 2 - 1;
+    this.mouse.y = - ((pixel.y / this.parent.clientHeight) * 2 - 1);
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const results = this.raycaster.intersectObject(this.points);
-    if (results.length > 0) {
-      return results[0];
+    if (results.length === 0) {
+      return null;
     }
-    return null;
+
+    const obj = results[0];
+
+    if (obj.index >= this.dp.nodeNames()) {
+      return null;
+    }
+
+    const name = this.dp.nodeNames()[obj.index];
+    if (!this.index.hasOwnProperty(name)) {
+      return null;
+    }
+
+    const data = {
+      name,
+      degree: this.dp.nodeProperty(name, 'degree'),
+      discovery: this.dp.nodeProperty(name, 'discovery'),
+      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+      degCent: this.dp.nodeProperty(name, 'deg_cent'),
+      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+    };
+
+    if (this.selected !== this.index[name]) {
+      this.display(name);
+    } else {
+      this.undisplay();
+    }
+
+    return data;
+
   }
 
   setColor (idx, r, g, b, update = true) {
@@ -429,36 +469,13 @@ export class SceneManager {
   }
 
   display (name) {
-    if (!this.index.hasOwnProperty(name)) {
-      return false;
-    }
-
-    const data = {
-      name,
-      degree: this.dp.nodeProperty(name, 'degree'),
-      discovery: this.dp.nodeProperty(name, 'discovery'),
-      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
-      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
-      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
-      degCent: this.dp.nodeProperty(name, 'deg_cent'),
-      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
-    };
-
-    select('#infopanel')
-      .html(infopanel(data))
-      .select('#clear')
-      .on('click', () => this.undisplay());
-
-    if (this.selected !== this.index[name]) {
-      this.select(name);
-      this.focus(name);
-    } else {
+    console.log("NAME", name);
+    if (name.trim() === '') {
       this.undisplay();
+      return;
     }
-
-    return true;
+    this.select(name);
+    this.focus(name);
   }
 
   undisplay () {

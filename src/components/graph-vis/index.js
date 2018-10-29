@@ -204,6 +204,11 @@ class GraphVisComponent extends Component {
     this.onValueChanged(this.state.zoom.value + delta, 'zoom');
   }
 
+  onVisClick = (e) => {
+    const obj = this.scene.pick({x: e.clientX, y: e.clientY});
+    console.log(obj);
+  }
+
   toggleAutoplay = () => {
     const {year} = this.state;
     let interval = year.interval;
@@ -367,6 +372,7 @@ class GraphVisComponent extends Component {
               onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
               onMouseUp={(e) => {this.dragging.status = false;}}
               onMouseMove={this.onDrag}
+              onClick={this.onVisClick}
             />
             <oc-molecule
               slot={1}
