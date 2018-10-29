@@ -429,18 +429,18 @@ export class SceneManager {
       .on('click', () => this.undisplay());
 
     if (this.selected !== this.index[name]) {
-      this.scene.select(name);
-      this.scene.focus(name);
+      this.select(name);
+      this.focus(name);
     } else {
-      this.scene.undisplay();
+      this.undisplay();
     }
 
     return true;
   }
 
   undisplay () {
-    this.scene.unselect();
-    this.scene.unfocus();
+    this.unselect();
+    this.unfocus();
   }
 
   hideAfter (year) {
