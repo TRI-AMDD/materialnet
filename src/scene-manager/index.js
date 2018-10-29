@@ -12,9 +12,12 @@ import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
 export class SceneManager {
-  constructor ({el, width, height, dp}) {
+  constructor ({el, dp}) {
+    const width = el.clientWidth;
+    const height = el.clientHeight;
     this.width = width;
     this.height = height;
+    this.parent = el;
     this.dp = dp;
 
     this.scene = new three.Scene();
@@ -35,7 +38,6 @@ export class SceneManager {
     this.renderer = new three.WebGLRenderer({
       antialias: true
     });
-    this.renderer.setSize(width, height);
 
     this.el = this.renderer.domElement;
     select(el).append(() => this.el);
@@ -143,6 +145,14 @@ export class SceneManager {
     this.scene.add(this.points);
 
     this.setDegreeSize(2017);
+
+    this.resize();
+  }
+
+  resize() {
+    const width = this.parent.clientWidth;
+    const height = this.parent.clientHeight;
+    this.renderer.setSize(width, height);
   }
 
   linksVisible (vis) {
