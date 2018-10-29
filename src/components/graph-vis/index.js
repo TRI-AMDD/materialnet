@@ -17,9 +17,10 @@ import {
 } from '@material-ui/core';
 
 // import { Play, Pause } from '@material-ui/icons';
-import { PlayArrow, Pause } from '@material-ui/icons'
+import { PlayArrow, Pause } from '@material-ui/icons';
 
-import { Slider } from '@material-ui/lab';
+import ResizeObserver from 'resize-observer-polyfill';
+
 import MySlider from './slider';
 import Search from './search';
 
@@ -36,6 +37,7 @@ class GraphVisComponent extends Component {
     status: false,
     start: {x: 0, y: 0}
   }
+  ro;
 
   constructor(props) {
     super(props);
@@ -105,8 +107,6 @@ class GraphVisComponent extends Component {
     this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
     this.scene = new SceneManager({
       el: this.visElement,
-      width: 1000,
-      height: 400,
       dp: this.data
     });
 
@@ -118,6 +118,18 @@ class GraphVisComponent extends Component {
     }
 
     window.requestAnimationFrame(animate);
+
+    this.ro = new ResizeObserver(() => {
+      this.scene.resize();
+    });
+
+    this.ro.observe(this.visElement);
+  }
+
+  componentWillUnmount() {
+    if (this.ro) {
+      this.ro.unobserve(this.visElement);
+    }
   }
 
   setDefaults() {
@@ -291,6 +303,7 @@ class GraphVisComponent extends Component {
           </TableBody>
         </Table>
         <div
+          style={{width: '100%', height: '40rem'}}
           ref={ref => {this.visElement = ref}}
           onWheel={this.onVisZoom}
           onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
