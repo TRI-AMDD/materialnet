@@ -82,10 +82,12 @@ class GraphVisComponent extends Component {
         ]
       },
       size: {
-        value: 'degree',
+        value: 'normal',
         options: [
           {label: 'None', value: 'none'},
-          {label: 'Degree', value: 'degree'}
+          {label: 'Degree', value: 'normal'},
+          {label: 'Degree - Large', value: 'large'},
+          {label: 'Degree - Huge', value: 'huge'}
         ]
       },
       showLinks: {
@@ -96,10 +98,16 @@ class GraphVisComponent extends Component {
     this.sceneSetters = {
       zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
       spacing: (val) => { this.scene.expand(val); },
-      year: (val) => { this.scene.hideAfter(val); },
+      year: (val) => {
+        this.scene.hideAfter(val);
+        if (this.state.size.value !== 'none') {
+          this.scene.setDegreeSize(this.state.year.value, this.state.size.value);
+        }
+      },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
       search: (val) => { this.scene.display(val); },
-      showLinks: (val) => { this.scene.linksVisible(val) }
+      showLinks: (val) => { this.scene.linksVisible(val) },
+      size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); }
     }
   }
 
