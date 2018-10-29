@@ -1,5 +1,6 @@
 import { select } from 'd3-selection';
-import { scaleLinear } from 'd3-scale';
+import { scaleSequential } from 'd3-scale';
+import { interpolateViridis } from 'd3-scale-chromatic';
 import { color as d3Color } from 'd3-color';
 
 import * as three from 'three';
@@ -21,7 +22,7 @@ export class SceneManager {
     this.dp = dp;
 
     this.scene = new three.Scene();
-    this.scene.background = new three.Color(0xeeeeee);
+    this.scene.background = new three.Color(0xffffff);
 
     this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1, 1);
 
@@ -80,9 +81,8 @@ export class SceneManager {
     this.scene.add(this.lines);
 
     // Create a sequential colormap.
-    this.cmap = scaleLinear()
-      .domain([1945, 1980, 2015])
-      .range(['#7570b3', '#d95f02', '#1b9e77']);
+    this.cmap = scaleSequential(interpolateViridis)
+      .domain([1945, 2015]);
 
     // Initialize point geometry.
     positions.length = 0;
