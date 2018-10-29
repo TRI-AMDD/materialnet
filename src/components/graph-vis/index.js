@@ -62,6 +62,22 @@ class GraphVisComponent extends Component {
       },
       search: {
         value: ''
+      },
+      color: {
+        value: 'discovery',
+        options: [
+          {label: 'None', value: 'none'},
+          {label: 'Year of discovery', value: 'discovery'},
+          {label: 'Discovered/Hypothetical', value: 'boolean'},
+          {label: 'Discovered/Undiscovered', value: 'undiscovered'}
+        ]
+      },
+      size: {
+        value: 'degree',
+        options: [
+          {label: 'None', value: 'none'},
+          {label: 'Degree', value: 'degree'}
+        ]
       }
     }
 
@@ -157,7 +173,9 @@ class GraphVisComponent extends Component {
       spacing,
       opacity,
       year,
-      search
+      search,
+      size,
+      color
     } = this.state;
 
     return (
@@ -231,17 +249,20 @@ class GraphVisComponent extends Component {
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Select/>
+                  <Select value={color.value} onChange={(e) => {this.onValueChanged(e.target.value, 'color')}}>
+                    {color.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                  </Select>
                 </FormControl>
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Select/>
+                  <Select value={size.value} onChange={(e) => {this.onValueChanged(e.target.value, 'size')}}>
+                    {size.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                  </Select>
                 </FormControl>
               </TableCell>
               <TableCell>
                 <FormControl fullWidth>
-                  <Select/>
                 </FormControl>
               </TableCell>
             </TableRow>
