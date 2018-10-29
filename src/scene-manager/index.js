@@ -144,7 +144,7 @@ export class SceneManager {
     this.points = new three.Points(this.geometry, this.material);
     this.scene.add(this.points);
 
-    this.setDegreeSize(2017);
+    this.setDegreeSize(2017, 'normal');
 
     this.resize();
   }
@@ -175,13 +175,25 @@ export class SceneManager {
     this.updateSize();
   }
 
-  setDegreeSize (year) {
+  setDegreeSize (year, level) {
     this.degreeSize = true;
 
     const degrees = this.dp.nodeDegrees(year);
 
     this.dp.nodeNames().forEach((name, i) => {
-      this.setSize(i, 10 + Math.sqrt(degrees[name]));
+      const deg = degrees[name];
+
+      if (level === 'normal') {
+        this.setSize(i, 10 + Math.sqrt(deg));
+      } else if (level === 'large') {
+        this.setSize(i, 10 + Math.sqrt(Math.sqrt(deg * deg * deg)));
+      } else if (level === 'huge') {
+        this.setSize(i, 10 + deg);
+      } else if (level === 'none') {
+        this.setConstSize(10);
+      } else {
+        throw new Error(`bad level option: ${level}`);
+      }
     });
 
     this.updateSize();
