@@ -25,6 +25,7 @@ import testStructure from './testMolecule.json';
 
 import MySlider from './slider';
 import Search from './search';
+import InfoPanel from './info-panel';
 
 import { sortStringsLength } from './sort';
 
@@ -98,6 +99,9 @@ class GraphVisComponent extends Component {
       },
       showLinks: {
         value: false
+      },
+      selected: {
+        value: null
       }
     }
 
@@ -206,7 +210,11 @@ class GraphVisComponent extends Component {
 
   onVisClick = (e) => {
     const obj = this.scene.pick({x: e.clientX, y: e.clientY});
-    console.log(obj);
+    const newState = produce(this.state, draft => {
+      draft.selected.value = obj;
+      return draft;
+    });
+    this.setState(newState);
   }
 
   toggleAutoplay = () => {
@@ -258,7 +266,8 @@ class GraphVisComponent extends Component {
       size,
       color,
       colorYear,
-      showLinks
+      showLinks,
+      selected
     } = this.state;
 
     return (
@@ -361,12 +370,12 @@ class GraphVisComponent extends Component {
           </TableBody>
         </Table>
         <div
-          style={{width: '100%', height: '40rem'}}
+          style={{width: '100%', height: '40rem', marginTop: '1rem', marginBottom: '1rem'}}
         >
           <split-me n={2}>
             <div
               slot={0}
-              style={{width: '100%', height: '100%', position: 'relative'}}
+              style={{width: '100%', height: '100%'}}
               ref={ref => {this.visElement = ref}}
               onWheel={this.onVisZoom}
               onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
@@ -379,6 +388,9 @@ class GraphVisComponent extends Component {
             />
           </split-me>
         </div>
+        {selected.value &&
+          <InfoPanel {...selected.value}/>
+        }
       </div>
     );
   }
