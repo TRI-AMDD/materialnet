@@ -20,6 +20,9 @@ import { PlayArrow, Pause } from '@material-ui/icons'
 
 import { Slider } from '@material-ui/lab';
 import MySlider from './slider';
+import Search from './search';
+
+import { sortStringsLength } from './sort';
 
 import { SceneManager } from '../../scene-manager';
 import { DiskDataProvider } from '../../data-provider';
@@ -44,9 +47,10 @@ class GraphVisComponent extends Component {
         max: 10
       },
       opacity: {
-        value: 50,
+        value: 0.01,
         min: 0,
-        max: 100
+        max: 0.1,
+        step: 0.001
       },
       year: {
         value: 2016,
@@ -55,19 +59,25 @@ class GraphVisComponent extends Component {
         step: 1,
         play: false,
         interval: null
+      },
+      search: {
+        value: ''
       }
     }
 
     this.sceneSetters = {
       zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
       spacing: (val) => { this.scene.expand(val); },
-      year: (val) => { this.scene.hideAfter(val); }
+      year: (val) => { this.scene.hideAfter(val); },
+      opacity: (val) => { this.scene.setLinkOpacity(val); },
+      search: (val) => { this.scene.display(val); }
     }
   }
 
   componentDidMount() {
     const { edges, nodes } = this.props;
     this.data = new DiskDataProvider(nodes, edges);
+    this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
     this.scene = new SceneManager({
       el: this.visElement,
       width: 1000,
@@ -146,7 +156,8 @@ class GraphVisComponent extends Component {
       zoom,
       spacing,
       opacity,
-      year
+      year,
+      search
     } = this.state;
 
     return (
@@ -215,7 +226,7 @@ class GraphVisComponent extends Component {
             <TableRow>
               <TableCell>
                 <FormControl fullWidth>
-                  <Input/>
+                  <Search options={this.searchOptions} value={search.value} onChange={(e, val) => {this.onValueChanged(val.newValue, 'search')}}/>
                 </FormControl>
               </TableCell>
               <TableCell>
