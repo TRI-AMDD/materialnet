@@ -156,7 +156,7 @@ class GraphVisComponent extends Component {
 
   onVisZoom = (e) => {
     e.preventDefault();
-    const delta = e.deltaY < 0 ? -1 : 1;
+    const delta = e.deltaY > 0 ? -1 : 1;
     this.onValueChanged(this.state.zoom.value + delta, 'zoom');
   }
 
