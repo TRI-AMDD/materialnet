@@ -547,6 +547,14 @@ export class SceneManager {
     this.updateEdgePosition();
   }
 
+  moveCamera(dx, dy) {
+    this.camera.left -= dx / this.camera.zoom;
+    this.camera.right -= dx / this.camera.zoom;
+    this.camera.top += dy / this.camera.zoom;
+    this.camera.bottom += dy / this.camera.zoom;
+    this.camera.updateProjectionMatrix();
+  }
+
   render () {
     this.renderer.render(this.scene, this.camera);
   }

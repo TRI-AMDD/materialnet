@@ -32,6 +32,10 @@ class GraphVisComponent extends Component {
   visElement;
   scene;
   data;
+  dragging = {
+    status: false,
+    start: {x: 0, y: 0}
+  }
 
   constructor(props) {
     super(props);
@@ -171,6 +175,16 @@ class GraphVisComponent extends Component {
     this.setState(newState);
   }
 
+  onDrag = (e) => {
+    if (!this.dragging.status) {
+      return;
+    }
+    const dx = e.clientX - this.dragging.start.x;
+    const dy = e.clientY - this.dragging.start.y;
+    this.scene.moveCamera(dx, dy);
+    this.dragging.start = {x: e.clientX, y: e.clientY};
+  }
+
   render() {
     const {
       zoom,
@@ -279,6 +293,9 @@ class GraphVisComponent extends Component {
         <div
           ref={ref => {this.visElement = ref}}
           onWheel={this.onVisZoom}
+          onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
+          onMouseUp={(e) => {this.dragging.status = false;}}
+          onMouseMove={this.onDrag}
         />
       </div>
     );
