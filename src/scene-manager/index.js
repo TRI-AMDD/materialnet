@@ -153,6 +153,7 @@ export class SceneManager {
     const width = this.parent.clientWidth;
     const height = this.parent.clientHeight;
     this.renderer.setSize(width, height);
+    this.render();
   }
 
   linksVisible (vis) {
