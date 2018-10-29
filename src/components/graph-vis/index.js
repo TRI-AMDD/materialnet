@@ -21,6 +21,8 @@ import { PlayArrow, Pause } from '@material-ui/icons';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
+import testStructure from './testMolecule.json';
+
 import MySlider from './slider';
 import Search from './search';
 
@@ -304,12 +306,22 @@ class GraphVisComponent extends Component {
         </Table>
         <div
           style={{width: '100%', height: '40rem'}}
-          ref={ref => {this.visElement = ref}}
-          onWheel={this.onVisZoom}
-          onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
-          onMouseUp={(e) => {this.dragging.status = false;}}
-          onMouseMove={this.onDrag}
-        />
+        >
+          <split-me n={2}>
+            <div
+              slot={0}
+              style={{width: '100%', height: '100%', position: 'relative'}}
+              ref={ref => {this.visElement = ref}}
+              onWheel={this.onVisZoom}
+              onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
+              onMouseUp={(e) => {this.dragging.status = false;}}
+              onMouseMove={this.onDrag}
+            />
+            <oc-molecule
+              slot={1}
+            />
+          </split-me>
+        </div>
       </div>
     );
   }
