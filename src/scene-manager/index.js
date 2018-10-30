@@ -503,7 +503,7 @@ export class SceneManager {
     // Collect all the nodes with discovery year after the specified year; these
     // will be hidden next.
     const toHide = year < 2016 ? this.dp.nodeNames().filter(d => {
-      const discovery = this.dp.nodeProperty(d, 'discovery') || 2000;
+      const discovery = this.dp.nodeProperty(d, 'discovery') || 2016;
       return !this.dp.nodeExists(d) || discovery > year;
     }) : [];
 
