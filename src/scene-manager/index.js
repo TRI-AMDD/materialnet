@@ -411,7 +411,7 @@ export class SceneManager {
     this.geometry.attributes.size.needsUpdate = true;
   }
 
-  select (name) {
+  select (name, center = false) {
     if (this.selected !== null) {
       this.geometry.attributes.selected.array[this.selected] = 0;
     }
@@ -423,7 +423,10 @@ export class SceneManager {
 
     const x = this.geometry.attributes.position.array[3 * this.selected + 0];
     const y = this.geometry.attributes.position.array[3 * this.selected + 1];
-    this.setCamera(x, y);
+
+    if (center) {
+      this.setCamera(x, y);
+    }
   }
 
   unselect () {
@@ -481,13 +484,13 @@ export class SceneManager {
     this.updateEdgeFocus();
   }
 
-  display (name) {
+  display (name, center=false) {
     console.log("NAME", name);
     if (name.trim() === '') {
       this.undisplay();
       return;
     }
-    this.select(name);
+    this.select(name, center);
     this.focus(name);
   }
 
