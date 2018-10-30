@@ -119,7 +119,7 @@ class GraphVisComponent extends Component {
         }
       },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
-      search: (val) => { this.scene.display(val); },
+      search: (val) => { this.scene.display(val, true); },
       showLinks: (val) => { this.scene.linksVisible(val); },
       nightMode: (val) => { this.scene.setNightMode(val); },
       size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); },
