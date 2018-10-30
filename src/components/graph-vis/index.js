@@ -245,6 +245,11 @@ class GraphVisComponent extends Component {
     this.dragging.status = true;
     this.dragging.start = {x: event.clientX, y: event.clientY};
 
+    const linksOn = this.state.showLinks.value;
+    if (linksOn) {
+      this.scene.linksVisible(false);
+    }
+
     const mouseMoveListener = (e) => {
       this.onDrag(e);
     };
@@ -252,6 +257,11 @@ class GraphVisComponent extends Component {
     const mouseUpListener = () => {
       window.removeEventListener('mousemove', mouseMoveListener);
       window.removeEventListener('mouseup', mouseUpListener);
+
+      if (linksOn) {
+        this.scene.linksVisible(true);
+      }
+
       setTimeout(() => {this.dragging.status = false;}, 50);
     };
 
