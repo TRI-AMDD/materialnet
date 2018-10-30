@@ -289,7 +289,6 @@ class GraphVisComponent extends Component {
       showLinks,
       selected
     } = this.state;
-
     const nSplit = selected.value ? 2 : 1;
     const splitSizes = nSplit === 2 ? '0.6, 0.4' : '1';
 
@@ -399,7 +398,10 @@ class GraphVisComponent extends Component {
             n={nSplit} sizes={splitSizes}
             ref={wc(
               // Events
-              {},
+              {
+                // Ugly workaround to fix firefox not resizing split elements.
+                slotResized: () => { this.onValueChanged(zoom.value, 'zoom'); }
+              },
             )}
           >
             <div
