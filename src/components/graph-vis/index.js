@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import produce from "immer"
-
 import {
   Checkbox,
   Select,
@@ -22,6 +20,7 @@ import { PlayArrow, Pause } from '@material-ui/icons';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
+import { fetchStructure } from '../../rest';
 import testStructure from './testMolecule.json';
 
 import MySlider from './slider';
@@ -106,6 +105,9 @@ class GraphVisComponent extends Component {
         value: false
       },
       selected: {
+        value: null
+      },
+      structure: {
         value: null
       }
     }
@@ -197,11 +199,10 @@ class GraphVisComponent extends Component {
 
   onValueChanged = (value, key) => {
     if (key in this.state) {
-      const newState = produce(this.state, draft => {
-        draft[key]['value'] = value;
-        return draft;
-      })
-      this.setState(newState);
+      this.setState((state, props) => {
+        state[key]['value'] = value;
+        return state;
+      });
     }
     if (key in this.sceneSetters) {
       this.sceneSetters[key](value);
@@ -233,11 +234,17 @@ class GraphVisComponent extends Component {
       this.scene.display(obj.name);
     }
 
-    const newState = produce(this.state, draft => {
-      draft.selected.value = obj;
-      return draft;
-    });
-    this.setState(newState);
+    this.onValueChanged(obj, 'selected');
+    this.onValueChanged(null, 'structure');
+
+    if (!obj) {
+      return;
+    }
+
+    fetchStructure(obj.name)
+    .then(cjson => {
+      this.onValueChanged(cjson, 'structure');
+    })
   }
 
   onVisDrag = (event) => {
@@ -280,12 +287,11 @@ class GraphVisComponent extends Component {
       }, 1000);
     }
 
-    const newState = produce(this.state, draft => {
-      draft.year.play = play;
-      draft.year.interval = interval;
-      return draft;
+    this.setState((state, props) => {
+      state['year']['play'] = play;
+      state['year']['interval'] = interval;
+      return state;
     });
-    this.setState(newState);
   }
 
   onDrag = (e) => {
@@ -301,6 +307,7 @@ class GraphVisComponent extends Component {
   onClearSelection = () => {
     this.scene.undisplay();
     this.onValueChanged(null, 'selected');
+    this.onValueChanged(null, 'structure');
   }
 
   render() {
@@ -315,7 +322,8 @@ class GraphVisComponent extends Component {
       colorYear,
       showLinks,
       nightMode,
-      selected
+      selected,
+      structure
     } = this.state;
 
     const nSplit = 2;
@@ -447,7 +455,6 @@ class GraphVisComponent extends Component {
               onWheel={this.onVisZoom}
               onClick={this.onVisClick}
             />
-            {selected.value &&
             <oc-molecule
               slot={1}
               ref={wc(
@@ -455,11 +462,10 @@ class GraphVisComponent extends Component {
                 {},
                 // Props
                 {
-                  cjson: testStructure
+                  cjson: structure.value
                 }
               )}
             />
-            }
           </split-me>
         </Paper>
         {selected.value &&
