@@ -11,13 +11,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 
-// const suggestions = [
-//   { label: 'Afghanistan' },
-//   { label: 'Aland Islands' },
-//   { label: 'Albania' },
-//   { label: 'Algeria' }
-// ];
-
 function renderInputComponent(inputProps) {
   const { classes, inputRef = () => {}, ref, ...other } = inputProps;
 
@@ -82,10 +75,7 @@ const styles = theme => ({
     margin: 0,
     padding: 0,
     listStyleType: 'none',
-  },
-  divider: {
-    height: theme.spacing.unit * 2,
-  },
+  }
 });
 
 class IntegrationAutosuggest extends React.Component {
@@ -170,7 +160,6 @@ class IntegrationAutosuggest extends React.Component {
             </Paper>
           )}
         />
-        <div className={classes.divider} />
       </div>
     );
   }
