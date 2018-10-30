@@ -5,8 +5,6 @@ import { color as d3Color } from 'd3-color';
 
 import * as three from 'three';
 
-import infopanel from './infopanel.pug';
-
 import vertShader from './shader/circle-vert.glsl';
 import fragShader from './shader/circle-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
@@ -414,10 +412,6 @@ export class SceneManager {
     this.geometry.attributes.selected.needsUpdate = true;
 
     this.selected = null;
-
-    select('#infopanel')
-      .selectAll('*')
-      .remove();
   }
 
   focus (name, edges = true) {
