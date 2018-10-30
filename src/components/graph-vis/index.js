@@ -102,6 +102,9 @@ class GraphVisComponent extends Component {
       showLinks: {
         value: false
       },
+      nightMode: {
+        value: false
+      },
       selected: {
         value: null
       }
@@ -118,7 +121,8 @@ class GraphVisComponent extends Component {
       },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
       search: (val) => { this.scene.display(val); },
-      showLinks: (val) => { this.scene.linksVisible(val) },
+      showLinks: (val) => { this.scene.linksVisible(val); },
+      nightMode: (val) => { this.scene.setNightMode(val); },
       size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); },
       color: (val) => {
         switch (val) {
@@ -310,6 +314,7 @@ class GraphVisComponent extends Component {
       color,
       colorYear,
       showLinks,
+      nightMode,
       selected
     } = this.state;
 
@@ -414,6 +419,11 @@ class GraphVisComponent extends Component {
               </TableCell>
             </TableRow>
           </TableBody>
+          <TableHead>
+            <TableRow>
+              <TableCell>Night Mode <Checkbox checked={nightMode.value} onChange={(e, val) => {this.onValueChanged(val, 'nightMode')}}/></TableCell>
+            </TableRow>
+          </TableHead>
         </Table>
         <Paper
           style={{width: '100%', height: '40rem', marginTop: '2rem', marginBottom: '2rem'}}
