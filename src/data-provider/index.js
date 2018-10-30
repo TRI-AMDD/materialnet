@@ -87,7 +87,9 @@ export class DiskDataProvider extends DataProvider {
         table[node] = 0;
       }
 
-      if (this.nodeExists(other) && this.nodeProperty(other, 'discovery') <= year) {
+      const discovery = this.nodeProperty(other, 'discovery') || 2016;
+
+      if (this.nodeExists(other) && discovery <= year) {
         table[node]++;
       }
     }
