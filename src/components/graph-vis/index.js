@@ -405,7 +405,7 @@ class GraphVisComponent extends Component {
             <TableRow>
               <TableCell>
                 <FormControl fullWidth>
-                  <Search options={this.searchOptions} value={search.value} onChange={(e, val) => {this.onValueChanged(val.newValue, 'search')}}/>
+                  <Search options={this.searchOptions} value={search.value} maxItems={20} onChange={(e, val) => {this.onValueChanged(val.newValue, 'search')}}/>
                 </FormControl>
               </TableCell>
               <TableCell>

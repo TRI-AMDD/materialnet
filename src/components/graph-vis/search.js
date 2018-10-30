@@ -105,11 +105,11 @@ class IntegrationAutosuggest extends React.Component {
   getSuggestions(value) {
     const inputValue = deburr(value.trim()).toLowerCase();
     const inputLength = inputValue.length;
-    const maxSuggestions = 10;
+    const { maxItems } =  this.props;
     let count = 0;
 
     const matchFn = (suggestion) => {
-      if (count >= maxSuggestions) {
+      if (count >= maxItems) {
         return false;
       }
 
@@ -132,7 +132,7 @@ class IntegrationAutosuggest extends React.Component {
   }
 
   render() {
-    const { classes, onChange, value } = this.props;
+    const { classes, onChange, value, maxItems } = this.props;
 
     const autosuggestProps = {
       renderInputComponent,
@@ -167,9 +167,12 @@ class IntegrationAutosuggest extends React.Component {
               <Paper
                 square
                 {...options.containerProps}
-                style={{ width: this.popperNode ? this.popperNode.clientWidth : null }}
+                style={{ width: this.popperNode ? this.popperNode.clientWidth : null, height: '15rem', overflowY: 'scroll' }}
               >
                 {options.children}
+                {(options.children && options.children.props.items.length === maxItems) &&
+                  <MenuItem disabled>...</MenuItem>
+                }
               </Paper>
             </Popper>
           )}
