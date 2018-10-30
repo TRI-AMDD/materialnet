@@ -151,8 +151,8 @@ export class SceneManager {
   }
 
   resize() {
-    const width = this.parent.clientWidth;
-    const height = this.parent.clientHeight;
+    const width = this.width = this.parent.clientWidth;
+    const height = this.height = this.parent.clientHeight;
     this.renderer.setSize(width, height);
 
     const mid = 0.5 * (this.camera.left + this.camera.right);
@@ -420,6 +420,10 @@ export class SceneManager {
     this.geometry.attributes.selected.array[this.selected] = 1;
 
     this.geometry.attributes.selected.needsUpdate = true;
+
+    const x = this.geometry.attributes.position.array[3 * this.selected + 0];
+    const y = this.geometry.attributes.position.array[3 * this.selected + 1];
+    this.setCamera(x, y);
   }
 
   unselect () {
@@ -601,6 +605,14 @@ export class SceneManager {
     this.camera.right -= dx / this.camera.zoom;
     this.camera.top += dy / this.camera.zoom;
     this.camera.bottom += dy / this.camera.zoom;
+    this.camera.updateProjectionMatrix();
+  }
+
+  setCamera (x, y) {
+    this.camera.left = x - this.width / 2;
+    this.camera.right = x + this.width / 2;
+    this.camera.bottom = y - this.height / 2;
+    this.camera.top = y + this.height / 2;
     this.camera.updateProjectionMatrix();
   }
 
