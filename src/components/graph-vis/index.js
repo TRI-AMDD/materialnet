@@ -211,6 +211,10 @@ class GraphVisComponent extends Component {
   }
 
   onVisClick = (e) => {
+    if (this.dragging.status) {
+      return;
+    }
+
     let obj = this.scene.pick({x: e.clientX, y: e.clientY});
 
     if (!obj) {
@@ -230,6 +234,25 @@ class GraphVisComponent extends Component {
       return draft;
     });
     this.setState(newState);
+  }
+
+  onVisDrag = (event) => {
+    event.preventDefault();
+    this.dragging.status = true;
+    this.dragging.start = {x: event.clientX, y: event.clientY};
+
+    const mouseMoveListener = (e) => {
+      this.onDrag(e);
+    };
+
+    const mouseUpListener = () => {
+      window.removeEventListener('mousemove', mouseMoveListener);
+      window.removeEventListener('mouseup', mouseUpListener);
+      setTimeout(() => {this.dragging.status = false;}, 50);
+    };
+
+    window.addEventListener('mousemove', mouseMoveListener);
+    window.addEventListener('mouseup', mouseUpListener);
   }
 
   toggleAutoplay = () => {
@@ -406,10 +429,9 @@ class GraphVisComponent extends Component {
               slot={0}
               style={{width: '100%', height: '100%'}}
               ref={ref => {this.visElement = ref}}
+              draggable={true}
+              onDragStart={this.onVisDrag}
               onWheel={this.onVisZoom}
-              onMouseDown={(e) => {this.dragging.status = true; this.dragging.start = {x: e.clientX, y: e.clientY};}}
-              onMouseUp={(e) => {this.dragging.status = false;}}
-              onMouseMove={this.onDrag}
               onClick={this.onVisClick}
             />
             {selected.value &&
