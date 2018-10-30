@@ -313,8 +313,8 @@ class GraphVisComponent extends Component {
       selected
     } = this.state;
 
-    const nSplit = selected.value ? 2 : 1;
-    const splitSizes = nSplit === 2 ? '0.6, 0.4' : '1';
+    const nSplit = 2;
+    const splitSizes = '0.6, 0.4';
 
     return (
       <div>
