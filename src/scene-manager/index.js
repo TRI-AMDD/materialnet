@@ -5,8 +5,8 @@ import { color as d3Color } from 'd3-color';
 
 import * as three from 'three';
 
-import vertShader from './shader/circle-vert.glsl';
-import fragShader from './shader/circle-frag.glsl';
+import vertHighlightShader from './shader/circle-highlight-vert.glsl';
+import fragHighlightShader from './shader/circle-highlight-frag.glsl';
 import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
@@ -134,8 +134,8 @@ export class SceneManager {
           value: this.zoom
         }
       },
-      vertexShader: vertShader,
-      fragmentShader: fragShader
+      vertexShader: vertHighlightShader,
+      fragmentShader: fragHighlightShader
     });
     this.material.transparent = true;
 
