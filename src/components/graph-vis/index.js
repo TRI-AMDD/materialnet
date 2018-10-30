@@ -422,7 +422,10 @@ class GraphVisComponent extends Component {
             n={nSplit} sizes={splitSizes}
             ref={wc(
               // Events
-              {},
+              {
+                // Ugly workaround to fix firefox not resizing split elements.
+                slotResized: () => { this.onValueChanged(zoom.value, 'zoom'); }
+              },
             )}
           >
             <div
