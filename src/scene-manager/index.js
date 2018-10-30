@@ -151,6 +151,14 @@ export class SceneManager {
     const width = this.parent.clientWidth;
     const height = this.parent.clientHeight;
     this.renderer.setSize(width, height);
+
+    const mid = 0.5 * (this.camera.left + this.camera.right);
+
+    this.camera.left = mid - width / 2;
+    this.camera.right = mid + width / 2;
+
+    this.camera.updateProjectionMatrix();
+
     this.render();
   }
 
