@@ -119,7 +119,17 @@ class GraphVisComponent extends Component {
         }
       },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
-      search: (val) => { this.scene.display(val, true); },
+      search: (val) => {
+        const obj = this.scene.pickName(val);
+        if (obj) {
+          this.scene.display(val, true);
+          this.selectNode(obj);
+        } else {
+          this.scene.undisplay();
+          this.onValueChanged(null, 'selected');
+          this.onValueChanged(null, 'structure');
+        }
+      },
       showLinks: (val) => { this.scene.linksVisible(val); },
       nightMode: (val) => { this.scene.setNightMode(val); },
       size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); },
@@ -223,6 +233,10 @@ class GraphVisComponent extends Component {
       return;
     }
 
+    this.selectNode(obj);
+  }
+
+  selectNode (obj) {
     const currentName = this.state.selected.value ? this.state.selected.value.name : '';
     if (obj.name === currentName) {
       this.scene.undisplay();

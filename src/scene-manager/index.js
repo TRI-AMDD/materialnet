@@ -303,6 +303,10 @@ export class SceneManager {
     }
 
     const name = this.dp.nodeNames()[obj.index];
+    return this.pickName(name);
+  }
+
+  pickName (name) {
     if (!this.index.hasOwnProperty(name)) {
       return null;
     }
@@ -321,7 +325,6 @@ export class SceneManager {
     };
 
     return data;
-
   }
 
   setColor (idx, r, g, b, update = true) {
@@ -486,7 +489,7 @@ export class SceneManager {
 
   display (name, center=false) {
     console.log("NAME", name);
-    if (name.trim() === '') {
+    if (!name || name.trim() === '') {
       this.undisplay();
       return;
     }
