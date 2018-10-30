@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Button,
   Card,
   CardHeader,
   CardContent,
@@ -18,14 +19,15 @@ class InfoPanel extends Component {
       eigenCent,
       degCent,
       shortestPath,
-      degNeigh
+      degNeigh,
+      onClear
     } = this.props;
 
     const hypothetical = discovery === null;
 
     return (
       <Card>
-        <CardHeader title={`${name} (${hypothetical ? 'undiscovered' : discovery})`}>
+        <CardHeader title={`${name} (${hypothetical ? 'undiscovered' : discovery})`} action={<Button onClick={onClear}>Clear selection</Button>}>
 
         </CardHeader>
         <CardContent>

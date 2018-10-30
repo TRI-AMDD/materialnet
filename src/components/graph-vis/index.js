@@ -209,7 +209,20 @@ class GraphVisComponent extends Component {
   }
 
   onVisClick = (e) => {
-    const obj = this.scene.pick({x: e.clientX, y: e.clientY});
+    let obj = this.scene.pick({x: e.clientX, y: e.clientY});
+
+    if (!obj) {
+      return;
+    }
+
+    const currentName = this.state.selected.value ? this.state.selected.value.name : '';
+    if (obj.name === currentName) {
+      this.scene.undisplay();
+      obj = null;
+    } else {
+      this.scene.display(obj.name);
+    }
+
     const newState = produce(this.state, draft => {
       draft.selected.value = obj;
       return draft;
@@ -254,6 +267,11 @@ class GraphVisComponent extends Component {
     const dy = e.clientY - this.dragging.start.y;
     this.scene.moveCamera(dx, dy);
     this.dragging.start = {x: e.clientX, y: e.clientY};
+  }
+
+  onClearSelection = () => {
+    this.scene.undisplay();
+    this.onValueChanged(null, 'selected');
   }
 
   render() {
@@ -383,13 +401,13 @@ class GraphVisComponent extends Component {
               onMouseMove={this.onDrag}
               onClick={this.onVisClick}
             />
-            <oc-molecule
+            {/* <oc-molecule
               slot={1}
-            />
+            /> */}
           </split-me>
         </div>
         {selected.value &&
-          <InfoPanel {...selected.value}/>
+          <InfoPanel {...selected.value} onClear={this.onClearSelection}/>
         }
       </div>
     );

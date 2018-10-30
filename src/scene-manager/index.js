@@ -299,12 +299,6 @@ export class SceneManager {
       degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
     };
 
-    if (this.selected !== this.index[name]) {
-      this.display(name);
-    } else {
-      this.undisplay();
-    }
-
     return data;
 
   }
