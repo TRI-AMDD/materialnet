@@ -5,9 +5,9 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import { defineCustomElements as defineSplitMe } from 'split-me/dist/loader';
-// import { defineCustomElements as defineMolecule } from '@openchemistry/molecule/dist/loader';
+import { defineCustomElements as defineMolecule } from '@openchemistry/molecule/dist/loader';
 defineSplitMe(window);
-// defineMolecule(window);
+defineMolecule(window);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

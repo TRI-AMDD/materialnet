@@ -9,6 +9,7 @@ import {
   FormControl,
   Input,
   IconButton,
+  Paper,
   Table,
   TableBody,
   TableRow,
@@ -31,6 +32,7 @@ import { sortStringsLength } from './sort';
 
 import { SceneManager } from '../../scene-manager';
 import { DiskDataProvider } from '../../data-provider';
+import { wc } from '../../utils/webcomponents.js';
 
 class GraphVisComponent extends Component {
   visElement;
@@ -288,6 +290,9 @@ class GraphVisComponent extends Component {
       selected
     } = this.state;
 
+    const nSplit = selected.value ? 2 : 1;
+    const splitSizes = nSplit === 2 ? '0.6, 0.4' : '1';
+
     return (
       <div>
         <Table>
@@ -387,10 +392,16 @@ class GraphVisComponent extends Component {
             </TableRow>
           </TableBody>
         </Table>
-        <div
-          style={{width: '100%', height: '40rem', marginTop: '1rem', marginBottom: '1rem'}}
+        <Paper
+          style={{width: '100%', height: '40rem', marginTop: '2rem', marginBottom: '2rem'}}
         >
-          <split-me n={2}>
+          <split-me
+            n={nSplit} sizes={splitSizes}
+            ref={wc(
+              // Events
+              {},
+            )}
+          >
             <div
               slot={0}
               style={{width: '100%', height: '100%'}}
@@ -401,11 +412,21 @@ class GraphVisComponent extends Component {
               onMouseMove={this.onDrag}
               onClick={this.onVisClick}
             />
-            {/* <oc-molecule
+            {selected.value &&
+            <oc-molecule
               slot={1}
-            /> */}
+              ref={wc(
+                // Events
+                {},
+                // Props
+                {
+                  cjson: testStructure
+                }
+              )}
+            />
+            }
           </split-me>
-        </div>
+        </Paper>
         {selected.value &&
           <InfoPanel {...selected.value} onClear={this.onClearSelection}/>
         }
