@@ -7,6 +7,7 @@ import Autosuggest from 'react-autosuggest';
 import { deburr } from 'lodash-es';
 
 import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
@@ -80,8 +81,6 @@ const styles = theme => ({
 
 class IntegrationAutosuggest extends React.Component {
   state = {
-    single: '',
-    popper: '',
     suggestions: [],
   };
 
@@ -147,6 +146,9 @@ class IntegrationAutosuggest extends React.Component {
             placeholder: 'Search (e.g. NaCl)',
             value: value,
             onChange: onChange,
+            inputRef: node => {
+              this.popperNode = node;
+            }
           }}
           theme={{
             container: classes.container,
@@ -155,9 +157,15 @@ class IntegrationAutosuggest extends React.Component {
             suggestion: classes.suggestion,
           }}
           renderSuggestionsContainer={options => (
-            <Paper {...options.containerProps} square>
-              {options.children}
-            </Paper>
+            <Popper anchorEl={this.popperNode} open={Boolean(options.children)} placement='bottom-start'>
+              <Paper
+                square
+                {...options.containerProps}
+                style={{ width: this.popperNode ? this.popperNode.clientWidth : null }}
+              >
+                {options.children}
+              </Paper>
+            </Popper>
           )}
         />
       </div>
