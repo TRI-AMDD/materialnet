@@ -67,6 +67,9 @@ export class SceneManager {
       uniforms: {
         opacity: {
           value: 0.05
+        },
+        night: {
+          value: 0
         }
       },
       vertexShader: lineVertShader,
@@ -165,6 +168,16 @@ export class SceneManager {
   linksVisible (vis) {
     this._linksVisible = vis;
     this.lines.visible = this._linksVisible;
+  }
+
+  setNightMode (night) {
+    if (night) {
+      this.scene.background.setRGB(0, 0, 0);
+      this.lineMaterial.uniforms.night.value = 1.0;
+    } else {
+      this.scene.background.setRGB(1, 1, 1);
+      this.lineMaterial.uniforms.night.value = 0.0;
+    }
   }
 
   setLinkOpacity (o) {
