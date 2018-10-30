@@ -5,7 +5,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  Input,
   IconButton,
   Paper,
   Table,
@@ -15,13 +14,11 @@ import {
   TableHead
 } from '@material-ui/core';
 
-// import { Play, Pause } from '@material-ui/icons';
 import { PlayArrow, Pause } from '@material-ui/icons';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
 import { fetchStructure } from '../../rest';
-import testStructure from './testMolecule.json';
 
 import MySlider from './slider';
 import Search from './search';
