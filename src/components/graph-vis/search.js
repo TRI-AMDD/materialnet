@@ -105,22 +105,28 @@ class IntegrationAutosuggest extends React.Component {
   getSuggestions(value) {
     const inputValue = deburr(value.trim()).toLowerCase();
     const inputLength = inputValue.length;
+    const maxSuggestions = 10;
     let count = 0;
-  
+
+    const matchFn = (suggestion) => {
+      if (count >= maxSuggestions) {
+        return false;
+      }
+
+      const match = suggestion.label.toLowerCase().includes(inputValue);
+
+      if (match) {
+        count += 1;
+      }
+
+      return match;
+    }
+
     return inputLength === 0
       ? []
-      : this.props.options.filter(suggestion => {
-          const keep =
-            count < 10 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-  
-          if (keep) {
-            count += 1;
-          }
-  
-          return keep;
-        });
+      : this.props.options.filter(matchFn);
   }
-  
+
   getSuggestionValue(suggestion) {
     return suggestion.label;
   }
