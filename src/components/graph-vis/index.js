@@ -44,6 +44,13 @@ class GraphVisComponent extends Component {
     super(props);
 
     this.state = {
+      dataset: {
+        value: 'OQMD1',
+        options: [
+          {label: 'OQMD1', value: 'OQMD1'},
+          {label: 'OQMD2', value: 'OQMD2'},
+        ]
+      },
       zoom: {
         value: 40,
         min: 0,
@@ -333,6 +340,7 @@ class GraphVisComponent extends Component {
 
   render() {
     const {
+      dataset,
       zoom,
       spacing,
       opacity,
@@ -353,6 +361,20 @@ class GraphVisComponent extends Component {
     return (
       <div>
         <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Dataset</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableCell>
+              <FormControl fullWidth>
+                <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
+                  {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </TableCell>
+          </TableBody>
           <TableHead>
             <TableRow>
               <TableCell>Zoom</TableCell>
