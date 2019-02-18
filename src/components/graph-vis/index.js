@@ -43,86 +43,13 @@ class GraphVisComponent extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      dataset: {
-        value: 'OQMD1',
-        options: [
-          {label: 'OQMD1', value: 'OQMD1'},
-          {label: 'OQMD2', value: 'OQMD2'},
-        ]
-      },
-      zoom: {
-        value: 40,
-        min: 0,
-        max: 100
-      },
-      spacing: {
-        value: 1,
-        min: 0.1,
-        max: 10
-      },
-      opacity: {
-        value: 0.01,
-        min: 0,
-        max: 0.1,
-        step: 0.001
-      },
-      year: {
-        value: 2016,
-        min: 1945,
-        max: 2016,
-        step: 1,
-        play: false,
-        interval: null
-      },
-      search: {
-        value: ''
-      },
-      color: {
-        value: 'discovery',
-        options: [
-          {label: 'None', value: 'none'},
-          {label: 'Year of discovery', value: 'discovery'},
-          {label: 'Discovered/Hypothetical', value: 'boolean'},
-          {label: 'Discovered/Undiscovered', value: 'undiscovered'}
-        ]
-      },
-      colorYear: {
-        value: 2016,
-        min: 1945,
-        max: 2016,
-        step: 1
-      },
-      size: {
-        value: 'normal',
-        options: [
-          {label: 'None', value: 'none'},
-          {label: 'Degree', value: 'normal'},
-          {label: 'Degree - Large', value: 'large'},
-          {label: 'Degree - Huge', value: 'huge'}
-        ]
-      },
-      showLinks: {
-        value: false
-      },
-      nightMode: {
-        value: false
-      },
-      selected: {
-        value: null
-      },
-      structure: {
-        value: null
-      }
-    }
-
     this.sceneSetters = {
       zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
       spacing: (val) => { this.scene.expand(val); },
       year: (val) => {
         this.scene.hideAfter(val);
-        if (this.state.size.value !== 'none') {
-          this.scene.setDegreeSize(this.state.year.value, this.state.size.value);
+        if (this.props.size.value !== 'none') {
+          this.scene.setDegreeSize(this.props.year.value, this.props.size.value);
         }
       },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
@@ -139,7 +66,7 @@ class GraphVisComponent extends Component {
       },
       showLinks: (val) => { this.scene.linksVisible(val); },
       nightMode: (val) => { this.scene.setNightMode(val); },
-      size: (val) => { this.scene.setDegreeSize(this.state.year.value, val); },
+      size: (val) => { this.scene.setDegreeSize(this.props.year.value, val); },
       color: (val) => {
         switch (val) {
           case 'boolean':
@@ -151,7 +78,7 @@ class GraphVisComponent extends Component {
             break;
 
           case 'undiscovered':
-            this.scene.setUndiscoveredColor(this.state.colorYear.value);
+            this.scene.setUndiscoveredColor(this.props.colorYear.value);
             break;
 
           default:
@@ -159,7 +86,7 @@ class GraphVisComponent extends Component {
         }
       },
       colorYear: (val) => {
-        switch (this.state.color.value) {
+        switch (this.props.color.value) {
           case 'boolean':
             this.scene.setBooleanColor();
             break;
@@ -211,19 +138,14 @@ class GraphVisComponent extends Component {
   }
 
   setDefaults() {
-    for (let key in this.state) {
-      const value = this.state[key].value;
+    for (let key in this.props) {
+      const value = this.props[key].value;
       this.onValueChanged(value, key);
     }
   }
 
   onValueChanged = (value, key) => {
-    if (key in this.state) {
-      this.setState((state, props) => {
-        state[key]['value'] = value;
-        return state;
-      });
-
+    if (key in this.props) {
       if (this.props.update) {
         this.props.update(value, key);
       }
@@ -236,7 +158,7 @@ class GraphVisComponent extends Component {
   onVisZoom = (e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -1 : 1;
-    this.onValueChanged(this.state.zoom.value + delta, 'zoom');
+    this.onValueChanged(this.props.zoom.value + delta, 'zoom');
   }
 
   onVisClick = (e) => {
@@ -254,7 +176,7 @@ class GraphVisComponent extends Component {
   }
 
   selectNode (obj) {
-    const currentName = this.state.selected.value ? this.state.selected.value.name : '';
+    const currentName = this.props.selected.value ? this.props.selected.value.name : '';
     if (obj.name === currentName) {
       this.scene.undisplay();
       obj = null;
@@ -280,7 +202,7 @@ class GraphVisComponent extends Component {
     this.dragging.status = true;
     this.dragging.start = {x: event.clientX, y: event.clientY};
 
-    const linksOn = this.state.showLinks.value;
+    const linksOn = this.props.showLinks.value;
     if (linksOn) {
       this.scene.linksVisible(false);
     }
@@ -305,7 +227,7 @@ class GraphVisComponent extends Component {
   }
 
   toggleAutoplay = () => {
-    const {year} = this.state;
+    const {year} = this.props;
     let interval = year.interval;
     let play = !year.play;
 
@@ -316,7 +238,7 @@ class GraphVisComponent extends Component {
 
     if (!year.play) {
       interval = setInterval(() => {
-        const {year} = this.state;
+        const {year} = this.props;
         let nextYear = year.value + 1;
         if (year.value === year.max) {
           nextYear = year.min;
@@ -325,11 +247,7 @@ class GraphVisComponent extends Component {
       }, 1000);
     }
 
-    this.setState((state, props) => {
-      state['year']['play'] = play;
-      state['year']['interval'] = interval;
-      return state;
-    });
+    this.props.setPlayState(play, interval);
   }
 
   onDrag = (e) => {
@@ -351,6 +269,7 @@ class GraphVisComponent extends Component {
   render() {
     const {
       dataset,
+      datasetName,
       zoom,
       spacing,
       opacity,
@@ -363,10 +282,7 @@ class GraphVisComponent extends Component {
       nightMode,
       selected,
       structure
-    } = this.state;
-
-    const datasetName = this.props.datasetName;
-    console.log(datasetName);
+    } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
     if (dataChanged) {

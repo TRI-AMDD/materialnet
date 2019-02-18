@@ -106,12 +106,42 @@ class GraphVisContainer extends Component {
       nodes,
       edges,
       zoom,
-      dataset
+      dataset,
+      spacing,
+      opacity,
+      year,
+      search,
+      size,
+      color,
+      colorYear,
+      showLinks,
+      nightMode,
+      selected,
+      structure,
     } = this.state;
 
     if (nodes && edges) {
       return (
-        <GraphVisComponent update={this.update} nodes={nodes} edges={edges} zoom={zoom} datasetName={dataset.value} dataset={dataset} />
+        <GraphVisComponent
+          update={this.update}
+          setPlayState={this.setPlayState}
+          nodes={nodes}
+          edges={edges}
+          dataset={dataset}
+          datasetName={dataset.value}
+          zoom={zoom}
+          spacing={spacing}
+          opacity={opacity}
+          year={year}
+          search={search}
+          size={size}
+          color={color}
+          colorYear={colorYear}
+          showLinks={showLinks}
+          nightMode={nightMode}
+          selected={selected}
+          structure={structure}
+        />
       );
     } else {
       return (null);
@@ -126,8 +156,17 @@ class GraphVisContainer extends Component {
     if (key in this.state) {
       this.setState((state) => {
         state[key]['value'] = value;
+        return state;
       });
     }
+  }
+
+  setPlayState = (play, interval) => {
+    this.setState((state, props) => {
+      state['year']['play'] = play;
+      state['year']['interval'] = interval;
+      return state;
+    });
   }
 }
 
