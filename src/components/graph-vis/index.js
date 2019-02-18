@@ -373,13 +373,15 @@ class GraphVisComponent extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableCell>
-              <FormControl fullWidth>
-                <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
-                  {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                </Select>
-              </FormControl>
-            </TableCell>
+            <TableRow>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
+                    {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </TableCell>
+            </TableRow>
           </TableBody>
           <TableHead>
             <TableRow>
