@@ -153,6 +153,9 @@ class GraphVisComponent extends Component {
           case 'undiscovered':
             this.scene.setUndiscoveredColor(this.state.colorYear.value);
             break;
+
+          default:
+            throw new Error(`impossible colormap option: ${val}`);
         }
       },
       colorYear: (val) => {
@@ -168,6 +171,9 @@ class GraphVisComponent extends Component {
           case 'undiscovered':
             this.scene.setUndiscoveredColor(val);
             break;
+
+          default:
+            throw new Error(`impossible colormap option: ${val}`);
         }
       }
     }
