@@ -17,7 +17,6 @@ export class SceneManager {
     this.width = width;
     this.height = height;
     this.parent = el;
-    this.dp = dp;
 
     this.scene = new three.Scene();
     this.scene.background = new three.Color(0xffffff);
@@ -40,6 +39,12 @@ export class SceneManager {
 
     this.el = this.renderer.domElement;
     select(el).append(() => this.el);
+
+    this.initScene(dp);
+  }
+
+  initScene (dp) {
+    this.dp = dp;
 
     // Initialize edge geometry.
     let positions = [];
@@ -148,6 +153,10 @@ export class SceneManager {
     this.setDegreeSize(2017, 'normal');
 
     this.resize();
+  }
+
+  clear () {
+    this.scene.remove.apply(this.scene, this.scene.children);
   }
 
   resize() {

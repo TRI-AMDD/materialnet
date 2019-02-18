@@ -223,6 +223,10 @@ class GraphVisComponent extends Component {
         state[key]['value'] = value;
         return state;
       });
+
+      if (this.props.update) {
+        this.props.update(value, key);
+      }
     }
     if (key in this.sceneSetters) {
       this.sceneSetters[key](value);
@@ -360,6 +364,19 @@ class GraphVisComponent extends Component {
       selected,
       structure
     } = this.state;
+
+    const datasetName = this.props.datasetName;
+    console.log(datasetName);
+
+    const dataChanged = this.datasetName !== this.props.dataset.value;
+    if (dataChanged) {
+      console.log('DATA CHANGED');
+      if (this.scene) {
+        this.scene.clear();
+        this.scene.initScene(this.data);
+      }
+    }
+    this.datasetName = this.props.dataset.value;
 
     const nSplit = 2;
     const splitSizes = '0.6, 0.4';

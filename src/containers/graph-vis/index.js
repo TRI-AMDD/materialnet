@@ -8,7 +8,77 @@ class GraphVisContainer extends Component {
     super(props);
     this.state = {
       nodes: null,
-      edges: null
+      edges: null,
+      dataset: {
+        value: 'OQMD1',
+        options: [
+          {label: 'OQMD1', value: 'OQMD1'},
+          {label: 'OQMD2', value: 'OQMD2'},
+        ]
+      },
+      zoom: {
+        value: 40,
+        min: 0,
+        max: 100
+      },
+      spacing: {
+        value: 1,
+        min: 0.1,
+        max: 10
+      },
+      opacity: {
+        value: 0.01,
+        min: 0,
+        max: 0.1,
+        step: 0.001
+      },
+      year: {
+        value: 2016,
+        min: 1945,
+        max: 2016,
+        step: 1,
+        play: false,
+        interval: null
+      },
+      search: {
+        value: ''
+      },
+      color: {
+        value: 'discovery',
+        options: [
+          {label: 'None', value: 'none'},
+          {label: 'Year of discovery', value: 'discovery'},
+          {label: 'Discovered/Hypothetical', value: 'boolean'},
+          {label: 'Discovered/Undiscovered', value: 'undiscovered'}
+        ]
+      },
+      colorYear: {
+        value: 2016,
+        min: 1945,
+        max: 2016,
+        step: 1
+      },
+      size: {
+        value: 'normal',
+        options: [
+          {label: 'None', value: 'none'},
+          {label: 'Degree', value: 'normal'},
+          {label: 'Degree - Large', value: 'large'},
+          {label: 'Degree - Huge', value: 'huge'}
+        ]
+      },
+      showLinks: {
+        value: false
+      },
+      nightMode: {
+        value: false
+      },
+      selected: {
+        value: null
+      },
+      structure: {
+        value: null
+      }
     }
   }
 
@@ -32,14 +102,31 @@ class GraphVisContainer extends Component {
   }
 
   render() {
-    const { nodes, edges } = this.state;
+    const {
+      nodes,
+      edges,
+      zoom,
+      dataset
+    } = this.state;
 
     if (nodes && edges) {
       return (
-        <GraphVisComponent nodes={nodes} edges={edges}/>
+        <GraphVisComponent update={this.update} nodes={nodes} edges={edges} zoom={zoom} datasetName={dataset.value} dataset={dataset} />
       );
     } else {
       return (null);
+    }
+  }
+
+  update = (value, key) => {
+    if (!this.state) {
+      return;
+    }
+    console.log('update', this.state);
+    if (key in this.state) {
+      this.setState((state) => {
+        state[key]['value'] = value;
+      });
     }
   }
 }
