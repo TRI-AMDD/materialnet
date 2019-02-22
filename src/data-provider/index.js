@@ -39,6 +39,10 @@ export class DiskDataProvider extends DataProvider {
     this.edgeIndex = graph.edgeIndex;
 
     this._names = Object.keys(this.nodes);
+    const bad = this._names.indexOf('value');
+    if (bad > -1) {
+      this._names = this._names.slice(0, bad).concat(this._names.slice(bad + 1));
+    }
   }
 
   edgeCount () {

@@ -281,7 +281,9 @@ class GraphVisComponent extends Component {
       showLinks,
       nightMode,
       selected,
-      structure
+      structure,
+      nodes,
+      edges
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -289,7 +291,11 @@ class GraphVisComponent extends Component {
       console.log('DATA CHANGED');
       if (this.scene) {
         this.scene.clear();
+
+        this.data = new DiskDataProvider(nodes, edges);
+
         this.scene.initScene(this.data);
+        this.setDefaults();
       }
     }
     this.datasetName = this.props.dataset.value;
