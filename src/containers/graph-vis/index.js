@@ -139,9 +139,6 @@ class GraphVisContainer extends Component {
     }
 
     if (key === 'dataset') {
-      if (value === undefined) {
-        return;
-      }
       const datafile = `sample-data/${value}.json`;
       fetch(datafile).then(resp => resp.json())
         .then(data => {
