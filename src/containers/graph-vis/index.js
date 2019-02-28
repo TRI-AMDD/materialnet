@@ -84,24 +84,7 @@ class GraphVisContainer extends Component {
   }
 
   componentDidMount() {
-    const [nodefile] = [
-      'sample-data/precise.json'
-    ];
-
-    let nodePromise = fetch(nodefile);
-
-    Promise.all([nodePromise])
-    .then((values) => {
-      return Promise.all(values.map(x => x.json()));
-    })
-    .then((values) => {
-      const [data] = values;
-      this.setState({
-        ...this.state,
-        edges: data.edges,
-        nodes: data.nodes
-      });
-    });
+    this.update('precise', 'dataset');
   }
 
   render() {
