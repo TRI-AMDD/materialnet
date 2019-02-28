@@ -269,7 +269,6 @@ class GraphVisComponent extends Component {
   render() {
     const {
       dataset,
-      datasetName,
       zoom,
       spacing,
       opacity,

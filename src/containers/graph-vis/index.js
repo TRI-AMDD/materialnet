@@ -10,10 +10,11 @@ class GraphVisContainer extends Component {
       nodes: null,
       edges: null,
       dataset: {
-        value: 'OQMD1',
+        value: 'precise',
         options: [
-          {label: 'OQMD1', value: 'OQMD1'},
-          {label: 'OQMD2', value: 'OQMD2'},
+          {label: 'Precise', value: 'precise'},
+          {label: 'Sample 1', value: 'sample1'},
+          {label: 'Sample 2', value: 'sample2'},
         ]
       },
       zoom: {
@@ -83,21 +84,23 @@ class GraphVisContainer extends Component {
   }
 
   componentDidMount() {
-    const [edgefile, nodefile] = [
-      'sample-data/edges.json',
-      'sample-data/nodes.json'
+    const [nodefile] = [
+      'sample-data/precise.json'
     ];
 
-    let edgePromise = fetch(edgefile);
     let nodePromise = fetch(nodefile);
 
-    Promise.all([edgePromise, nodePromise])
+    Promise.all([nodePromise])
     .then((values) => {
       return Promise.all(values.map(x => x.json()));
     })
     .then((values) => {
-      const [edges, nodes] = values;
-      this.setState({...this.state, edges, nodes});
+      const [data] = values;
+      this.setState({
+        ...this.state,
+        edges: data.edges,
+        nodes: data.nodes
+      });
     });
   }
 
@@ -128,7 +131,6 @@ class GraphVisContainer extends Component {
           nodes={nodes}
           edges={edges}
           dataset={dataset}
-          datasetName={dataset.value}
           zoom={zoom}
           spacing={spacing}
           opacity={opacity}
@@ -152,12 +154,29 @@ class GraphVisContainer extends Component {
     if (!this.state) {
       return;
     }
-    console.log('update', this.state);
-    if (key in this.state) {
-      this.setState((state) => {
-        state[key]['value'] = value;
-        return state;
-      });
+
+    if (key === 'dataset') {
+      if (value === undefined) {
+        return;
+      }
+      const datafile = `sample-data/${value}.json`;
+      fetch(datafile).then(resp => resp.json())
+        .then(data => {
+          this.setState(state => {
+            state[key].value = value;
+            state.nodes = data.nodes;
+            state.edges = data.edges;
+
+            return state;
+          });
+        });
+    } else {
+      if (key in this.state) {
+        this.setState((state) => {
+          state[key]['value'] = value;
+          return state;
+        });
+      }
     }
   }
 
