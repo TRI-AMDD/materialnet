@@ -17,6 +17,13 @@ class GraphVisContainer extends Component {
           {label: 'Sample 2', value: 'sample2'},
         ]
       },
+      template: {
+        value: 'material',
+        options: [
+          {label: 'Material', value: 'material'},
+          {label: 'Minimal', value: 'minimal'}
+        ]
+      },
       zoom: {
         value: 40,
         min: 0,
@@ -93,6 +100,7 @@ class GraphVisContainer extends Component {
       edges,
       zoom,
       dataset,
+      template,
       spacing,
       opacity,
       year,
@@ -114,6 +122,7 @@ class GraphVisContainer extends Component {
           nodes={nodes}
           edges={edges}
           dataset={dataset}
+          template={template}
           zoom={zoom}
           spacing={spacing}
           opacity={opacity}
