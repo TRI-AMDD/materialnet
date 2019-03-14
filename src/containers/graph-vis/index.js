@@ -127,7 +127,7 @@ class GraphVisContainer extends Component {
           nightMode={nightMode}
           selected={selected}
           structure={structure}
-          template={templates.material}
+          template={templates.minimal}
         />
       );
     } else {
