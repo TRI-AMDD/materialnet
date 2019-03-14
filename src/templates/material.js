@@ -7,7 +7,7 @@ import {
   Typography
 } from '@material-ui/core';
 
-export default function materialTemplate ({name, degree, discovery, formationEnergy, synthesisProbability, clusCoeff, eigenCent, degCent, shortestPath, degNeigh, onClear}) {
+export default function ({name, degree, discovery, formationEnergy, synthesisProbability, clusCoeff, eigenCent, degCent, shortestPath, degNeigh, onClear}) {
   const hypothetical = discovery === null;
 
   return (
