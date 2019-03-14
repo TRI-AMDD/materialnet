@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import GraphVisComponent from '../../components/graph-vis';
-import * as templates from '../../templates';
 
 class GraphVisContainer extends Component {
 
@@ -16,6 +15,13 @@ class GraphVisContainer extends Component {
           {label: 'Precise', value: 'precise'},
           {label: 'Sample 1', value: 'sample1'},
           {label: 'Sample 2', value: 'sample2'},
+        ]
+      },
+      template: {
+        value: 'material',
+        options: [
+          {label: 'Material', value: 'material'},
+          {label: 'Minimal', value: 'minimal'}
         ]
       },
       zoom: {
@@ -94,6 +100,7 @@ class GraphVisContainer extends Component {
       edges,
       zoom,
       dataset,
+      template,
       spacing,
       opacity,
       year,
@@ -115,6 +122,7 @@ class GraphVisContainer extends Component {
           nodes={nodes}
           edges={edges}
           dataset={dataset}
+          template={template}
           zoom={zoom}
           spacing={spacing}
           opacity={opacity}
@@ -127,7 +135,6 @@ class GraphVisContainer extends Component {
           nightMode={nightMode}
           selected={selected}
           structure={structure}
-          template={templates.minimal}
         />
       );
     } else {

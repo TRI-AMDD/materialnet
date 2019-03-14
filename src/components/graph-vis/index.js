@@ -30,6 +30,8 @@ import { SceneManager } from '../../scene-manager';
 import { DiskDataProvider } from '../../data-provider';
 import { wc } from '../../utils/webcomponents.js';
 
+import * as templates from '../../templates';
+
 class GraphVisComponent extends Component {
   visElement;
   scene;
@@ -269,6 +271,7 @@ class GraphVisComponent extends Component {
   render() {
     const {
       dataset,
+      template,
       zoom,
       spacing,
       opacity,
@@ -308,6 +311,7 @@ class GraphVisComponent extends Component {
           <TableHead>
             <TableRow>
               <TableCell>Dataset</TableCell>
+              <TableCell>Template</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -316,6 +320,13 @@ class GraphVisComponent extends Component {
                 <FormControl fullWidth>
                   <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
                     {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <FormControl fullWidth>
+                  <Select value={template.value} onChange={(e) => {this.onValueChanged(e.target.value, 'template')}}>
+                    {template.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
                   </Select>
                 </FormControl>
               </TableCell>
@@ -458,7 +469,7 @@ class GraphVisComponent extends Component {
           </split-me>
         </Paper>
         {selected.value &&
-          <InfoPanel {...selected.value} onClear={this.onClearSelection} template={this.props.template} />
+          <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[this.props.template.value]} />
         }
       </div>
     );
