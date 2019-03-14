@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import GraphVisComponent from '../../components/graph-vis';
+import materialTemplate from '../../templates/material';
 
 class GraphVisContainer extends Component {
 
@@ -126,6 +127,7 @@ class GraphVisContainer extends Component {
           nightMode={nightMode}
           selected={selected}
           structure={structure}
+          template={materialTemplate}
         />
       );
     } else {

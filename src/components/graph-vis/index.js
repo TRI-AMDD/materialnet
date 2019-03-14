@@ -458,7 +458,7 @@ class GraphVisComponent extends Component {
           </split-me>
         </Paper>
         {selected.value &&
-          <InfoPanel {...selected.value} onClear={this.onClearSelection}/>
+          <InfoPanel {...selected.value} onClear={this.onClearSelection} template={this.props.template} />
         }
       </div>
     );
