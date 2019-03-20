@@ -13,7 +13,9 @@ class GraphVisContainer extends Component {
         value: 'precise',
         options: [
           {label: 'Precise', value: 'precise'},
+          {label: 'Precise - Gephi', value: 'precise-gephi'},
           {label: 'Sample 1', value: 'sample1'},
+          {label: 'Sample 1 - Gephi', value: 'sample1-gephi'},
           {label: 'Sample 2', value: 'sample2'},
         ]
       },
