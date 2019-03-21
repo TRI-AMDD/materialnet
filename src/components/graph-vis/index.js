@@ -84,7 +84,7 @@ class GraphVisComponent extends Component {
             break;
 
           default:
-            throw new Error(`impossible colormap option: ${val}`);
+            this.scene.setPropertyColor(val);
         }
       },
       colorYear: (val) => {
@@ -142,7 +142,9 @@ class GraphVisComponent extends Component {
   setDefaults() {
     for (let key in this.props) {
       const value = this.props[key].value;
-      this.onValueChanged(value, key);
+      if (key !== 'colorYear' || ['discovery', 'boolean', 'undiscovered'].indexOf(value) !== -1) {
+        this.onValueChanged(value, key);
+      }
     }
   }
 

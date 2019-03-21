@@ -59,7 +59,14 @@ class GraphVisContainer extends Component {
           {label: 'None', value: 'none'},
           {label: 'Year of discovery', value: 'discovery'},
           {label: 'Discovered/Hypothetical', value: 'boolean'},
-          {label: 'Discovered/Undiscovered', value: 'undiscovered'}
+          {label: 'Discovered/Undiscovered', value: 'undiscovered'},
+          {label: 'Formation Energy', value: 'formation_energy'},
+          {label: 'Synthesis Probability', value: 'synthesis_probability'},
+          {label: 'Clustering Coefficient', value: 'clus_coeff'},
+          {label: 'Eigenvector Centrality', value: 'eigen_cent'},
+          {label: 'Degree Centrality', value: 'deg_cent'},
+          {label: 'Shortest path', value: 'shortest_path'},
+          {label: 'Degree Neighborhood', value: 'deg_neigh'},
         ]
       },
       colorYear: {
