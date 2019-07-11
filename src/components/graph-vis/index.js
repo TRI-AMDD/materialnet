@@ -27,6 +27,7 @@ import InfoPanel from './info-panel';
 import { sortStringsLength } from './sort';
 
 import { SceneManager } from '../../scene-manager';
+import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import { DiskDataProvider } from '../../data-provider';
 import { wc } from '../../utils/webcomponents.js';
 
@@ -112,7 +113,7 @@ class GraphVisComponent extends Component {
     const { edges, nodes } = this.props;
     this.data = new DiskDataProvider(nodes, edges);
     this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
-    this.scene = new SceneManager({
+    this.scene = new GeoJSSceneManager({
       el: this.visElement,
       dp: this.data
     });
