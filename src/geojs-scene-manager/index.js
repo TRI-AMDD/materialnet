@@ -101,7 +101,11 @@ export class GeoJSSceneManager {
     tooltipElem.classList.toggle('hidden', true);
     tooltipElem.style['pointer-events'] = 'none';
 
+    let onNode = false;
+
     points.geoOn(geo.event.feature.mouseon, evt => {
+      onNode = true;
+
       const name = evt.data;
       const node = nodes[name];
 
@@ -109,7 +113,34 @@ export class GeoJSSceneManager {
       tooltipElem.innerText = name;
       tooltipElem.classList.toggle('hidden', false);
     });
+    points.geoOn(geo.event.feature.mousemove, evt => {
+      tooltip.position(evt.mouse.geo);
+    });
     points.geoOn(geo.event.feature.mouseoff, evt => {
+      onNode = false;
+
+      tooltipElem.classList.toggle('hidden', true);
+    });
+
+    lines.geoOn(geo.event.feature.mouseon, evt => {
+      if (onNode) {
+        return;
+      }
+
+      const text = `${evt.data[0]} - ${evt.data[1]}`;
+
+      tooltip.position(evt.mouse.geo);
+      tooltipElem.innerText = text;
+      tooltipElem.classList.toggle('hidden', false);
+    });
+    lines.geoOn(geo.event.feature.mousemove, evt => {
+      tooltip.position(evt.mouse.geo);
+    });
+    lines.geoOn(geo.event.feature.mouseoff, evt => {
+      if (onNode) {
+        return;
+      }
+
       tooltipElem.classList.toggle('hidden', true);
     });
 
