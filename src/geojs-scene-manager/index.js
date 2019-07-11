@@ -7,12 +7,15 @@ export class GeoJSSceneManager {
   }
 
   initScene(dp) {
+    const degrees = dp.nodeDegrees(2020);
+
     let nodes = {};
     dp.nodeNames().forEach(name => {
       const pos = dp.nodePosition(name);
       nodes[name] = {
         x: pos.x,
         y: pos.y,
+        degree: degrees[name],
       };
     });
 
@@ -74,7 +77,7 @@ export class GeoJSSceneManager {
         fillColor: 'gray',
         strokeOpacity: 0.5,
         fillOpacity: 0.5,
-        radius: name => Math.max(2, Math.sqrt(10)),
+        radius: name => Math.max(2, Math.sqrt(nodes[name].degree)),
       },
       position: name => nodes[name],
     })
