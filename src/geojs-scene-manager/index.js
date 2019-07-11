@@ -1,5 +1,7 @@
 import geo from 'geojs';
 
+import './tooltip.css';
+
 export class GeoJSSceneManager {
   constructor({el, dp}) {
     this.parent = el;
@@ -82,6 +84,34 @@ export class GeoJSSceneManager {
       position: name => nodes[name],
     })
       .data(Object.keys(nodes));
+
+    const ui = map.createLayer('ui', {
+      zIndex: 2,
+    });
+
+    const tooltip = ui.createWidget('dom', {
+      position: {
+        x: 0,
+        y: 0,
+      },
+    });
+
+    const tooltipElem = tooltip.canvas();
+    tooltipElem.setAttribute('id', 'tooltip');
+    tooltipElem.classList.toggle('hidden', true);
+    tooltipElem.style['pointer-events'] = 'none';
+
+    points.geoOn(geo.event.feature.mouseon, evt => {
+      const name = evt.data;
+      const node = nodes[name];
+
+      tooltip.position(evt.mouse.geo);
+      tooltipElem.innerText = name;
+      tooltipElem.classList.toggle('hidden', false);
+    });
+    points.geoOn(geo.event.feature.mouseoff, evt => {
+      tooltipElem.classList.toggle('hidden', true);
+    });
 
     map.draw();
   }
