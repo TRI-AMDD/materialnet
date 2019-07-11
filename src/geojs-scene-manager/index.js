@@ -70,6 +70,16 @@ export class GeoJSSceneManager {
     })
       .data(Object.keys(nodes));
 
+    const edges = dp.edges;
+    const lines = layer.createFeature('line')
+      .data(edges)
+      .style({
+        position: name => nodes[name],
+        width: 1,
+        strokeColor: 'black',
+        strokeOpacity: 0.1,
+      });
+
     map.draw();
   }
 
