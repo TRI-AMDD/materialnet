@@ -148,7 +148,13 @@ export class GeoJSSceneManager {
   }
 
   expand () {}
-  setLinkOpacity () {}
+
+  setLinkOpacity (value) {
+    this.lines.style('strokeOpacity', value);
+    this.lines.modified();
+    this.map.draw();
+  }
+
   hideAfter () {}
   setDegreeSize () {}
   pickName () {}
