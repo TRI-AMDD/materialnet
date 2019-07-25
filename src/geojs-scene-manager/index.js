@@ -53,7 +53,7 @@ export class GeoJSSceneManager {
     params.map.max += 3;
     params.map.min -= 3;
 
-    const map = geo.map(params.map);
+    const map = this.map = geo.map(params.map);
 
     const layer = map.createLayer('feature', {
       features: [
@@ -63,7 +63,7 @@ export class GeoJSSceneManager {
     });
 
     const edges = dp.edges;
-    const lines = layer.createFeature('line')
+    const lines = this.lines = layer.createFeature('line')
       .data(edges)
       .style({
         position: name => nodes[name],
@@ -154,7 +154,12 @@ export class GeoJSSceneManager {
   pickName () {}
   display () {}
   undisplay () {}
-  linksVisible () {}
+
+  linksVisible (show) {
+    this.lines.visible(show);
+    this.map.draw();
+  }
+
   setNightMode () {}
   setBooleanColor () {}
   setDiscoveryColor () {}
