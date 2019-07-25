@@ -47,7 +47,7 @@ class GraphVisComponent extends Component {
     super(props);
 
     this.sceneSetters = {
-      zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
+      zoom: (val) => { this.scene.zoom = val; },
       spacing: (val) => { this.scene.expand(val); },
       year: (val) => {
         this.scene.hideAfter(val);
@@ -115,7 +115,8 @@ class GraphVisComponent extends Component {
     this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
     this.scene = new GeoJSSceneManager({
       el: this.visElement,
-      dp: this.data
+      dp: this.data,
+      onValueChanged: this.onValueChanged,
     });
 
     this.setDefaults();
@@ -158,12 +159,6 @@ class GraphVisComponent extends Component {
     if (key in this.sceneSetters) {
       this.sceneSetters[key](value);
     }
-  }
-
-  onVisZoom = (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -1 : 1;
-    this.onValueChanged(this.props.zoom.value + delta, 'zoom');
   }
 
   onVisClick = (e) => {
@@ -455,7 +450,6 @@ class GraphVisComponent extends Component {
               ref={ref => {this.visElement = ref}}
               draggable={true}
               onDragStart={this.onVisDrag}
-              onWheel={this.onVisZoom}
               onClick={this.onVisClick}
             />
             <oc-molecule

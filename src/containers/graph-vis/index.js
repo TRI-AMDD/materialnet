@@ -27,9 +27,9 @@ class GraphVisContainer extends Component {
         ]
       },
       zoom: {
-        value: 40,
-        min: 0,
-        max: 100
+        value: -2.3,
+        min: -3.75,
+        max: 3
       },
       spacing: {
         value: 1,

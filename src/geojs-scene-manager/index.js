@@ -3,9 +3,10 @@ import geo from 'geojs';
 import './tooltip.css';
 
 export class GeoJSSceneManager {
-  constructor({el, dp}) {
+  constructor({el, dp, onValueChanged}) {
     this.parent = el;
     this.initScene(dp);
+    this.onValueChanged = onValueChanged;
   }
 
   initScene(dp) {
@@ -144,6 +145,10 @@ export class GeoJSSceneManager {
       tooltipElem.classList.toggle('hidden', true);
     });
 
+    map.geoOn(geo.event.zoom, () => {
+      this.onValueChanged(map.zoom(), 'zoom');
+    });
+
     map.draw();
   }
 
@@ -176,4 +181,12 @@ export class GeoJSSceneManager {
   pick () {}
   moveCamera () {}
   clear () {}
+
+  get zoom () {
+    return this.map.zoom();
+  }
+
+  set zoom (zoom) {
+    this.map.zoom(zoom);
+  }
 }
