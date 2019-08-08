@@ -2,16 +2,8 @@ import React, { Component } from 'react';
 
 import {
   Checkbox,
-  Select,
-  MenuItem,
-  FormControl,
   IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHead
+  Paper
 } from '@material-ui/core';
 
 import { PlayArrow, Pause } from '@material-ui/icons';
@@ -20,8 +12,6 @@ import ResizeObserver from 'resize-observer-polyfill';
 
 import { fetchStructure } from '../../rest';
 
-import MySlider from './slider';
-import Search from './search';
 import InfoPanel from './info-panel';
 
 import { sortStringsLength } from './sort';
@@ -29,9 +19,14 @@ import { sortStringsLength } from './sort';
 import { SceneManager } from '../../scene-manager';
 import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import { DiskDataProvider } from '../../data-provider';
+import Grid from '../controls/grid';
+import SearchControl from '../controls/search';
+import SliderControl from '../controls/slider';
+import SelectControl from '../controls/select';
 import { wc } from '../../utils/webcomponents.js';
 
 import * as templates from '../../templates';
+import CheckboxControl from '../controls/checkbox';
 
 class GraphVisComponent extends Component {
   visElement;
@@ -313,132 +308,83 @@ class GraphVisComponent extends Component {
 
     return (
       <div>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Dataset</TableCell>
-              <TableCell>Template</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
-                    {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={template.value} onChange={(e) => {this.onValueChanged(e.target.value, 'template')}}>
-                    {template.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Zoom</TableCell>
-              <TableCell>Link opacity / display</TableCell>
-              <TableCell>Node spacing</TableCell>
-              <TableCell>Discovered before</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={zoom}
-                    onChange={(val) => {this.onValueChanged(val, 'zoom')}}
-                  />
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    disabled={!showLinks.value}
-                    params={opacity}
-                    onChange={(val) => {this.onValueChanged(val, 'opacity')}}
-                  >
-                    <Checkbox checked={showLinks.value} onChange={(e, val) => {this.onValueChanged(val, 'showLinks')}}/>
-                  </MySlider>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={spacing}
-                    onChange={(val) => {this.onValueChanged(val, 'spacing')}}
-                  />
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={year}
-                    onChange={(val) => {this.onValueChanged(val, 'year')}}
-                    digits={0}
-                  >
-                    <IconButton
-                      onClick={this.toggleAutoplay}
-                    >
-                      { year.play ? <Pause/> : <PlayArrow/>}
-                    </IconButton>
-                  </MySlider>
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Search</TableCell>
-              <TableCell>Node size</TableCell>
-              <TableCell>Node color</TableCell>
-              <TableCell>Color year</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Search options={this.searchOptions} value={search.value} maxItems={20} onChange={(e, val) => {this.onValueChanged(val.newValue, 'search')}}/>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={size.value} onChange={(e) => {this.onValueChanged(e.target.value, 'size')}}>
-                    {size.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={color.value} onChange={(e) => {this.onValueChanged(e.target.value, 'color')}}>
-                    {color.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={colorYear}
-                    onChange={(val) => {this.onValueChanged(val, 'colorYear')}}
-                    disabled={color.value !== 'undiscovered'}
-                    digits={0}
-                  />
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Night Mode <Checkbox checked={nightMode.value} onChange={(e, val) => {this.onValueChanged(val, 'nightMode')}}/></TableCell>
-            </TableRow>
-          </TableHead>
-        </Table>
+        <Grid>
+          <SelectControl
+            {...dataset}
+            label={'Dataset'}
+            onChange={(val) => {this.onValueChanged(val, 'dataset')}}
+          />
+          <SelectControl
+            {...template}
+            label={'Template'}
+            onChange={(val) => {this.onValueChanged(val, 'template')}}
+          />
+          <SliderControl
+            {...zoom}
+            label={'Zoom'}
+            range={[zoom.min, zoom.max]}
+            onChange={(val) => {this.onValueChanged(val, 'zoom')}}
+          />
+          <SliderControl
+            {...opacity}
+            label={'Link opacity / display'}
+            disabled={!showLinks.value}
+            range={[opacity.min, opacity.max]}
+            onChange={(val) => {this.onValueChanged(val, 'opacity')}}
+          >
+            <Checkbox checked={showLinks.value} onChange={(_e, val) => {this.onValueChanged(val, 'showLinks')}}/>
+          </SliderControl>
+          <SliderControl
+            {...spacing}
+            label={'Node spacing'}
+            range={[spacing.min, spacing.max]}
+            onChange={(val) => {this.onValueChanged(val, 'spacing')}}
+          />
+          <SliderControl
+            {...year}
+            label={'Discovered before'}
+            range={[year.min, year.max]}
+            digits={0}
+            onChange={(val) => {this.onValueChanged(val, 'year')}}
+          >
+            <IconButton
+              onClick={this.toggleAutoplay}
+            >
+              { year.play ? <Pause/> : <PlayArrow/>}
+            </IconButton>
+          </SliderControl>
+          <SearchControl
+            label={'Search'}
+            options={this.searchOptions}
+            value={search.value}
+            maxItems={20}
+            onChange={(_e, val) => {this.onValueChanged(val.newValue, 'search')}}
+          />
+          <SelectControl
+            {...size}
+            label={'Node size'}
+            onChange={(val) => {this.onValueChanged(val, 'size')}}
+          />
+          <SelectControl
+            {...color}
+            label={'Node color'}
+            onChange={(val) => {this.onValueChanged(val, 'color')}}
+          />
+          <SliderControl
+            {...colorYear}
+            label={'Color year'}
+            range={[colorYear.min, colorYear.max]}
+            digits={0}
+            disabled={color.value !== 'undiscovered'}
+            onChange={(val) => {this.onValueChanged(val, 'colorYear')}}
+          />
+          <CheckboxControl
+            label="Night mode"
+            value={nightMode.value}
+            onChange={(val) => {this.onValueChanged(val, 'nightMode')}}
+          />
+        </Grid>
+
         <Paper
           style={{width: '100%', height: '40rem', marginTop: '2rem', marginBottom: '2rem'}}
         >
