@@ -218,7 +218,6 @@ export class GeoJSSceneManager {
   }
 
   setNightMode () {}
-  setBooleanColor () {}
 
   setConstColor () {
     this.points.style('fillColor', `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`);
@@ -230,6 +229,28 @@ export class GeoJSSceneManager {
     this.dp.nodeNames().forEach((name, i) => {
       const exists = this.dp.nodeExists(name);
       const color = exists ? 'rgb(81,96,204)' : '#de2d26';
+
+      colors[i] = color;
+    });
+
+    this.points.style('fillColor', (nodeId, i) => colors[i]);
+    this.map.draw();
+  }
+
+  setPropertyColor (prop) {
+    const [low, high] = this.propMinMax(prop);
+
+    this.cmap = scaleSequential(interpolateViridis)
+      .domain([low, high]);
+
+    let colors = [];
+    this.dp.nodeNames().forEach((name, i) => {
+      const val = this.dp.nodeProperty(name, prop);
+
+      let color = this.cmap(val);
+      if (!color) {
+        color = '#ff0000';
+      }
 
       colors[i] = color;
     });
@@ -260,8 +281,18 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
+  propMinMax (prop) {
+    const props = this.dp.nodeNames()
+      .map(name => this.dp.nodeProperty(name, prop))
+      .filter(d => d !== undefined);
+
+    return [
+      Math.min.apply(null, props),
+      Math.max.apply(null, props)
+    ];
+  }
+
   setUndiscoveredColor () {}
-  setPropertyColor () {}
   render () {}
   resize () {}
   pick () {}
