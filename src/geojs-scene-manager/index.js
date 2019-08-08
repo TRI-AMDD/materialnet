@@ -220,6 +220,11 @@ export class GeoJSSceneManager {
   setNightMode () {}
   setBooleanColor () {}
 
+  setConstColor () {
+    this.points.style('fillColor', `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`);
+    this.map.draw();
+  }
+
   setDiscoveryColor () {
     this.cmap = scaleSequential(interpolateViridis)
       .domain([1945, 2015]);

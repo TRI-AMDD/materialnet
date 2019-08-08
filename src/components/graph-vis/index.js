@@ -72,6 +72,10 @@ class GraphVisComponent extends Component {
       size: (val) => { this.scene.setDegreeSize(this.props.year.value, val); },
       color: (val) => {
         switch (val) {
+          case 'none':
+            this.scene.setConstColor();
+            break;
+
           case 'boolean':
             this.scene.setBooleanColor();
             break;
@@ -100,6 +104,10 @@ class GraphVisComponent extends Component {
 
           case 'undiscovered':
             this.scene.setUndiscoveredColor(val);
+            break;
+
+          case 'none':
+            this.scene.setConstColor();
             break;
 
           default:
