@@ -1,3 +1,7 @@
+import { scaleSequential } from 'd3-scale';
+import { interpolateViridis } from 'd3-scale-chromatic';
+import { color as d3Color } from 'd3-color';
+
 import geo from 'geojs';
 
 import './tooltip.css';
@@ -80,8 +84,8 @@ export class GeoJSSceneManager {
       style: {
         strokeColor: 'black',
         fillColor: 'gray',
-        strokeOpacity: 0.5,
-        fillOpacity: 0.5,
+        strokeOpacity: 0.8,
+        fillOpacity: 0.8,
         radius: name => Math.max(2, Math.sqrt(nodes[name].degree)),
       },
       position: name => nodes[name],
@@ -215,7 +219,29 @@ export class GeoJSSceneManager {
 
   setNightMode () {}
   setBooleanColor () {}
-  setDiscoveryColor () {}
+
+  setDiscoveryColor () {
+    this.cmap = scaleSequential(interpolateViridis)
+      .domain([1945, 2015]);
+
+    let colors = [];
+    this.dp.nodeNames().forEach((name, i) => {
+      const discovery = this.dp.nodeProperty(name, 'discovery');
+
+      let color;
+      if (discovery !== null) {
+        color = (this.cmap(discovery));
+      } else {
+        color = ('#de2d26');
+      }
+
+      colors.push(color);
+    });
+
+    this.points.style('fillColor', (nodeId, i) => colors[i]);
+    this.map.draw();
+  }
+
   setUndiscoveredColor () {}
   setPropertyColor () {}
   render () {}
