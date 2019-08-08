@@ -225,6 +225,19 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
+  setBooleanColor () {
+    let colors = [];
+    this.dp.nodeNames().forEach((name, i) => {
+      const exists = this.dp.nodeExists(name);
+      const color = exists ? 'rgb(81,96,204)' : '#de2d26';
+
+      colors[i] = color;
+    });
+
+    this.points.style('fillColor', (nodeId, i) => colors[i]);
+    this.map.draw();
+  }
+
   setDiscoveryColor () {
     this.cmap = scaleSequential(interpolateViridis)
       .domain([1945, 2015]);
