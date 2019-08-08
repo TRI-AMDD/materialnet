@@ -10,6 +10,8 @@ export class GeoJSSceneManager {
   }
 
   initScene(dp) {
+    this.dp = dp;
+
     const degrees = dp.nodeDegrees(2020);
 
     let nodes = {};
@@ -73,7 +75,7 @@ export class GeoJSSceneManager {
         strokeOpacity: 0.1,
       });
 
-    const points = layer.createFeature('point', {
+    const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
       style: {
         strokeColor: 'black',
@@ -146,6 +148,7 @@ export class GeoJSSceneManager {
     });
 
     map.geoOn(geo.event.zoom, () => {
+      points.dataTime().modified();
       this.onValueChanged(map.zoom(), 'zoom');
     });
 
@@ -161,7 +164,46 @@ export class GeoJSSceneManager {
   }
 
   hideAfter () {}
-  setDegreeSize () {}
+
+  setDegreeSize (year, level) {
+    // const zoom = Math.pow(2, this.map.zoom());
+
+    if (level === 'none') {
+      this.points.style('radius', () => {
+        return Math.pow(2, this.map.zoom()) * 10;
+      });
+      this.map.draw();
+    } else {
+      const degrees = this.dp.nodeDegrees(year);
+
+      let sizes = [];
+      this.dp.nodeNames().forEach((name, i) => {
+        const deg = degrees[name];
+
+        switch(level) {
+          case 'normal':
+            sizes[i] = 10 + Math.sqrt(deg);
+            break;
+
+          case 'large':
+            sizes[i] = 10 + Math.sqrt(Math.sqrt(deg * deg * deg));
+            break;
+
+          case 'huge':
+            sizes[i] = 10 + deg;
+            break;
+
+          default:
+            throw new Error(`bad level option: ${level}`);
+            break;
+        }
+      });
+
+      this.points.style('radius', (nodeId, i) => Math.pow(2, this.map.zoom()) * sizes[i]);
+      this.map.draw();
+    }
+  }
+
   pickName () {}
   display () {}
   undisplay () {}
