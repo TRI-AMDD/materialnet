@@ -292,7 +292,19 @@ export class GeoJSSceneManager {
     ];
   }
 
-  setUndiscoveredColor () {}
+  setUndiscoveredColor (year) {
+    let colors = [];
+    this.dp.nodeNames().forEach((name, i) => {
+      const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
+      const color = existsYet ? 'rgb(81,96,204)' : '#de2d26';
+
+      colors[i] = color;
+    });
+
+    this.points.style('fillColor', (nodeId, i) => colors[i]);
+    this.map.draw();
+  }
+
   render () {}
   resize () {}
   pick () {}
