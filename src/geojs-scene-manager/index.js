@@ -7,10 +7,12 @@ import geo from 'geojs';
 import './tooltip.css';
 
 export class GeoJSSceneManager {
-  constructor({el, dp, onValueChanged}) {
+  constructor({el, dp, onValueChanged, picked}) {
     this.parent = el;
     this.initScene(dp);
     this.onValueChanged = onValueChanged;
+    this.picked = picked;
+    this.lineSelected = new Set([]);
   }
 
   initScene(dp) {
@@ -128,6 +130,26 @@ export class GeoJSSceneManager {
 
       tooltipElem.classList.toggle('hidden', true);
     });
+    points.geoOn(geo.event.feature.mouseclick, evt => {
+      if (evt.top) {
+        const name = evt.data;
+
+        const data = {
+          name,
+          degree: this.dp.nodeProperty(name, 'degree'),
+          discovery: this.dp.nodeProperty(name, 'discovery'),
+          formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+          synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+          clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+          eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+          degCent: this.dp.nodeProperty(name, 'deg_cent'),
+          shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+          degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+        };
+
+        this.picked(data);
+      }
+    });
 
     lines.geoOn(geo.event.feature.mouseon, evt => {
       if (onNode) {
@@ -162,7 +184,18 @@ export class GeoJSSceneManager {
   expand () {}
 
   setLinkOpacity (value) {
-    this.lines.style('strokeOpacity', value);
+    this.linkOpacity = value;
+    if (this.selected) {
+      this.lines.style('strokeOpacity', (node, idx, edge) => {
+        if (this.lineSelected.has(edge[0]) && this.lineSelected.has(edge[1])) {
+          return value;
+        } else {
+          return 0;
+        }
+      });
+    } else {
+      this.lines.style('strokeOpacity', value);
+    }
     this.lines.modified();
     this.map.draw();
   }
@@ -209,7 +242,49 @@ export class GeoJSSceneManager {
   }
 
   pickName () {}
-  display () {}
+
+  display (name) {
+    this.selected = name;
+
+    // Collect neighborhood of selected node.
+    let onehop = new Set([]);
+    for(let i = 0; i < this.dp.edgeCount(); i++) {
+      const edge = this.dp.edgeNodes(i);
+
+      if (name === edge[0] || name === edge[1]) {
+        onehop.add(edge[0]);
+        onehop.add(edge[1]);
+      }
+    }
+
+    // Set opacity of all nodes in accordance with membership in the
+    // neighborhood.
+    let focus = 0.8;
+    let defocus = 0.05;
+    this.points.style('fillOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
+    this.points.style('strokeOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
+
+    // Same for edges.
+    const lineFocus = this.linkOpacity;
+    const lineDefocus = 0;
+    console.log('data', this.lines.data());
+    this.lines.style('strokeOpacity', (node, idx, edge) => {
+      if (onehop.has(edge[0]) && onehop.has(edge[1])) {
+        this.lineSelected.add(edge[0]);
+        this.lineSelected.add(edge[1]);
+
+        return lineFocus;
+      } else {
+        this.lineSelected.delete(edge[0]);
+        this.lineSelected.delete(edge[1]);
+
+        return lineDefocus;
+      }
+    });
+
+    this.map.draw();
+  }
+
   undisplay () {}
 
   linksVisible (show) {

@@ -125,6 +125,9 @@ class GraphVisComponent extends Component {
       el: this.visElement,
       dp: this.data,
       onValueChanged: this.onValueChanged,
+      picked: (data) => {
+        this.selectNode(data);
+      },
     });
 
     this.setDefaults();
@@ -167,20 +170,6 @@ class GraphVisComponent extends Component {
     if (key in this.sceneSetters) {
       this.sceneSetters[key](value);
     }
-  }
-
-  onVisClick = (e) => {
-    if (this.dragging.status) {
-      return;
-    }
-
-    let obj = this.scene.pick({x: e.clientX, y: e.clientY});
-
-    if (!obj) {
-      return;
-    }
-
-    this.selectNode(obj);
   }
 
   selectNode (obj) {
@@ -458,7 +447,6 @@ class GraphVisComponent extends Component {
               ref={ref => {this.visElement = ref}}
               draggable={true}
               onDragStart={this.onVisDrag}
-              onClick={this.onVisClick}
             />
             <oc-molecule
               slot={1}
