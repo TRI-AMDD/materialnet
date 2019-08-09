@@ -13,6 +13,7 @@ export class GeoJSSceneManager {
     this.onValueChanged = onValueChanged;
     this.picked = picked;
     this.lineSelected = new Set([]);
+    this.expansion = 1;
   }
 
   initScene(dp) {
@@ -20,7 +21,7 @@ export class GeoJSSceneManager {
 
     const degrees = dp.nodeDegrees(2020);
 
-    let nodes = {};
+    let nodes = this.nodes = {};
     dp.nodeNames().forEach(name => {
       const pos = dp.nodePosition(name);
       nodes[name] = {
@@ -181,7 +182,23 @@ export class GeoJSSceneManager {
     map.draw();
   }
 
-  expand () {}
+  expand (m) {
+    const factor = m / this.expansion;
+    this.expansion = m;
+
+    let expanded = {...this.nodes};
+    Object.keys(expanded).forEach(node => {
+      expanded[node].x *= factor;
+      expanded[node].y *= factor;
+    });
+
+    const positioner = name => expanded[name];
+
+    this.points.position(positioner);
+    this.lines.position(positioner);
+
+    this.map.draw();
+  }
 
   setLinkOpacity (value) {
     this.linkOpacity = value;
