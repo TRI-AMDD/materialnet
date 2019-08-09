@@ -267,7 +267,6 @@ export class GeoJSSceneManager {
     // Same for edges.
     const lineFocus = this.linkOpacity;
     const lineDefocus = 0;
-    console.log('data', this.lines.data());
     this.lines.style('strokeOpacity', (node, idx, edge) => {
       if (onehop.has(edge[0]) && onehop.has(edge[1])) {
         this.lineSelected.add(edge[0]);
@@ -285,7 +284,13 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  undisplay () {}
+  undisplay () {
+    this.points.style('fillOpacity', 0.8);
+    this.points.style('strokeOpacity', 0.8);
+    this.setLinkOpacity(this.linkOpacity);
+
+    this.map.draw();
+  }
 
   linksVisible (show) {
     this.lines.visible(show);
