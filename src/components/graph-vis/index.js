@@ -190,7 +190,9 @@ class GraphVisComponent extends Component {
 
     fetchStructure(obj.name)
     .then(cjson => {
-      this.onValueChanged(cjson, 'structure');
+      if (cjson) {
+        this.onValueChanged(cjson, 'structure');
+      }
     })
   }
 
