@@ -133,21 +133,7 @@ export class GeoJSSceneManager {
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        const name = evt.data;
-
-        const data = {
-          name,
-          degree: this.dp.nodeProperty(name, 'degree'),
-          discovery: this.dp.nodeProperty(name, 'discovery'),
-          formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-          synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
-          clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
-          eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
-          degCent: this.dp.nodeProperty(name, 'deg_cent'),
-          shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-          degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
-        };
-
+        const data = this.pickName(evt.data);
         this.picked(data);
       }
     });
@@ -258,7 +244,26 @@ export class GeoJSSceneManager {
     }
   }
 
-  pickName () {}
+  pickName (name) {
+    if (!this.dp.hasNode(name)) {
+      return null;
+    }
+
+    const data = {
+      name,
+      degree: this.dp.nodeProperty(name, 'degree'),
+      discovery: this.dp.nodeProperty(name, 'discovery'),
+      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+      degCent: this.dp.nodeProperty(name, 'deg_cent'),
+      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+    };
+
+    return data;
+  }
 
   display (name) {
     this.selected = name;

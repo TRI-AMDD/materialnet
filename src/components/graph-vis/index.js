@@ -60,7 +60,6 @@ class GraphVisComponent extends Component {
         const obj = this.scene.pickName(val);
         if (obj) {
           this.scene.display(val, true);
-          this.selectNode(obj);
         } else {
           this.scene.undisplay();
           this.onValueChanged(null, 'selected');
