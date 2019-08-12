@@ -1,6 +1,14 @@
 export function fetchStructure(name) {
   return fetch(`sample-data/structures/${name}.cjson`)
-    .then(res => {
-      return res.json();
+    .then(async res => {
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (e) {
+        json = null;
+      }
+
+      return json;
     });
 }

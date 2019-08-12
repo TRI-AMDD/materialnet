@@ -7,10 +7,13 @@ import geo from 'geojs';
 import './tooltip.css';
 
 export class GeoJSSceneManager {
-  constructor({el, dp, onValueChanged}) {
+  constructor({el, dp, onValueChanged, picked}) {
     this.parent = el;
     this.initScene(dp);
     this.onValueChanged = onValueChanged;
+    this.picked = picked;
+    this.lineSelected = new Set([]);
+    this.expansion = 1;
   }
 
   initScene(dp) {
@@ -18,7 +21,7 @@ export class GeoJSSceneManager {
 
     const degrees = dp.nodeDegrees(2020);
 
-    let nodes = {};
+    let nodes = this.nodes = {};
     dp.nodeNames().forEach(name => {
       const pos = dp.nodePosition(name);
       nodes[name] = {
@@ -128,6 +131,12 @@ export class GeoJSSceneManager {
 
       tooltipElem.classList.toggle('hidden', true);
     });
+    points.geoOn(geo.event.feature.mouseclick, evt => {
+      if (evt.top) {
+        const data = this.pickName(evt.data);
+        this.picked(data);
+      }
+    });
 
     lines.geoOn(geo.event.feature.mouseon, evt => {
       if (onNode) {
@@ -159,10 +168,37 @@ export class GeoJSSceneManager {
     map.draw();
   }
 
-  expand () {}
+  expand (m) {
+    const factor = m / this.expansion;
+    this.expansion = m;
+
+    let expanded = {...this.nodes};
+    Object.keys(expanded).forEach(node => {
+      expanded[node].x *= factor;
+      expanded[node].y *= factor;
+    });
+
+    const positioner = name => expanded[name];
+
+    this.points.position(positioner);
+    this.lines.position(positioner);
+
+    this.map.draw();
+  }
 
   setLinkOpacity (value) {
-    this.lines.style('strokeOpacity', value);
+    this.linkOpacity = value;
+    if (this.selected) {
+      this.lines.style('strokeOpacity', (node, idx, edge) => {
+        if (this.lineSelected.has(edge[0]) && this.lineSelected.has(edge[1])) {
+          return value;
+        } else {
+          return 0;
+        }
+      });
+    } else {
+      this.lines.style('strokeOpacity', value);
+    }
     this.lines.modified();
     this.map.draw();
   }
@@ -208,9 +244,75 @@ export class GeoJSSceneManager {
     }
   }
 
-  pickName () {}
-  display () {}
-  undisplay () {}
+  pickName (name) {
+    if (!this.dp.hasNode(name)) {
+      return null;
+    }
+
+    const data = {
+      name,
+      degree: this.dp.nodeProperty(name, 'degree'),
+      discovery: this.dp.nodeProperty(name, 'discovery'),
+      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
+      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
+      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
+      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
+      degCent: this.dp.nodeProperty(name, 'deg_cent'),
+      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
+      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+    };
+
+    return data;
+  }
+
+  display (name) {
+    this.selected = name;
+
+    // Collect neighborhood of selected node.
+    let onehop = new Set([]);
+    for(let i = 0; i < this.dp.edgeCount(); i++) {
+      const edge = this.dp.edgeNodes(i);
+
+      if (name === edge[0] || name === edge[1]) {
+        onehop.add(edge[0]);
+        onehop.add(edge[1]);
+      }
+    }
+
+    // Set opacity of all nodes in accordance with membership in the
+    // neighborhood.
+    let focus = 0.8;
+    let defocus = 0.05;
+    this.points.style('fillOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
+    this.points.style('strokeOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
+
+    // Same for edges.
+    const lineFocus = this.linkOpacity;
+    const lineDefocus = 0;
+    this.lines.style('strokeOpacity', (node, idx, edge) => {
+      if (onehop.has(edge[0]) && onehop.has(edge[1])) {
+        this.lineSelected.add(edge[0]);
+        this.lineSelected.add(edge[1]);
+
+        return lineFocus;
+      } else {
+        this.lineSelected.delete(edge[0]);
+        this.lineSelected.delete(edge[1]);
+
+        return lineDefocus;
+      }
+    });
+
+    this.map.draw();
+  }
+
+  undisplay () {
+    this.points.style('fillOpacity', 0.8);
+    this.points.style('strokeOpacity', 0.8);
+    this.setLinkOpacity(this.linkOpacity);
+
+    this.map.draw();
+  }
 
   linksVisible (show) {
     this.lines.visible(show);
