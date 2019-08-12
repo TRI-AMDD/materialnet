@@ -1,6 +1,7 @@
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
 import { color as d3Color } from 'd3-color';
+import { select } from 'd3-selection';
 
 import geo from 'geojs';
 
@@ -319,7 +320,16 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  setNightMode () {}
+  setNightMode (night) {
+    const bgColor = night ? 'black' : 'white';
+    const strokeColor = night ? 'white' : 'black';
+    const linkColor = strokeColor;
+
+    select(this.parent)
+      .style('background-color', bgColor);
+    this.lines.style('strokeColor', linkColor);
+    this.map.draw();
+  }
 
   setConstColor () {
     this.points.style('fillColor', `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`);
