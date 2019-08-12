@@ -13,7 +13,7 @@ export default (props) => {
   return (
     <Grid container spacing={24}>
       {children.map((child, i) => {
-        const gridsize = child.props.gridsize || {xs: 12, sm: 6}
+        const gridsize = child.props.gridsize || {xs: 12}
         return (
           <Grid item key={i} {...gridsize}>
             {child}

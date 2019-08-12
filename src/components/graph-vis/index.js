@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 
 import {
-  Checkbox,
-  IconButton,
   Paper
 } from '@material-ui/core';
-
-import { PlayArrow, Pause } from '@material-ui/icons';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -19,14 +16,11 @@ import { sortStringsLength } from './sort';
 import { SceneManager } from '../../scene-manager';
 import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import { DiskDataProvider } from '../../data-provider';
-import Grid from '../controls/grid';
-import SearchControl from '../controls/search';
-import SliderControl from '../controls/slider';
-import SelectControl from '../controls/select';
-import { wc } from '../../utils/webcomponents.js';
 
 import * as templates from '../../templates';
-import CheckboxControl from '../controls/checkbox';
+
+import Controls from './controls';
+import Structure from './structure';
 
 class GraphVisComponent extends Component {
   visElement;
@@ -140,6 +134,15 @@ class GraphVisComponent extends Component {
     this.ro.observe(this.visElement);
   }
 
+  componentDidUpdate() {
+    const { selected } = this.props;
+    if (selected.value) {
+      this.renderInfo();
+    } else {
+      this.renderControls();
+    }
+  }    
+
   componentWillUnmount() {
     if (this.ro) {
       this.ro.unobserve(this.visElement);
@@ -148,9 +151,11 @@ class GraphVisComponent extends Component {
 
   setDefaults() {
     for (let key in this.props) {
-      const value = this.props[key].value;
-      if (key !== 'colorYear' || ['discovery', 'boolean', 'undiscovered'].indexOf(value) !== -1) {
-        this.onValueChanged(value, key);
+      if (this.props[key] && this.props[key].value ){
+        const value = this.props[key].value;
+        if (key !== 'colorYear' || ['discovery', 'boolean', 'undiscovered'].indexOf(value) !== -1) {
+          this.onValueChanged(value, key);
+        }
       }
     }
   }
@@ -259,8 +264,27 @@ class GraphVisComponent extends Component {
     this.onValueChanged(null, 'structure');
   }
 
-  render() {
+  renderControls() {
     const {
+      drawerRef,
+      dataset,
+      template,
+      zoom,
+      spacing,
+      opacity,
+      year,
+      search,
+      size,
+      color,
+      colorYear,
+      showLinks,
+      nightMode
+    } = this.props;
+    if (!drawerRef || !drawerRef.current) {
+      return;
+    }
+
+    const props = {
       dataset,
       template,
       zoom,
@@ -273,8 +297,36 @@ class GraphVisComponent extends Component {
       colorYear,
       showLinks,
       nightMode,
+      searchOptions: this.searchOptions,
+      onValueChanged: this.onValueChanged,
+      toggleAutoplay: this.toggleAutoplay,
+    }
+
+    ReactDOM.render(<Controls {...props}/>, drawerRef.current);
+  }
+
+  renderInfo() {
+    const {
+      drawerRef,
       selected,
-      structure,
+      template,
+      structure
+    } = this.props;
+
+    ReactDOM.render(
+      <React.Fragment>
+        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
+        <div style={{width: '100%', height: '15rem'}}>
+          <Structure cjson={structure.value}/>
+        </div>
+      </React.Fragment>,
+      drawerRef.current
+    );
+
+  }
+
+  render() {
+    const {
       nodes,
       edges
     } = this.props;
@@ -293,125 +345,13 @@ class GraphVisComponent extends Component {
     }
     this.datasetName = this.props.dataset.value;
 
-    const nSplit = 2;
-    const splitSizes = '0.6, 0.4';
-
     return (
-      <div>
-        <Grid>
-          <SelectControl
-            {...dataset}
-            label={'Dataset'}
-            onChange={(val) => {this.onValueChanged(val, 'dataset')}}
-          />
-          <SelectControl
-            {...template}
-            label={'Template'}
-            onChange={(val) => {this.onValueChanged(val, 'template')}}
-          />
-          <SliderControl
-            {...zoom}
-            label={'Zoom'}
-            range={[zoom.min, zoom.max]}
-            onChange={(val) => {this.onValueChanged(val, 'zoom')}}
-          />
-          <SliderControl
-            {...opacity}
-            label={'Link opacity / display'}
-            disabled={!showLinks.value}
-            range={[opacity.min, opacity.max]}
-            onChange={(val) => {this.onValueChanged(val, 'opacity')}}
-          >
-            <Checkbox checked={showLinks.value} onChange={(_e, val) => {this.onValueChanged(val, 'showLinks')}}/>
-          </SliderControl>
-          <SliderControl
-            {...spacing}
-            label={'Node spacing'}
-            range={[spacing.min, spacing.max]}
-            onChange={(val) => {this.onValueChanged(val, 'spacing')}}
-          />
-          <SliderControl
-            {...year}
-            label={'Discovered before'}
-            range={[year.min, year.max]}
-            digits={0}
-            onChange={(val) => {this.onValueChanged(val, 'year')}}
-          >
-            <IconButton
-              onClick={this.toggleAutoplay}
-            >
-              { year.play ? <Pause/> : <PlayArrow/>}
-            </IconButton>
-          </SliderControl>
-          <SearchControl
-            label={'Search'}
-            options={this.searchOptions}
-            value={search.value}
-            maxItems={20}
-            onChange={(_e, val) => {this.onValueChanged(val.newValue, 'search')}}
-          />
-          <SelectControl
-            {...size}
-            label={'Node size'}
-            onChange={(val) => {this.onValueChanged(val, 'size')}}
-          />
-          <SelectControl
-            {...color}
-            label={'Node color'}
-            onChange={(val) => {this.onValueChanged(val, 'color')}}
-          />
-          <SliderControl
-            {...colorYear}
-            label={'Color year'}
-            range={[colorYear.min, colorYear.max]}
-            digits={0}
-            disabled={color.value !== 'undiscovered'}
-            onChange={(val) => {this.onValueChanged(val, 'colorYear')}}
-          />
-          <CheckboxControl
-            label="Night mode"
-            value={nightMode.value}
-            onChange={(val) => {this.onValueChanged(val, 'nightMode')}}
-          />
-        </Grid>
-
-        <Paper
-          style={{width: '100%', height: '40rem', marginTop: '2rem', marginBottom: '2rem'}}
-        >
-          <split-me
-            n={nSplit} sizes={splitSizes}
-            ref={wc(
-              // Events
-              {
-                // Ugly workaround to fix firefox not resizing split elements.
-                slotResized: () => { this.onValueChanged(zoom.value, 'zoom'); }
-              },
-            )}
-          >
-            <div
-              slot={0}
-              style={{width: '100%', height: '100%'}}
-              ref={ref => {this.visElement = ref}}
-              draggable={true}
-              onDragStart={this.onVisDrag}
-            />
-            <oc-molecule
-              slot={1}
-              ref={wc(
-                // Events
-                {},
-                // Props
-                {
-                  cjson: structure.value
-                }
-              )}
-            />
-          </split-me>
-        </Paper>
-        {selected.value &&
-          <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[this.props.template.value]} />
-        }
-      </div>
+      <div
+        style={{width: '100%', height: '100%'}}
+        ref={ref => {this.visElement = ref}}
+        draggable={true}
+        onDragStart={this.onVisDrag}
+      />
     );
   }
 }

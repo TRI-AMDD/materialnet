@@ -100,7 +100,7 @@ class GraphVisContainer extends Component {
   }
 
   componentDidMount() {
-    this.update('precise', 'dataset');
+    this.update(this.state.dataset.value, 'dataset');
   }
 
   render() {
@@ -120,8 +120,12 @@ class GraphVisContainer extends Component {
       showLinks,
       nightMode,
       selected,
-      structure,
+      structure
     } = this.state;
+
+    const {
+      drawerRef
+    } = this.props;
 
     if (nodes && edges) {
       return (
@@ -144,6 +148,7 @@ class GraphVisContainer extends Component {
           nightMode={nightMode}
           selected={selected}
           structure={structure}
+          drawerRef={drawerRef}
         />
       );
     } else {
