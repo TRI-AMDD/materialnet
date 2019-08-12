@@ -1,116 +1,111 @@
 import React from 'react';
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  Typography
+  Typography,
+  IconButton
 } from '@material-ui/core';
+
+import CloseIcon from '@material-ui/icons/Close';
 
 export default function ({name, degree, discovery, formationEnergy, synthesisProbability, clusCoeff, eigenCent, degCent, shortestPath, degNeigh, onClear}) {
   const hypothetical = discovery === null;
 
   return (
-    <Card>
-      <CardHeader title={`${name} (${hypothetical ? 'undiscovered' : discovery})`} action={<Button onClick={onClear}>Clear selection</Button>}>
+    <React.Fragment>
+      <IconButton style={{float: 'right'}} onClick={onClear}><CloseIcon/></IconButton>
+      <Typography gutterBottom variant="h4">{`${name} (${hypothetical ? 'undiscovered' : discovery})`}</Typography>
+      <Typography gutterBottom variant="title">
+        Material Properties
+      </Typography>
 
-      </CardHeader>
-      <CardContent>
-        <Typography gutterBottom variant="title">
-          Material Properties
+      <React.Fragment>
+        <Typography gutterBottom variant="subheading" color="textSecondary">
+          Derived materials
         </Typography>
+        <Typography  paragraph>
+          {degree}
+        </Typography>
+      </React.Fragment>
 
-        <div>
+      {formationEnergy &&
+        <React.Fragment>
           <Typography gutterBottom variant="subheading" color="textSecondary">
-            Derived materials
+            Formation energy
           </Typography>
           <Typography  paragraph>
-            {degree}
+            {formationEnergy.toFixed(3)} eV/atom
           </Typography>
-        </div>
+        </React.Fragment>
+      }
 
-        {formationEnergy &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Formation energy
-              </Typography>
-              <Typography  paragraph>
-                {formationEnergy.toFixed(3)} eV/atom
-              </Typography>
-            </div>
-        }
+      {(hypothetical && synthesisProbability) &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Synthesis probability
+          </Typography>
+          <Typography  paragraph>
+            {(synthesisProbability * 100).toFixed(1)}%
+          </Typography>
+        </React.Fragment>
+      }
 
-        {(hypothetical && synthesisProbability) &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Synthesis probability
-              </Typography>
-              <Typography  paragraph>
-                {(synthesisProbability * 100).toFixed(1)}%
-              </Typography>
-            </div>
-        }
+      <Typography gutterBottom variant='title'>
+        Network Properties
+      </Typography>
 
-        <Typography gutterBottom variant='title'>
-          Network Properties
-        </Typography>
+      {clusCoeff &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Clustering coefficient
+          </Typography>
+          <Typography  paragraph>
+            {clusCoeff.toFixed(3)}
+          </Typography>
+        </React.Fragment>
+      }
 
-        {clusCoeff &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Clustering coefficient
-              </Typography>
-              <Typography  paragraph>
-                {clusCoeff.toFixed(3)}
-              </Typography>
-            </div>
-        }
+      {eigenCent &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Eigenvector centrality
+          </Typography>
+          <Typography  paragraph>
+            {eigenCent.toFixed(3)}
+          </Typography>
+        </React.Fragment>
+      }
 
-        {eigenCent &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Eigenvector centrality
-              </Typography>
-              <Typography  paragraph>
-                {eigenCent.toFixed(3)}
-              </Typography>
-            </div>
-        }
+      {degCent &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Degree centrality
+          </Typography>
+          <Typography  paragraph>
+            {degCent.toFixed(3)}
+          </Typography>
+        </React.Fragment>
+      }
 
-        {degCent &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Degree centrality
-              </Typography>
-              <Typography  paragraph>
-                {degCent.toFixed(3)}
-              </Typography>
-            </div>
-        }
+      {shortestPath &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Shortest path
+          </Typography>
+          <Typography  paragraph>
+            {shortestPath.toFixed(3)}
+          </Typography>
+        </React.Fragment>
+      }
 
-        {shortestPath &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Shortest path
-              </Typography>
-              <Typography  paragraph>
-                {shortestPath.toFixed(3)}
-              </Typography>
-            </div>
-        }
-
-        {degNeigh &&
-            <div>
-              <Typography gutterBottom variant="subheading" color="textSecondary">
-                Degree neighborhood
-              </Typography>
-              <Typography  paragraph>
-                {degNeigh.toFixed(3)}
-              </Typography>
-            </div>
-        }
-
-      </CardContent>
-    </Card>
+      {degNeigh &&
+        <React.Fragment>
+          <Typography gutterBottom variant="subheading" color="textSecondary">
+            Degree neighborhood
+          </Typography>
+          <Typography  paragraph>
+            {degNeigh.toFixed(3)}
+          </Typography>
+        </React.Fragment>
+      }
+    </React.Fragment>
   );
 }
