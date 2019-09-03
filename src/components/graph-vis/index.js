@@ -135,12 +135,7 @@ class GraphVisComponent extends Component {
   }
 
   componentDidUpdate() {
-    const { selected } = this.props;
-    if (selected.value) {
-      this.renderInfo();
-    } else {
-      this.renderControls();
-    }
+    this.renderDrawer();
   }    
 
   componentWillUnmount() {
@@ -264,9 +259,18 @@ class GraphVisComponent extends Component {
     this.onValueChanged(null, 'structure');
   }
 
+  renderDrawer() {
+    const { selected, drawerRef } = this.props;
+    if (!drawerRef || !drawerRef.current) {
+      return;
+    }
+
+    const content = selected.value ? this.renderInfo() : this.renderControls();
+    ReactDOM.render(content, drawerRef.current);
+  }
+
   renderControls() {
     const {
-      drawerRef,
       dataset,
       template,
       zoom,
@@ -280,10 +284,6 @@ class GraphVisComponent extends Component {
       showLinks,
       nightMode
     } = this.props;
-    if (!drawerRef || !drawerRef.current) {
-      return;
-    }
-
     const props = {
       dataset,
       template,
@@ -302,27 +302,22 @@ class GraphVisComponent extends Component {
       toggleAutoplay: this.toggleAutoplay,
     }
 
-    ReactDOM.render(<Controls {...props}/>, drawerRef.current);
+    return <Controls {...props}/>;
   }
 
   renderInfo() {
     const {
-      drawerRef,
       selected,
       template,
       structure
     } = this.props;
 
-    ReactDOM.render(
-      <React.Fragment>
-        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
-        <div style={{width: '100%', height: '15rem'}}>
-          <Structure cjson={structure.value}/>
-        </div>
-      </React.Fragment>,
-      drawerRef.current
-    );
-
+    return <React.Fragment>
+      <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
+      <div style={{ width: '100%', height: '15rem' }}>
+        <Structure cjson={structure.value} />
+      </div>
+    </React.Fragment>;
   }
 
   render() {
@@ -349,7 +344,7 @@ class GraphVisComponent extends Component {
       <div
         style={{width: '100%', height: '100%'}}
         ref={ref => {this.visElement = ref}}
-        draggable={true}
+        draggable
         onDragStart={this.onVisDrag}
       />
     );
