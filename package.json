@@ -42,6 +42,8 @@
     "jest-resolve": "23.6.0",
     "lodash-es": "^4.17.11",
     "mini-css-extract-plugin": "0.4.3",
+    "mobx": "^5.13.0",
+    "mobx-react": "^6.1.3",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -123,11 +125,13 @@
   },
   "babel": {
     "presets": [
-      "react-app"
+      "react-app",
+      "mobx"
     ]
   },
   "homepage": "https://arclamp.github.io/materialnet",
   "devDependencies": {
+    "babel-preset-mobx": "^2.0.0",
     "gh-pages": "^2.0.1"
   }
 }
