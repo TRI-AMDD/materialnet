@@ -2,6 +2,7 @@ import { observable, autorun, action, computed } from "mobx";
 import { createContext } from "mobx-react-lite-context";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
+import { fetchStructure } from "../rest";
 
 
 export class ApplicationStore {
@@ -152,9 +153,12 @@ export class ApplicationStore {
     }
 
     @action
-    deselect() {
+    clearSelection() {
         this.selected = null;
         this.structure = null;
+
+        // TODO
+        this.scene.undisplay();
     }
 
     @action
@@ -178,6 +182,32 @@ export class ApplicationStore {
         }
 
         this.setPlayState(play, interval);
+    }
+
+    @action
+    selectNode(obj, position) {
+        const currentName = this.selected ? this.selected.name : '';
+        if (obj.name === currentName) {
+            // TODO
+            this.scene.undisplay();
+            obj = null;
+        } else {
+            this.scene.display(obj.name);
+        }
+
+        this.selectd = obj;
+        this.selectedPosition = position;
+        this.structure = null;
+
+        if (!obj) {
+            return;
+        }
+
+        fetchStructure(obj.name).then(cjson => {
+            if (cjson) {
+                this.structure = cjson;
+            }
+        });
     }
 }
 

@@ -11,7 +11,6 @@ import InfoPanel from './info-panel';
 
 import { sortStringsLength } from './sort';
 
-import { SceneManager } from '../../scene-manager';
 import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import { DiskDataProvider } from '../../data-provider';
 
@@ -37,7 +36,6 @@ class GraphVisComponent extends Component {
 
   visElement;
   scene;
-  data;
   dragging = {
     status: false,
     start: {x: 0, y: 0}
@@ -117,9 +115,6 @@ class GraphVisComponent extends Component {
   }
 
   componentDidMount() {
-    const { edges, nodes } = this.props;
-    this.data = new DiskDataProvider(nodes, edges);
-    this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
     this.scene = new GeoJSSceneManager({
       el: this.visElement,
       dp: this.data,
@@ -173,31 +168,6 @@ class GraphVisComponent extends Component {
     }
   }
 
-  selectNode (obj, position) {
-    const currentName = this.props.selected.value ? this.props.selected.value.name : '';
-    if (obj.name === currentName) {
-      this.scene.undisplay();
-      obj = null;
-    } else {
-      this.scene.display(obj.name);
-    }
-
-    this.onValueChanged(obj, 'selected');
-    this.onValueChanged(position, 'selectedPosition');
-    this.onValueChanged(null, 'structure');
-
-    if (!obj) {
-      return;
-    }
-
-    fetchStructure(obj.name)
-    .then(cjson => {
-      if (cjson) {
-        this.onValueChanged(cjson, 'structure');
-      }
-    })
-  }
-
   onVisDrag = (event) => {
     event.preventDefault();
     this.dragging.status = true;
@@ -227,30 +197,6 @@ class GraphVisComponent extends Component {
     window.addEventListener('mouseup', mouseUpListener);
   }
 
-  toggleAutoplay = () => {
-    const {year} = this.props;
-    let interval = year.interval;
-    let play = !year.play;
-
-    if (year.play && year.interval) {
-      clearInterval(year.interval);
-      interval = null;
-    }
-
-    if (!year.play) {
-      interval = setInterval(() => {
-        const {year} = this.props;
-        let nextYear = year.value + 1;
-        if (year.value === year.max) {
-          nextYear = year.min;
-        }
-        this.onValueChanged(nextYear, 'year');
-      }, 1000);
-    }
-
-    this.props.setPlayState(play, interval);
-  }
-
   onDrag = (e) => {
     if (!this.dragging.status) {
       return;
@@ -261,59 +207,10 @@ class GraphVisComponent extends Component {
     this.dragging.start = {x: e.clientX, y: e.clientY};
   }
 
-  onClearSelection = () => {
-    this.scene.undisplay();
-    this.onValueChanged(null, 'selected');
-    this.onValueChanged(null, 'structure');
-  }
-
-
-  renderControls() {
-    const {
-      dataset,
-      template,
-      zoom,
-      spacing,
-      opacity,
-      year,
-      search,
-      size,
-      color,
-      colorYear,
-      showLinks,
-      nightMode
-    } = this.props;
-    const props = {
-      dataset,
-      template,
-      zoom,
-      spacing,
-      opacity,
-      year,
-      search,
-      size,
-      color,
-      colorYear,
-      showLinks,
-      nightMode,
-      searchOptions: this.searchOptions,
-      onValueChanged: this.onValueChanged,
-      toggleAutoplay: this.toggleAutoplay,
-    }
-
-    return <Controls {...props}/>;
-  }
-
   render() {
     const {
       nodes,
       edges,
-      selectedPosition,
-      drawerRef,
-      selected,
-      template,
-      structure, 
-      classes
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -321,9 +218,6 @@ class GraphVisComponent extends Component {
       console.log('DATA CHANGED');
       if (this.scene) {
         this.scene.clear();
-
-        this.data = new DiskDataProvider(nodes, edges);
-
         this.scene.initScene(this.data);
         this.setDefaults();
       }
@@ -338,18 +232,7 @@ class GraphVisComponent extends Component {
         onDragStart={this.onVisDrag}
       />
 
-      {/* drawer on the left */}
-      <Portal container={drawerRef ? drawerRef.current : null}>
-        {this.renderControls()}
-      </Portal>
-
-      {/* popup detail information */}
-      <Popper open={selected.value != null} anchorEl={this.visElement} placement="right-end" className={classes.popover} modifiers={{ inner: { enabled: true } }}>
-        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
-        <div style={{ width: '100%', height: '15rem' }}>
-          <Structure cjson={structure.value} />
-        </div>
-      </Popper>
+      
     </>);
   }
 }
