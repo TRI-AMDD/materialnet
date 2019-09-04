@@ -135,7 +135,7 @@ export class GeoJSSceneManager {
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
         const data = this.pickName(evt.data);
-        this.picked(data);
+        this.picked(data, evt.mouse.map);
       }
     });
 

@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 
-import {
-  Paper
-} from '@material-ui/core';
+import { Portal } from '@material-ui/core';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -113,8 +110,8 @@ class GraphVisComponent extends Component {
       el: this.visElement,
       dp: this.data,
       onValueChanged: this.onValueChanged,
-      picked: (data) => {
-        this.selectNode(data);
+      picked: (data, position) => {
+        this.selectNode(data, position);
       },
     });
 
@@ -133,10 +130,6 @@ class GraphVisComponent extends Component {
 
     this.ro.observe(this.visElement);
   }
-
-  componentDidUpdate() {
-    this.renderDrawer();
-  }    
 
   componentWillUnmount() {
     if (this.ro) {
@@ -166,7 +159,7 @@ class GraphVisComponent extends Component {
     }
   }
 
-  selectNode (obj) {
+  selectNode (obj, position) {
     const currentName = this.props.selected.value ? this.props.selected.value.name : '';
     if (obj.name === currentName) {
       this.scene.undisplay();
@@ -176,6 +169,7 @@ class GraphVisComponent extends Component {
     }
 
     this.onValueChanged(obj, 'selected');
+    this.onValueChanged(position, 'selectedPosition');
     this.onValueChanged(null, 'structure');
 
     if (!obj) {
@@ -259,15 +253,6 @@ class GraphVisComponent extends Component {
     this.onValueChanged(null, 'structure');
   }
 
-  renderDrawer() {
-    const { selected, drawerRef } = this.props;
-    if (!drawerRef || !drawerRef.current) {
-      return;
-    }
-
-    const content = selected.value ? this.renderInfo() : this.renderControls();
-    ReactDOM.render(content, drawerRef.current);
-  }
 
   renderControls() {
     const {
@@ -312,6 +297,7 @@ class GraphVisComponent extends Component {
       structure
     } = this.props;
 
+    console.log(this.props.selectedPosition);
     return <React.Fragment>
       <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
       <div style={{ width: '100%', height: '15rem' }}>
@@ -323,7 +309,9 @@ class GraphVisComponent extends Component {
   render() {
     const {
       nodes,
-      edges
+      edges,
+      drawerRef,
+      selected
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -340,14 +328,17 @@ class GraphVisComponent extends Component {
     }
     this.datasetName = this.props.dataset.value;
 
-    return (
+    return (<>
       <div
         style={{width: '100%', height: '100%'}}
         ref={ref => {this.visElement = ref}}
         draggable
         onDragStart={this.onVisDrag}
       />
-    );
+      <Portal container={drawerRef ? drawerRef.current : null}>
+        {selected.value ? this.renderInfo() : this.renderControls()}
+      </Portal>
+    </>);
   }
 }
 
