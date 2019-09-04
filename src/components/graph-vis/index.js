@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import { Portal, Popover } from '@material-ui/core';
+import { Portal, withStyles, Popper } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -18,6 +19,17 @@ import * as templates from '../../templates';
 
 import Controls from './controls';
 import Structure from './structure';
+
+
+const visStyles = theme => ({
+  popover: {
+    padding: '1rem',
+    minWidth: '15rem',
+    zIndex: 9999,
+    background: grey[100]
+  }
+})
+
 
 class GraphVisComponent extends Component {
   visElement;
@@ -298,7 +310,8 @@ class GraphVisComponent extends Component {
       drawerRef,
       selected,
       template,
-      structure
+      structure, 
+      classes
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -329,14 +342,14 @@ class GraphVisComponent extends Component {
       </Portal>
 
       {/* popup detail information */}
-      <Popover position={selectedPosition.value} open={selected.value != null} anchorEl={this.visElement} anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
+      <Popper open={selected.value != null} anchorEl={this.visElement} placement="right-end" className={classes.popover} modifiers={{ inner: { enabled: true } }}>
         <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
         <div style={{ width: '100%', height: '15rem' }}>
           <Structure cjson={structure.value} />
         </div>
-      </Popover>
+      </Popper>
     </>);
   }
 }
 
-export default GraphVisComponent;
+export default withStyles(visStyles)(GraphVisComponent);
