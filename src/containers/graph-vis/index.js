@@ -10,7 +10,7 @@ class GraphVisContainer extends Component {
       nodes: null,
       edges: null,
       dataset: {
-        value: 'sample1',
+        value: 'precise',
         options: [
           {label: 'Precise', value: 'precise'},
           {label: 'Precise - Gephi', value: 'precise-gephi'},
