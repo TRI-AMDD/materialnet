@@ -104,7 +104,7 @@ class GraphVisComponent extends Component {
     // debounce resize to await the animatiion
     this.ro = new ResizeObserver(debounce(() => {
       this.scene.resize();
-    }, 300));
+    }, 200));
 
     this.ro.observe(this.visElement);
 
