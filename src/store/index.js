@@ -3,6 +3,7 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
+import templates from "./templates";
 
 
 export class ApplicationStore {
@@ -23,13 +24,10 @@ export class ApplicationStore {
     };
 
     @observable
-    template = 'material';
+    template = templates[0].label;
 
     static templateSettings = {
-        options: [
-            { label: 'Material', value: 'material' },
-            { label: 'Minimal', value: 'minimal' }
-        ]
+        options: templates.map((d) => d.label)
     };
 
     @observable
@@ -130,6 +128,12 @@ export class ApplicationStore {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
+    }
+
+    @computed
+    get infoTemplate() {
+        const found = templates.find((d) => d.label === this.template);
+        return found ? found : templates[0];
     }
 
     @computed

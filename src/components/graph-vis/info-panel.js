@@ -1,11 +1,11 @@
 import React from 'react';
 import Store from '../../store';
-import * as templates from '../../templates';
-import { withStyles, Paper,IconButton } from '@material-ui/core';
+import { withStyles, Paper,IconButton, Typography } from '@material-ui/core';
 import Structure from './structure';
 import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
 import CloseIcon from '@material-ui/icons/Close';
+import InfoBlock from './info-block';
 
 
 const visStyles = theme => ({
@@ -20,6 +20,8 @@ const visStyles = theme => ({
   }
 })
 
+
+
 @observer
 class InfoPanel extends React.Component {
   static contextType = Store;
@@ -29,15 +31,24 @@ class InfoPanel extends React.Component {
   render() {
     const store = this.context;
     const { classes } = this.props;
-    const template = templates[store.template];
+    const obj = store.selected;
 
-    if (!store.selected) {
+    if (!obj) {
       return null;
     }
+    const hypothetical = obj.discovery === null;
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear}><CloseIcon /></IconButton>
 
-      {template(store.selected)}
+      <Typography gutterBottom variant="h4">{`${obj.name} (${hypothetical ? 'undiscovered' : obj.discovery})`}</Typography>
+
+      {store.infoTemplate.groups.map((group) => <React.Fragment key={group.label}>
+        <Typography gutterBottom variant="title">
+        {group.label}
+        </Typography>
+        { group.fields.map((field) => obj[field.property] != null && <InfoBlock key={field.label} {...field} value={obj[field.property]} />) }
+      </React.Fragment>)}
+
       <div style={{ width: '100%', height: '15rem' }}>
         <Structure cjson={store.structure} />
       </div>
