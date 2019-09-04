@@ -7,17 +7,22 @@ import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
 
 
-const visStyles = theme => ({
-  root: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    padding: '1rem',
-    minWidth: '15rem',
-    zIndex: 9999,
-    background: grey[100]
-  }
-})
+const visStyles = theme => {
+  console.log(theme);
+  return ({
+    root: {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      overflow: 'auto',
+      maxHeight: '100%',
+      padding: '1rem',
+      minWidth: '15rem',
+      zIndex: 9999,
+      background: grey[100]
+    }
+  })
+}
 
 @observer
 class InfoPanel extends React.Component {
