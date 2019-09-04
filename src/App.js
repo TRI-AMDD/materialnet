@@ -6,7 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 // import GraphVis from './containers/graph-vis';
 import Header from './components/header';
-import Store from './store';
+import Store, { ApplicationStore } from './store';
 import './App.css';
 import Controls from './components/graph-vis/controls';
 import InfoPanel from './components/graph-vis/info-panel';
@@ -45,6 +45,8 @@ const appStyles = theme => ({
   }
 })
 
+const store = new ApplicationStore();
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -54,7 +56,7 @@ class App extends React.Component {
     const { classes } = this.props;
 
     return (
-      <Store.Provider>
+      <Store.Provider value={store}>
         <div className={classes.root}>
           <CssBaseline />
           <Header />

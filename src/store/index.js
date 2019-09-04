@@ -1,5 +1,5 @@
 import { observable, autorun, action, computed } from "mobx";
-import { createContext } from "mobx-react-lite-context";
+import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
@@ -211,5 +211,4 @@ export class ApplicationStore {
     }
 }
 
-
-export default createContext(new ApplicationStore());
+export default createContext();

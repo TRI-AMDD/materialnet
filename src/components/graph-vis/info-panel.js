@@ -4,6 +4,7 @@ import * as templates from '../../templates';
 import { Popper, withStyles } from '@material-ui/core';
 import Structure from './structure';
 import { grey } from '@material-ui/core/colors';
+import { observer } from 'mobx-react';
 
 
 const visStyles = theme => ({
@@ -15,7 +16,7 @@ const visStyles = theme => ({
   }
 })
 
-
+@observer
 class InfoPanel extends React.Component {
   static contextType = Store;
 

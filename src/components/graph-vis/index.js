@@ -1,36 +1,11 @@
 import React, { Component } from 'react';
-
-import { Portal, withStyles, Popper } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
-
 import ResizeObserver from 'resize-observer-polyfill';
-
-import { fetchStructure } from '../../rest';
-
-import InfoPanel from './info-panel';
-
-import { sortStringsLength } from './sort';
-
 import { GeoJSSceneManager } from '../../geojs-scene-manager';
-import { DiskDataProvider } from '../../data-provider';
-
-import * as templates from '../../templates';
-
-import Controls from './controls';
-import Structure from './structure';
 import Store from '../../store';
+import { observer } from 'mobx-react';
 
 
-const visStyles = theme => ({
-  popover: {
-    padding: '1rem',
-    minWidth: '15rem',
-    zIndex: 9999,
-    background: grey[100]
-  }
-})
-
-
+@observer
 class GraphVisComponent extends Component {
   static contextType = Store;
 
@@ -237,4 +212,4 @@ class GraphVisComponent extends Component {
   }
 }
 
-export default withStyles(visStyles)(GraphVisComponent);
+export default GraphVisComponent;

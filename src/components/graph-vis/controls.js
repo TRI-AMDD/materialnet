@@ -13,7 +13,9 @@ import SliderControl from '../controls/slider';
 import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
 import Store, {ApplicationStore} from '../../store';
+import { observer } from 'mobx-react';
 
+@observer
 class Controls extends React.Component {
   static contextType = Store;
   
