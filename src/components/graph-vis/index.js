@@ -117,14 +117,15 @@ class GraphVisComponent extends Component {
     // set defaults
     this.initSceneListener();
 
-    const animate = () => {
-      if (!this.scene.parent || !this.scene.dp) {
-        return;
-      }
-      this.scene.render();
-      window.requestAnimationFrame(animate);
-    }
-    window.requestAnimationFrame(animate);
+    // dummy render function in GeoJSSceneManager
+    // const animate = () => {
+    //   if (!this.scene.parent || !this.scene.dp) {
+    //     return;
+    //   }
+    //   this.scene.render();
+    //   window.requestAnimationFrame(animate);
+    // }
+    // window.requestAnimationFrame(animate);
 
   }
 
