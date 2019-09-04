@@ -61,10 +61,10 @@ class GraphVisComponent extends Component {
       }
     });
     setAndObserve(() => {
-      if (store.selection == null) {
+      if (store.selected == null) {
         this.scene.undisplay();
       } else {
-        this.scene.display(store.selection.name);
+        this.scene.display(store.selected.name);
       }
     });
     setAndObserve(() => {
