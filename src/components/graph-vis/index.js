@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 
-import {
-  Paper
-} from '@material-ui/core';
+import { Portal, withStyles, Popper } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -21,6 +19,17 @@ import * as templates from '../../templates';
 
 import Controls from './controls';
 import Structure from './structure';
+
+
+const visStyles = theme => ({
+  popover: {
+    padding: '1rem',
+    minWidth: '15rem',
+    zIndex: 9999,
+    background: grey[100]
+  }
+})
+
 
 class GraphVisComponent extends Component {
   visElement;
@@ -113,8 +122,8 @@ class GraphVisComponent extends Component {
       el: this.visElement,
       dp: this.data,
       onValueChanged: this.onValueChanged,
-      picked: (data) => {
-        this.selectNode(data);
+      picked: (data, position) => {
+        this.selectNode(data, position);
       },
     });
 
@@ -133,15 +142,6 @@ class GraphVisComponent extends Component {
 
     this.ro.observe(this.visElement);
   }
-
-  componentDidUpdate() {
-    const { selected } = this.props;
-    if (selected.value) {
-      this.renderInfo();
-    } else {
-      this.renderControls();
-    }
-  }    
 
   componentWillUnmount() {
     if (this.ro) {
@@ -171,7 +171,7 @@ class GraphVisComponent extends Component {
     }
   }
 
-  selectNode (obj) {
+  selectNode (obj, position) {
     const currentName = this.props.selected.value ? this.props.selected.value.name : '';
     if (obj.name === currentName) {
       this.scene.undisplay();
@@ -181,6 +181,7 @@ class GraphVisComponent extends Component {
     }
 
     this.onValueChanged(obj, 'selected');
+    this.onValueChanged(position, 'selectedPosition');
     this.onValueChanged(null, 'structure');
 
     if (!obj) {
@@ -264,9 +265,9 @@ class GraphVisComponent extends Component {
     this.onValueChanged(null, 'structure');
   }
 
+
   renderControls() {
     const {
-      drawerRef,
       dataset,
       template,
       zoom,
@@ -280,10 +281,6 @@ class GraphVisComponent extends Component {
       showLinks,
       nightMode
     } = this.props;
-    if (!drawerRef || !drawerRef.current) {
-      return;
-    }
-
     const props = {
       dataset,
       template,
@@ -302,33 +299,19 @@ class GraphVisComponent extends Component {
       toggleAutoplay: this.toggleAutoplay,
     }
 
-    ReactDOM.render(<Controls {...props}/>, drawerRef.current);
-  }
-
-  renderInfo() {
-    const {
-      drawerRef,
-      selected,
-      template,
-      structure
-    } = this.props;
-
-    ReactDOM.render(
-      <React.Fragment>
-        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
-        <div style={{width: '100%', height: '15rem'}}>
-          <Structure cjson={structure.value}/>
-        </div>
-      </React.Fragment>,
-      drawerRef.current
-    );
-
+    return <Controls {...props}/>;
   }
 
   render() {
     const {
       nodes,
-      edges
+      edges,
+      selectedPosition,
+      drawerRef,
+      selected,
+      template,
+      structure, 
+      classes
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -345,15 +328,28 @@ class GraphVisComponent extends Component {
     }
     this.datasetName = this.props.dataset.value;
 
-    return (
+    return (<>
       <div
         style={{width: '100%', height: '100%'}}
         ref={ref => {this.visElement = ref}}
-        draggable={true}
+        draggable
         onDragStart={this.onVisDrag}
       />
-    );
+
+      {/* drawer on the left */}
+      <Portal container={drawerRef ? drawerRef.current : null}>
+        {this.renderControls()}
+      </Portal>
+
+      {/* popup detail information */}
+      <Popper open={selected.value != null} anchorEl={this.visElement} placement="right-end" className={classes.popover} modifiers={{ inner: { enabled: true } }}>
+        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
+        <div style={{ width: '100%', height: '15rem' }}>
+          <Structure cjson={structure.value} />
+        </div>
+      </Popper>
+    </>);
   }
 }
 
-export default GraphVisComponent;
+export default withStyles(visStyles)(GraphVisComponent);

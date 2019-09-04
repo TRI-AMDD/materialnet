@@ -93,6 +93,9 @@ class GraphVisContainer extends Component {
       selected: {
         value: null
       },
+      selectedPosition: {
+        value: null
+      },
       structure: {
         value: null
       }
@@ -120,6 +123,7 @@ class GraphVisContainer extends Component {
       showLinks,
       nightMode,
       selected,
+      selectedPosition,
       structure
     } = this.state;
 
@@ -147,6 +151,7 @@ class GraphVisContainer extends Component {
           showLinks={showLinks}
           nightMode={nightMode}
           selected={selected}
+          selectedPosition={selectedPosition}
           structure={structure}
           drawerRef={drawerRef}
         />
