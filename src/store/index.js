@@ -1,8 +1,10 @@
-import { observable, autorun, action } from "mobx";
+import { observable, autorun, action, computed } from "mobx";
 import { createContext } from "mobx-react-lite-context";
+import { DiskDataProvider } from "../data-provider";
+import { sortStringsLength } from "../components/graph-vis/sort";
 
 
-export class Store {
+export class ApplicationStore {
     @observable
     nodes = [];
 
@@ -12,42 +14,43 @@ export class Store {
     @observable
     dataset = 'precise';
 
-    static datasetOptions = [
-        { label: 'Precise', value: 'precise' },
-        { label: 'Precise - Gephi', value: 'precise-gephi' },
-        { label: 'Sample 1', value: 'sample1' },
-        { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
-        { label: 'Sample 2', value: 'sample2' },
-    ];
+    static datasetSettings = {
+        options: [
+            { label: 'Precise', value: 'precise' },
+            { label: 'Precise - Gephi', value: 'precise-gephi' },
+            { label: 'Sample 1', value: 'sample1' },
+            { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
+            { label: 'Sample 2', value: 'sample2' },
+        ]
+    };
 
     @observable
     template = 'material';
 
-    static templateOptions = [
-        { label: 'Material', value: 'material' },
-        { label: 'Minimal', value: 'minimal' }
-    ];
+    static templateSettings = {
+        options: [
+            { label: 'Material', value: 'material' },
+            { label: 'Minimal', value: 'minimal' }
+        ]
+    };
 
     @observable
     zoom = -2.3;
     static zoomSettings = {
-        min: -3.75,
-        max: 3
+        range: [-3.75, 3]
     };
 
     @observable
     spacing = 1;
     static spacingSettings = {
-        min: 0.1,
-        max: 10
+        range: [0.1, 10]
     };
 
 
     @observable
     opacity = 0.01;
     static opacitySettings = {
-        min: 0,
-        max: 0.1,
+        range: [0, 0.1],
         step: 0.001
     };
 
@@ -60,8 +63,7 @@ export class Store {
     interval = null;
 
     static yearSettings = {
-        min: 1945,
-        max: 2016,
+        range: [1945, 2016],
         step: 1,
     };
 
@@ -71,38 +73,41 @@ export class Store {
     @observable
     color = 'discovery';
 
-    static colorOptions = [
-        { label: 'None', value: 'none' },
-        { label: 'Year of discovery', value: 'discovery' },
-        { label: 'Discovered/Hypothetical', value: 'boolean' },
-        { label: 'Discovered/Undiscovered', value: 'undiscovered' },
-        { label: 'Formation Energy', value: 'formation_energy' },
-        { label: 'Synthesis Probability', value: 'synthesis_probability' },
-        { label: 'Clustering Coefficient', value: 'clus_coeff' },
-        { label: 'Eigenvector Centrality', value: 'eigen_cent' },
-        { label: 'Degree Centrality', value: 'deg_cent' },
-        { label: 'Shortest path', value: 'shortest_path' },
-        { label: 'Degree Neighborhood', value: 'deg_neigh' },
-    ];
+    static colorSettings = {
+        options: [
+            { label: 'None', value: 'none' },
+            { label: 'Year of discovery', value: 'discovery' },
+            { label: 'Discovered/Hypothetical', value: 'boolean' },
+            { label: 'Discovered/Undiscovered', value: 'undiscovered' },
+            { label: 'Formation Energy', value: 'formation_energy' },
+            { label: 'Synthesis Probability', value: 'synthesis_probability' },
+            { label: 'Clustering Coefficient', value: 'clus_coeff' },
+            { label: 'Eigenvector Centrality', value: 'eigen_cent' },
+            { label: 'Degree Centrality', value: 'deg_cent' },
+            { label: 'Shortest path', value: 'shortest_path' },
+            { label: 'Degree Neighborhood', value: 'deg_neigh' },
+        ]
+    };
 
     @observable
     colorYear = 2016;
 
-    static colorYearOptions = {
-        min: 1945,
-        max: 2016,
+    static colorYearSettings = {
+        range: [1945, 2016],
         step: 1
     };
 
     @observable
     size = 'normal';
 
-    static sizeOptions = [
-        { label: 'None', value: 'none' },
-        { label: 'Degree', value: 'normal' },
-        { label: 'Degree - Large', value: 'large' },
-        { label: 'Degree - Huge', value: 'huge' }
-    ];
+    static sizeSettings = {
+        options: [
+            { label: 'None', value: 'none' },
+            { label: 'Degree', value: 'normal' },
+            { label: 'Degree - Large', value: 'large' },
+            { label: 'Degree - Huge', value: 'huge' }
+        ]
+    };
 
     @observable
     showLinks = false;
@@ -130,6 +135,16 @@ export class Store {
         });
     }
 
+    @computed
+    get data() {
+        return new DiskDataProvider(this.nodes, this.edges);
+    }
+    
+    @computed
+    get searchOptions() {
+        return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
+    }
+
     @action
     setPlayState(play, interval) {
         this.play = play;
@@ -141,7 +156,30 @@ export class Store {
         this.selected = null;
         this.structure = null;
     }
+
+    @action
+    toggleAutoplay() {
+        let interval = this.interval;
+        let play = !this.play;
+
+        if (this.play && this.interval) {
+            clearInterval(this.interval);
+            interval = null;
+        }
+
+        if (!this.play) {
+            interval = setInterval(() => {
+                let nextYear = this.year + 1;
+                if (this.year === ApplicationStore.yearSettings.range[1]) {
+                    nextYear = ApplicationStore.yearSettings.range[0];
+                }
+                this.year = nextYear;
+            }, 1000);
+        }
+
+        this.setPlayState(play, interval);
+    }
 }
 
 
-export default createContext(new Store());
+export default createContext(new ApplicationStore());

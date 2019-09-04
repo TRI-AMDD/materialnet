@@ -19,6 +19,7 @@ import * as templates from '../../templates';
 
 import Controls from './controls';
 import Structure from './structure';
+import Store from '../../store';
 
 
 const visStyles = theme => ({
@@ -32,6 +33,8 @@ const visStyles = theme => ({
 
 
 class GraphVisComponent extends Component {
+  static contextType = Store;
+
   visElement;
   scene;
   data;
@@ -41,16 +44,16 @@ class GraphVisComponent extends Component {
   }
   ro;
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
 
     this.sceneSetters = {
       zoom: (val) => { this.scene.zoom = val; },
       spacing: (val) => { this.scene.expand(val); },
       year: (val) => {
         this.scene.hideAfter(val);
-        if (this.props.size.value !== 'none') {
-          this.scene.setDegreeSize(this.props.year.value, this.props.size.value);
+        if (this.context.size !== 'none') {
+          this.scene.setDegreeSize(this.context.year, this.context.size);
         }
       },
       opacity: (val) => { this.scene.setLinkOpacity(val); },
@@ -60,13 +63,12 @@ class GraphVisComponent extends Component {
           this.scene.display(val, true);
         } else {
           this.scene.undisplay();
-          this.onValueChanged(null, 'selected');
-          this.onValueChanged(null, 'structure');
+          this.context.deselect();
         }
       },
       showLinks: (val) => { this.scene.linksVisible(val); },
       nightMode: (val) => { this.scene.setNightMode(val); },
-      size: (val) => { this.scene.setDegreeSize(this.props.year.value, val); },
+      size: (val) => { this.scene.setDegreeSize(this.context.year, val); },
       color: (val) => {
         switch (val) {
           case 'none':
@@ -82,7 +84,7 @@ class GraphVisComponent extends Component {
             break;
 
           case 'undiscovered':
-            this.scene.setUndiscoveredColor(this.props.colorYear.value);
+            this.scene.setUndiscoveredColor(this.context.colorYear);
             break;
 
           default:
@@ -90,7 +92,7 @@ class GraphVisComponent extends Component {
         }
       },
       colorYear: (val) => {
-        switch (this.props.color.value) {
+        switch (this.context.color) {
           case 'boolean':
             this.scene.setBooleanColor();
             break;

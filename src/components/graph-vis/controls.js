@@ -12,100 +12,96 @@ import SearchControl from '../controls/search';
 import SliderControl from '../controls/slider';
 import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
+import Store, {ApplicationStore} from '../../store';
 
-const Controls = ({
-  dataset,
-  template,
-  zoom,
-  spacing,
-  opacity,
-  year,
-  search,
-  size,
-  color,
-  colorYear,
-  showLinks,
-  nightMode,
-  onValueChanged,
-  searchOptions,
-  toggleAutoplay
-}) => (
-  <Grid>
-    <SelectControl
-      {...dataset}
-      label={'Dataset'}
-      onChange={(val) => {onValueChanged(val, 'dataset')}}
-    />
-    <SelectControl
-      {...template}
-      label={'Template'}
-      onChange={(val) => {onValueChanged(val, 'template')}}
-    />
-    <SliderControl
-      {...zoom}
-      label={'Zoom'}
-      range={[zoom.min, zoom.max]}
-      onChange={(val) => {onValueChanged(val, 'zoom')}}
-    />
-    <SliderControl
-      {...opacity}
-      label={'Link opacity / display'}
-      disabled={!showLinks.value}
-      range={[opacity.min, opacity.max]}
-      onChange={(val) => {onValueChanged(val, 'opacity')}}
-    >
-      <Checkbox checked={showLinks.value} onChange={(_e, val) => {onValueChanged(val, 'showLinks')}}/>
-    </SliderControl>
-    <SliderControl
-      {...spacing}
-      label={'Node spacing'}
-      range={[spacing.min, spacing.max]}
-      onChange={(val) => {onValueChanged(val, 'spacing')}}
-    />
-    <SliderControl
-      {...year}
-      label={'Discovered before'}
-      range={[year.min, year.max]}
-      digits={0}
-      onChange={(val) => {onValueChanged(val, 'year')}}
-    >
-      <IconButton
-        onClick={toggleAutoplay}
-      >
-        { year.play ? <Pause/> : <PlayArrow/>}
-      </IconButton>
-    </SliderControl>
-    <SearchControl
-      label={'Search'}
-      options={searchOptions}
-      value={search.value}
-      maxItems={20}
-      onChange={(_e, val) => {onValueChanged(val.newValue, 'search')}}
-    />
-    <SelectControl
-      {...size}
-      label={'Node size'}
-      onChange={(val) => {onValueChanged(val, 'size')}}
-    />
-    <SelectControl
-      {...color}
-      label={'Node color'}
-      onChange={(val) => {onValueChanged(val, 'color')}}
-    />
-    <SliderControl
-      {...colorYear}
-      label={'Color year'}
-      range={[colorYear.min, colorYear.max]}
-      digits={0}
-      disabled={color.value !== 'undiscovered'}
-      onChange={(val) => {onValueChanged(val, 'colorYear')}}
-    />
-    <CheckboxControl
-      label="Night mode"
-      value={nightMode.value}
-      onChange={(val) => {onValueChanged(val, 'nightMode')}}
-    />
-  </Grid>
-)
+class Controls extends React.Component {
+  static contextType = Store;
+  
+  render() {
+    const store = this.context;
+    return (
+      <Grid>
+        <SelectControl
+          value={store.dataset}
+          {...ApplicationStore.datasetSettings}
+          label={'Dataset'}
+          onChange={(val) => { store.dataset = val; }}
+        />
+        <SelectControl
+          value={store.template}
+          {...ApplicationStore.templateSettings}
+          label={'Template'}
+          onChange={(val) => { store.template = val; }}
+        />
+        <SliderControl
+          value={store.zoom}
+          {...ApplicationStore.zoomSettings}
+          label={'Zoom'}
+          onChange={(val) => { store.zoom = val; }}
+        />
+        <SliderControl
+          value={store.opacity}
+          {...ApplicationStore.opacitySettings}
+          label={'Link opacity / display'}
+          disabled={!store.showLinks}
+          onChange={(val) => { store.opacity = val; }}
+        >
+          <Checkbox checked={store.showLinks} onChange={(_e, val) => { store.showLinks = val; }} />
+        </SliderControl>
+        <SliderControl
+          value={store.spacing}
+          {...ApplicationStore.spacingSettings}
+          label={'Node spacing'}
+          onChange={(val) => { store.spacing = val; }}
+        />
+        <SliderControl
+          value={store.year}
+          {...ApplicationStore.yearSettings}
+          label={'Discovered before'}
+          digits={0}
+          onChange={(val) => { store.year = val; }}
+        >
+          <IconButton
+            onClick={() => store.toggleAutoplay()}
+          >
+            {store.play ? <Pause /> : <PlayArrow />}
+          </IconButton>
+        </SliderControl>
+        <SearchControl
+          label={'Search'}
+          options={store.searchOptions}
+          value={store.search}
+          maxItems={20}
+          onChange={(_e, val) => { store.search = val.newValue; }}
+        />
+        <SelectControl
+          value={store.size}
+          {...ApplicationStore.sizeSettings}
+          label={'Node size'}
+          onChange={(val) => { store.size = val; }}
+        />
+        <SelectControl
+          value={store.color}
+          {...ApplicationStore.colorSettings}
+          label={'Node color'}
+          onChange={(val) => { store.color = val; }}
+        />
+        <SliderControl
+          value={store.colorYear}
+          {...ApplicationStore.colorYearSettings}
+          label={'Color year'}
+          digits={0}
+          disabled={store.color !== 'undiscovered'}
+          onChange={(val) => { store.colorYear = val; }}
+        />
+        <CheckboxControl
+          label="Night mode"
+          value={store.nightMode}
+          onChange={(val) => { store.nightMode = val; }}
+        />
+      </Grid>
+    );
+  }
+}
 
 export default Controls;
