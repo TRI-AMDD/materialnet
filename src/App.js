@@ -4,12 +4,12 @@ import { withStyles, Drawer } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-// import GraphVis from './containers/graph-vis';
 import Header from './components/header';
 import Store, { ApplicationStore } from './store';
 import './App.css';
 import Controls from './components/graph-vis/controls';
 import InfoPanel from './components/graph-vis/info-panel';
+import GraphVisComponent from './components/graph-vis';
 
 const appStyles = theme => ({
   root: {
@@ -75,7 +75,7 @@ class App extends React.Component {
 
             <div className={classes.contentContainer}>
               <div className={classes.content}>
-                {/* <GraphVis drawerRef={this.drawerRef}></GraphVis> */}
+                <GraphVisComponent/>
               </div>
             </div>
 

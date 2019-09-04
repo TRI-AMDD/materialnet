@@ -7,10 +7,7 @@ import { fetchStructure } from "../rest";
 
 export class ApplicationStore {
     @observable
-    nodes = [];
-
-    @observable
-    edges = [];
+    data = null;
 
     @observable
     dataset = 'precise';
@@ -130,19 +127,26 @@ export class ApplicationStore {
         autorun(() => {
             const datafile = `sample-data/${this.dataset}.json`;
             fetch(datafile).then(resp => resp.json()).then(data => {
-            this.nodes = data.nodes;
-            this.edges = data.edges;
+                this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
     }
 
     @computed
-    get data() {
-        return new DiskDataProvider(this.nodes, this.edges);
+    get nodes() {
+        return this.data.nodes;
+    }
+
+    @computed
+    get edges() {
+        return this.data.edges;
     }
     
     @computed
     get searchOptions() {
+        if (!this.data) {
+            return null;
+        }
         return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
