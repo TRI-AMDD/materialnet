@@ -32,45 +32,50 @@ class GraphVisComponent extends Component {
   }
 
   initSceneListener() {
+    const store = this.context;
+
     const setAndObserve = (f) => {
       this.autoRunListeners.push(autorun(f));
     };
     setAndObserve(() => {
-      this.scene.zoom = this.zoom;
+      this.scene.zoom = store.zoom;
     });
     setAndObserve(() => {
-      this.scene.expand(this.spacing);
+      this.scene.expand(store.spacing);
     });
     setAndObserve(() => {
-      this.scene.hideAfter(this.year);
-      if (this.size !== 'none') {
-        this.scene.setDegreeSize(this.year, this.size);
+      this.scene.hideAfter(store.year);
+      if (store.size !== 'none') {
+        this.scene.setDegreeSize(store.year, store.size);
       }
     });
     setAndObserve(() => {
-      this.scene.setLinkOpacity(this.opacity);
+      this.scene.setLinkOpacity(store.opacity);
     });
     setAndObserve(() => {
-      const obj = this.scene.pickName(this.search);
+      const obj = this.scene.pickName(store.search);
       if (obj) {
-        this.scene.display(this.search, true);
+        this.scene.display(store.search, true);
       } else {
-        this.scene.undisplay();
-        this.clearSelection();
+        store.clearSelection();
       }
     });
     setAndObserve(() => {
-      this.scene.linksVisible(this.linksVisible);
+      if (store.selection == null) {
+        this.scene.undisplay();
+      } else {
+        this.scene.display(store.selection.name);
+      }
     });
     setAndObserve(() => {
-      this.scene.setNightMode(this.nightMode);
+      this.scene.linksVisible(store.linksVisible);
     });
     setAndObserve(() => {
-      this.scene.setDegreeSize(this.year, this.size);
+      this.scene.setNightMode(store.nightMode);
     });
 
     setAndObserve(() => {
-      switch (this.color) {
+      switch (store.color) {
         case 'none':
           this.scene.setConstColor();
           break;
@@ -84,11 +89,11 @@ class GraphVisComponent extends Component {
           break;
 
         case 'undiscovered':
-          this.scene.setUndiscoveredColor(this.colorYear);
+          this.scene.setUndiscoveredColor(store.colorYear);
           break;
 
         default:
-          this.scene.setPropertyColor(this.color);
+          this.scene.setPropertyColor(store.color);
       }
     });
   }
@@ -116,7 +121,7 @@ class GraphVisComponent extends Component {
       if (!this.scene.parent || !this.scene.dp) {
         return;
       }
-      this.context.scene.render();
+      this.scene.render();
       window.requestAnimationFrame(animate);
     }
     window.requestAnimationFrame(animate);

@@ -123,7 +123,7 @@ export class GeoJSSceneManager {
       onNode = true;
 
       const name = evt.data;
-      const node = nodes[name];
+      // const node = nodes[name];
 
       tooltip.position(evt.mouse.geo);
       tooltipElem.innerText = name;
@@ -243,7 +243,6 @@ export class GeoJSSceneManager {
 
           default:
             throw new Error(`bad level option: ${level}`);
-            break;
         }
       });
 

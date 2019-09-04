@@ -160,9 +160,6 @@ export class ApplicationStore {
     clearSelection() {
         this.selected = null;
         this.structure = null;
-
-        // TODO
-        this.scene.undisplay();
     }
 
     @action
@@ -191,15 +188,11 @@ export class ApplicationStore {
     @action
     selectNode(obj, position) {
         const currentName = this.selected ? this.selected.name : '';
+        // toggle if click on selected
         if (obj.name === currentName) {
-            // TODO
-            this.scene.undisplay();
             obj = null;
-        } else {
-            this.scene.display(obj.name);
         }
-
-        this.selectd = obj;
+        this.selected = obj;
         this.selectedPosition = position;
         this.structure = null;
 

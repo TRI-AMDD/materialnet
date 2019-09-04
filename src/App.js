@@ -32,6 +32,7 @@ const appStyles = theme => ({
   contentContainer: {
     flexGrow: 1,
     display: 'flex',
+    position: 'relative',
     flexDirection: 'column'
   },
   content: {
@@ -77,9 +78,8 @@ class App extends React.Component {
               <div className={classes.content}>
                 <GraphVisComponent/>
               </div>
+              <InfoPanel />
             </div>
-
-            <InfoPanel/>
           </div>
         </div>
       </Store.Provider>
