@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Portal } from '@material-ui/core';
+import { Portal, Popover } from '@material-ui/core';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -290,28 +290,15 @@ class GraphVisComponent extends Component {
     return <Controls {...props}/>;
   }
 
-  renderInfo() {
-    const {
-      selected,
-      template,
-      structure
-    } = this.props;
-
-    console.log(this.props.selectedPosition);
-    return <React.Fragment>
-      <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
-      <div style={{ width: '100%', height: '15rem' }}>
-        <Structure cjson={structure.value} />
-      </div>
-    </React.Fragment>;
-  }
-
   render() {
     const {
       nodes,
       edges,
+      selectedPosition,
       drawerRef,
-      selected
+      selected,
+      template,
+      structure
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -335,9 +322,19 @@ class GraphVisComponent extends Component {
         draggable
         onDragStart={this.onVisDrag}
       />
+
+      {/* drawer on the left */}
       <Portal container={drawerRef ? drawerRef.current : null}>
-        {selected.value ? this.renderInfo() : this.renderControls()}
+        {this.renderControls()}
       </Portal>
+
+      {/* popup detail information */}
+      <Popover position={selectedPosition.value} open={selected.value != null} anchorEl={this.visElement} anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
+        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
+        <div style={{ width: '100%', height: '15rem' }}>
+          <Structure cjson={structure.value} />
+        </div>
+      </Popover>
     </>);
   }
 }
