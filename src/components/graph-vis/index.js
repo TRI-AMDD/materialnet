@@ -1,36 +1,35 @@
 import React, { Component } from 'react';
 
-import {
-  Checkbox,
-  Select,
-  MenuItem,
-  FormControl,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHead
-} from '@material-ui/core';
-
-import { PlayArrow, Pause } from '@material-ui/icons';
+import { Portal, withStyles, Popper } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
 import { fetchStructure } from '../../rest';
 
-import MySlider from './slider';
-import Search from './search';
 import InfoPanel from './info-panel';
 
 import { sortStringsLength } from './sort';
 
 import { SceneManager } from '../../scene-manager';
+import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import { DiskDataProvider } from '../../data-provider';
-import { wc } from '../../utils/webcomponents.js';
 
 import * as templates from '../../templates';
+
+import Controls from './controls';
+import Structure from './structure';
+
+
+const visStyles = theme => ({
+  popover: {
+    padding: '1rem',
+    minWidth: '15rem',
+    zIndex: 9999,
+    background: grey[100]
+  }
+})
+
 
 class GraphVisComponent extends Component {
   visElement;
@@ -46,7 +45,7 @@ class GraphVisComponent extends Component {
     super(props);
 
     this.sceneSetters = {
-      zoom: (val) => { this.scene.zoom = 0.125 * Math.pow(1.06, val); },
+      zoom: (val) => { this.scene.zoom = val; },
       spacing: (val) => { this.scene.expand(val); },
       year: (val) => {
         this.scene.hideAfter(val);
@@ -59,7 +58,6 @@ class GraphVisComponent extends Component {
         const obj = this.scene.pickName(val);
         if (obj) {
           this.scene.display(val, true);
-          this.selectNode(obj);
         } else {
           this.scene.undisplay();
           this.onValueChanged(null, 'selected');
@@ -71,6 +69,10 @@ class GraphVisComponent extends Component {
       size: (val) => { this.scene.setDegreeSize(this.props.year.value, val); },
       color: (val) => {
         switch (val) {
+          case 'none':
+            this.scene.setConstColor();
+            break;
+
           case 'boolean':
             this.scene.setBooleanColor();
             break;
@@ -84,7 +86,7 @@ class GraphVisComponent extends Component {
             break;
 
           default:
-            throw new Error(`impossible colormap option: ${val}`);
+            this.scene.setPropertyColor(val);
         }
       },
       colorYear: (val) => {
@@ -101,6 +103,10 @@ class GraphVisComponent extends Component {
             this.scene.setUndiscoveredColor(val);
             break;
 
+          case 'none':
+            this.scene.setConstColor();
+            break;
+
           default:
             throw new Error(`impossible colormap option: ${val}`);
         }
@@ -112,9 +118,13 @@ class GraphVisComponent extends Component {
     const { edges, nodes } = this.props;
     this.data = new DiskDataProvider(nodes, edges);
     this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
-    this.scene = new SceneManager({
+    this.scene = new GeoJSSceneManager({
       el: this.visElement,
-      dp: this.data
+      dp: this.data,
+      onValueChanged: this.onValueChanged,
+      picked: (data, position) => {
+        this.selectNode(data, position);
+      },
     });
 
     this.setDefaults();
@@ -141,8 +151,12 @@ class GraphVisComponent extends Component {
 
   setDefaults() {
     for (let key in this.props) {
-      const value = this.props[key].value;
-      this.onValueChanged(value, key);
+      if (this.props[key] && this.props[key].value ){
+        const value = this.props[key].value;
+        if (key !== 'colorYear' || ['discovery', 'boolean', 'undiscovered'].indexOf(value) !== -1) {
+          this.onValueChanged(value, key);
+        }
+      }
     }
   }
 
@@ -157,27 +171,7 @@ class GraphVisComponent extends Component {
     }
   }
 
-  onVisZoom = (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -1 : 1;
-    this.onValueChanged(this.props.zoom.value + delta, 'zoom');
-  }
-
-  onVisClick = (e) => {
-    if (this.dragging.status) {
-      return;
-    }
-
-    let obj = this.scene.pick({x: e.clientX, y: e.clientY});
-
-    if (!obj) {
-      return;
-    }
-
-    this.selectNode(obj);
-  }
-
-  selectNode (obj) {
+  selectNode (obj, position) {
     const currentName = this.props.selected.value ? this.props.selected.value.name : '';
     if (obj.name === currentName) {
       this.scene.undisplay();
@@ -187,6 +181,7 @@ class GraphVisComponent extends Component {
     }
 
     this.onValueChanged(obj, 'selected');
+    this.onValueChanged(position, 'selectedPosition');
     this.onValueChanged(null, 'structure');
 
     if (!obj) {
@@ -195,7 +190,9 @@ class GraphVisComponent extends Component {
 
     fetchStructure(obj.name)
     .then(cjson => {
-      this.onValueChanged(cjson, 'structure');
+      if (cjson) {
+        this.onValueChanged(cjson, 'structure');
+      }
     })
   }
 
@@ -268,7 +265,8 @@ class GraphVisComponent extends Component {
     this.onValueChanged(null, 'structure');
   }
 
-  render() {
+
+  renderControls() {
     const {
       dataset,
       template,
@@ -281,11 +279,39 @@ class GraphVisComponent extends Component {
       color,
       colorYear,
       showLinks,
+      nightMode
+    } = this.props;
+    const props = {
+      dataset,
+      template,
+      zoom,
+      spacing,
+      opacity,
+      year,
+      search,
+      size,
+      color,
+      colorYear,
+      showLinks,
       nightMode,
-      selected,
-      structure,
+      searchOptions: this.searchOptions,
+      onValueChanged: this.onValueChanged,
+      toggleAutoplay: this.toggleAutoplay,
+    }
+
+    return <Controls {...props}/>;
+  }
+
+  render() {
+    const {
       nodes,
-      edges
+      edges,
+      selectedPosition,
+      drawerRef,
+      selected,
+      template,
+      structure, 
+      classes
     } = this.props;
 
     const dataChanged = this.datasetName !== this.props.dataset.value;
@@ -302,178 +328,28 @@ class GraphVisComponent extends Component {
     }
     this.datasetName = this.props.dataset.value;
 
-    const nSplit = 2;
-    const splitSizes = '0.6, 0.4';
+    return (<>
+      <div
+        style={{width: '100%', height: '100%'}}
+        ref={ref => {this.visElement = ref}}
+        draggable
+        onDragStart={this.onVisDrag}
+      />
 
-    return (
-      <div>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Dataset</TableCell>
-              <TableCell>Template</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={dataset.value} onChange={(e) => {this.onValueChanged(e.target.value, 'dataset')}}>
-                    {dataset.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={template.value} onChange={(e) => {this.onValueChanged(e.target.value, 'template')}}>
-                    {template.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Zoom</TableCell>
-              <TableCell>Link opacity / display</TableCell>
-              <TableCell>Node spacing</TableCell>
-              <TableCell>Discovered before</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={zoom}
-                    onChange={(val) => {this.onValueChanged(val, 'zoom')}}
-                  />
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    disabled={!showLinks.value}
-                    params={opacity}
-                    onChange={(val) => {this.onValueChanged(val, 'opacity')}}
-                  >
-                    <Checkbox checked={showLinks.value} onChange={(e, val) => {this.onValueChanged(val, 'showLinks')}}/>
-                  </MySlider>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={spacing}
-                    onChange={(val) => {this.onValueChanged(val, 'spacing')}}
-                  />
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={year}
-                    onChange={(val) => {this.onValueChanged(val, 'year')}}
-                    digits={0}
-                  >
-                    <IconButton
-                      onClick={this.toggleAutoplay}
-                    >
-                      { year.play ? <Pause/> : <PlayArrow/>}
-                    </IconButton>
-                  </MySlider>
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Search</TableCell>
-              <TableCell>Node size</TableCell>
-              <TableCell>Node color</TableCell>
-              <TableCell>Color year</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Search options={this.searchOptions} value={search.value} maxItems={20} onChange={(e, val) => {this.onValueChanged(val.newValue, 'search')}}/>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={size.value} onChange={(e) => {this.onValueChanged(e.target.value, 'size')}}>
-                    {size.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <Select value={color.value} onChange={(e) => {this.onValueChanged(e.target.value, 'color')}}>
-                    {color.options.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </TableCell>
-              <TableCell>
-                <FormControl fullWidth>
-                  <MySlider
-                    params={colorYear}
-                    onChange={(val) => {this.onValueChanged(val, 'colorYear')}}
-                    disabled={color.value !== 'undiscovered'}
-                    digits={0}
-                  />
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableHead>
-            <TableRow>
-              <TableCell>Night Mode <Checkbox checked={nightMode.value} onChange={(e, val) => {this.onValueChanged(val, 'nightMode')}}/></TableCell>
-            </TableRow>
-          </TableHead>
-        </Table>
-        <Paper
-          style={{width: '100%', height: '40rem', marginTop: '2rem', marginBottom: '2rem'}}
-        >
-          <split-me
-            n={nSplit} sizes={splitSizes}
-            ref={wc(
-              // Events
-              {
-                // Ugly workaround to fix firefox not resizing split elements.
-                slotResized: () => { this.onValueChanged(zoom.value, 'zoom'); }
-              },
-            )}
-          >
-            <div
-              slot={0}
-              style={{width: '100%', height: '100%'}}
-              ref={ref => {this.visElement = ref}}
-              draggable={true}
-              onDragStart={this.onVisDrag}
-              onWheel={this.onVisZoom}
-              onClick={this.onVisClick}
-            />
-            <oc-molecule
-              slot={1}
-              ref={wc(
-                // Events
-                {},
-                // Props
-                {
-                  cjson: structure.value
-                }
-              )}
-            />
-          </split-me>
-        </Paper>
-        {selected.value &&
-          <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[this.props.template.value]} />
-        }
-      </div>
-    );
+      {/* drawer on the left */}
+      <Portal container={drawerRef ? drawerRef.current : null}>
+        {this.renderControls()}
+      </Portal>
+
+      {/* popup detail information */}
+      <Popper open={selected.value != null} anchorEl={this.visElement} placement="right-end" className={classes.popover} modifiers={{ inner: { enabled: true } }}>
+        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
+        <div style={{ width: '100%', height: '15rem' }}>
+          <Structure cjson={structure.value} />
+        </div>
+      </Popper>
+    </>);
   }
 }
 
-export default GraphVisComponent;
+export default withStyles(visStyles)(GraphVisComponent);

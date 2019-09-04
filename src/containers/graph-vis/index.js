@@ -27,9 +27,9 @@ class GraphVisContainer extends Component {
         ]
       },
       zoom: {
-        value: 40,
-        min: 0,
-        max: 100
+        value: -2.3,
+        min: -3.75,
+        max: 3
       },
       spacing: {
         value: 1,
@@ -59,7 +59,14 @@ class GraphVisContainer extends Component {
           {label: 'None', value: 'none'},
           {label: 'Year of discovery', value: 'discovery'},
           {label: 'Discovered/Hypothetical', value: 'boolean'},
-          {label: 'Discovered/Undiscovered', value: 'undiscovered'}
+          {label: 'Discovered/Undiscovered', value: 'undiscovered'},
+          {label: 'Formation Energy', value: 'formation_energy'},
+          {label: 'Synthesis Probability', value: 'synthesis_probability'},
+          {label: 'Clustering Coefficient', value: 'clus_coeff'},
+          {label: 'Eigenvector Centrality', value: 'eigen_cent'},
+          {label: 'Degree Centrality', value: 'deg_cent'},
+          {label: 'Shortest path', value: 'shortest_path'},
+          {label: 'Degree Neighborhood', value: 'deg_neigh'},
         ]
       },
       colorYear: {
@@ -86,6 +93,9 @@ class GraphVisContainer extends Component {
       selected: {
         value: null
       },
+      selectedPosition: {
+        value: null
+      },
       structure: {
         value: null
       }
@@ -93,7 +103,7 @@ class GraphVisContainer extends Component {
   }
 
   componentDidMount() {
-    this.update('precise', 'dataset');
+    this.update(this.state.dataset.value, 'dataset');
   }
 
   render() {
@@ -113,8 +123,13 @@ class GraphVisContainer extends Component {
       showLinks,
       nightMode,
       selected,
-      structure,
+      selectedPosition,
+      structure
     } = this.state;
+
+    const {
+      drawerRef
+    } = this.props;
 
     if (nodes && edges) {
       return (
@@ -136,7 +151,9 @@ class GraphVisContainer extends Component {
           showLinks={showLinks}
           nightMode={nightMode}
           selected={selected}
+          selectedPosition={selectedPosition}
           structure={structure}
+          drawerRef={drawerRef}
         />
       );
     } else {

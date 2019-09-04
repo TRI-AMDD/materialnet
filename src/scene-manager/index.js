@@ -235,8 +235,42 @@ export class SceneManager {
     this.updateColor();
   }
 
+  propMinMax (prop) {
+    const props = this.dp.nodeNames()
+      .map(name => this.dp.nodeProperty(name, prop))
+      .filter(d => d !== undefined);
+
+    return [
+      Math.min.apply(null, props),
+      Math.max.apply(null, props)
+    ];
+  }
+
+  setPropertyColor (prop) {
+    const [low, high] = this.propMinMax(prop);
+
+    this.cmap = scaleSequential(interpolateViridis)
+      .domain([low, high]);
+
+    this.dp.nodeNames().forEach((name, i) => {
+      const val = this.dp.nodeProperty(name, prop);
+
+      let color = d3Color(this.cmap(val));
+      if (color === null) {
+        color = d3Color('#ff0000');
+      }
+
+      this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
+    });
+
+    this.updateColor();
+  }
+
   setDiscoveryColor () {
     this.undiscoveredColor = false;
+
+    this.cmap = scaleSequential(interpolateViridis)
+      .domain([1945, 2015]);
 
     this.dp.nodeNames().forEach((name, i) => {
       const discovery = this.dp.nodeProperty(name, 'discovery');

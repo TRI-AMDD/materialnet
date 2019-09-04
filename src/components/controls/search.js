@@ -132,7 +132,7 @@ class IntegrationAutosuggest extends React.Component {
   }
 
   render() {
-    const { classes, onChange, value, maxItems } = this.props;
+    const { classes, onChange, value, maxItems, label } = this.props;
 
     const autosuggestProps = {
       renderInputComponent,
@@ -149,9 +149,13 @@ class IntegrationAutosuggest extends React.Component {
           {...autosuggestProps}
           inputProps={{
             classes,
+            label,
             placeholder: 'Search (e.g. NaCl)',
             value: value,
             onChange: onChange,
+            InputLabelProps: {
+              shrink: true,
+            },
             inputRef: node => {
               this.popperNode = node;
             }
