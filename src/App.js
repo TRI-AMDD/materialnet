@@ -6,6 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import GraphVis from './containers/graph-vis';
 import Header from './components/header';
+import Store from './store';
 import './App.css';
 
 const appStyles = theme => ({
@@ -51,27 +52,29 @@ class App extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <Header />
-        <div className={classes.body}>
-          <Drawer
-            variant='persistent'
-            open
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-          >
-            <div style={{width: '100%'}} ref={this.drawerRef}></div>
-          </Drawer>
+      <Store.Provider>
+        <div className={classes.root}>
+          <CssBaseline />
+          <Header />
+          <div className={classes.body}>
+            <Drawer
+              variant='persistent'
+              open
+              classes={{
+                paper: classes.drawerPaper,
+              }}
+            >
+              <div style={{width: '100%'}} ref={this.drawerRef}></div>
+            </Drawer>
 
-          <div className={classes.contentContainer}>
-            <div className={classes.content}>
-              <GraphVis drawerRef={this.drawerRef}></GraphVis>
+            <div className={classes.contentContainer}>
+              <div className={classes.content}>
+                <GraphVis drawerRef={this.drawerRef}></GraphVis>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Store.Provider>
     );
   }
 }
