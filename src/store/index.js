@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
-import { eq, isEqual } from "lodash-es";
+import { isEqual } from "lodash-es";
 
 
 export class ApplicationStore {
