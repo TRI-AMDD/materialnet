@@ -123,7 +123,6 @@ export class GeoJSSceneManager {
       onNode = true;
 
       const name = evt.data;
-      // const node = nodes[name];
 
       tooltip.position(evt.mouse.geo);
       tooltipElem.innerText = name;
