@@ -5,54 +5,39 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
+import datasets from '../datasets';
 
 export class ApplicationStore {
     @observable
     data = null;
 
     @observable
-    dataset = 'precise';
+    datasets = datasets;
 
-    static datasetSettings = {
-        options: [
-            { label: 'Precise', value: 'precise' },
-            { label: 'Precise - Gephi', value: 'precise-gephi' },
-            { label: 'Sample 1', value: 'sample1' },
-            { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
-            { label: 'Sample 2', value: 'sample2' },
-        ]
-    };
+    @observable
+    dataset = datasets[0];
 
     @observable
     template = 'material';
 
-    static templateSettings = {
-        options: [
-            // dataset specific
-            { label: 'Material', value: 'material' },
-            { label: 'Minimal', value: 'minimal' }
-        ]
-    };
+    @observable
+    templates = [
+        { label: 'Material', value: 'material' },
+        { label: 'Minimal', value: 'minimal' }
+    ];
 
     @observable
     zoom = -2.3;
-    static zoomSettings = {
-        range: [-3.75, 3] // dataset specific ?
-    };
+    @observable
+    zoomRange = [-3.75, 3]; // dataset specific ?
 
     @observable
     spacing = 1;
-    static spacingSettings = {
-        range: [0.1, 10]
-    };
-
+    @observable
+    spacingRange = [0.1, 10];
 
     @observable
     opacity = 0.01;
-    static opacitySettings = {
-        range: [0, 0.1],
-        step: 0.001
-    };
 
     // dataset specific or not existing
     @observable
@@ -63,10 +48,8 @@ export class ApplicationStore {
     @observable
     interval = null;
 
-    static yearSettings = {
-        range: [1945, 2016], // dataset specific
-        step: 1,
-    };
+    @observable
+    yearRange = [1945, 2016]; // dataset specific
 
     @observable
     search = '';
@@ -74,41 +57,34 @@ export class ApplicationStore {
     @observable
     color = 'discovery'; // dataset specific
 
-    static colorSettings = {
-        options: [ // dataset specific
-            { label: 'None', value: 'none' },
-            { label: 'Year of discovery', value: 'discovery' },
-            { label: 'Discovered/Hypothetical', value: 'boolean' },
-            { label: 'Discovered/Undiscovered', value: 'undiscovered' },
-            { label: 'Formation Energy', value: 'formation_energy' },
-            { label: 'Synthesis Probability', value: 'synthesis_probability' },
-            { label: 'Clustering Coefficient', value: 'clus_coeff' },
-            { label: 'Eigenvector Centrality', value: 'eigen_cent' },
-            { label: 'Degree Centrality', value: 'deg_cent' },
-            { label: 'Shortest path', value: 'shortest_path' },
-            { label: 'Degree Neighborhood', value: 'deg_neigh' },
-        ]
-    };
+    @observable
+    colors = [
+        { label: 'None', value: 'none' },
+        { label: 'Year of discovery', value: 'discovery' },
+        { label: 'Discovered/Hypothetical', value: 'boolean' },
+        { label: 'Discovered/Undiscovered', value: 'undiscovered' },
+        { label: 'Formation Energy', value: 'formation_energy' },
+        { label: 'Synthesis Probability', value: 'synthesis_probability' },
+        { label: 'Clustering Coefficient', value: 'clus_coeff' },
+        { label: 'Eigenvector Centrality', value: 'eigen_cent' },
+        { label: 'Degree Centrality', value: 'deg_cent' },
+        { label: 'Shortest path', value: 'shortest_path' },
+        { label: 'Degree Neighborhood', value: 'deg_neigh' },
+    ];
 
     @observable
     colorYear = 2016; // dataset specific
 
-    static colorYearSettings = {
-        range: [1945, 2016], // dataset specific
-        step: 1
-    };
-
     @observable
     size = 'normal';
 
-    static sizeSettings = {
-        options: [
-            { label: 'None', value: 'none' },
-            { label: 'Degree', value: 'normal' },
-            { label: 'Degree - Large', value: 'large' },
-            { label: 'Degree - Huge', value: 'huge' }
-        ]
-    };
+    @observable
+    sizes = [
+        { label: 'None', value: 'none' },
+        { label: 'Degree', value: 'normal' },
+        { label: 'Degree - Large', value: 'large' },
+        { label: 'Degree - Huge', value: 'huge' }
+    ];
 
     @observable
     showLinks = false;
@@ -131,16 +107,11 @@ export class ApplicationStore {
     constructor() {
         // load data and update on dataset change
         autorun(() => {
-            const datafile = `sample-data/${this.dataset}.json`;
+            const datafile = `sample-data/${this.dataset.label}.json`;
             fetch(datafile).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
-    }
-
-    @computed
-    get datasetLabel() {
-        return ApplicationStore.datasetSettings.options.find((d) => d.value === this.dataset).label;
     }
 
     @computed
@@ -186,8 +157,8 @@ export class ApplicationStore {
         if (!this.play) {
             interval = setInterval(() => {
                 let nextYear = this.year + 1;
-                if (this.year === ApplicationStore.yearSettings.range[1]) {
-                    nextYear = ApplicationStore.yearSettings.range[0];
+                if (this.year === this.yearRange[1]) {
+                    nextYear = this.yearRange[0];
                 }
                 this.year = nextYear;
             }, 1000);

@@ -12,7 +12,7 @@ import SearchControl from '../controls/search';
 import SliderControl from '../controls/slider';
 import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
-import Store, {ApplicationStore} from '../../store';
+import Store from '../../store';
 import { observer } from 'mobx-react';
 
 @observer
@@ -24,26 +24,27 @@ class Controls extends React.Component {
     return (
       <Grid>
         <SelectControl
-          value={store.dataset}
-          {...ApplicationStore.datasetSettings}
+          value={store.dataset.value}
+          options={store.datasets}
           label={'Dataset'}
-          onChange={(val) => { store.dataset = val; }}
+          onChange={(val) => { store.dataset = store.datasets.find((d) => d.value === val); }}
         />
         <SelectControl
-          value={store.template}
-          {...ApplicationStore.templateSettings}
+          value={store.template.value}
+          options={store.templates}
           label={'Template'}
-          onChange={(val) => { store.template = val; }}
+          onChange={(val) => { store.template = store.templates.find((d) => d.value === val); }}
         />
         <SliderControl
           value={store.zoom}
-          {...ApplicationStore.zoomSettings}
+          range={store.zoomRange}
           label={'Zoom'}
           onChange={(val) => { store.zoom = val; }}
         />
         <SliderControl
           value={store.opacity}
-          {...ApplicationStore.opacitySettings}
+          range={[0, 0.1]}
+          step={0.001}
           label={'Link opacity / display'}
           disabled={!store.showLinks}
           onChange={(val) => { store.opacity = val; }}
@@ -52,14 +53,15 @@ class Controls extends React.Component {
         </SliderControl>
         <SliderControl
           value={store.spacing}
-          {...ApplicationStore.spacingSettings}
+          range={store.spacingRange}
           label={'Node spacing'}
           onChange={(val) => { store.spacing = val; }}
         />
         { /* dataset specific */ }
         <SliderControl 
           value={store.year}
-          {...ApplicationStore.yearSettings}
+          range={store.yearRange}
+          step={1}
           label={'Discovered before'}
           digits={0}
           onChange={(val) => { store.year = val; }}
@@ -79,20 +81,21 @@ class Controls extends React.Component {
         />
         <SelectControl
           value={store.size}
-          {...ApplicationStore.sizeSettings}
+          options={store.sizes}
           label={'Node size'}
           onChange={(val) => { store.size = val; }}
         />
         <SelectControl
           value={store.color}
-          {...ApplicationStore.colorSettings}
+          options={store.colors}
           label={'Node color'}
           onChange={(val) => { store.color = val; }}
         />
         { /* dataset specific */}
         <SliderControl
           value={store.colorYear}
-          {...ApplicationStore.colorYearSettings}
+          range={store.yearRange}
+          step={1}
           label={'Color year'}
           digits={0}
           disabled={store.color !== 'undiscovered'}

@@ -87,7 +87,7 @@ class GraphVisComponent extends Component {
           break;
 
         case 'discovery':
-          this.scene.setDiscoveryColor();
+          this.scene.setDiscoveryColor(store.yearRange);
           break;
 
         case 'undiscovered':

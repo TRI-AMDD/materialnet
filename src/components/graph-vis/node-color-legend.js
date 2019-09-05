@@ -91,7 +91,7 @@ class NodeColorLegend extends React.Component  {
                 </div>;
             case 'discovery':
                 return <div className={classes.root}>
-                    {gradient(ApplicationStore.yearSettings.range, (d) => d.toString())}
+                    {gradient(store.yearRange, (d) => d.toString())}
                     {circle('Undiscovered', ApplicationStore.NOT_EXISTENT_COLOR)}
                 </div>;
             default:

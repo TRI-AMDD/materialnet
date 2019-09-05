@@ -125,7 +125,7 @@ class App extends React.Component {
               <img className='logo' src={logo} alt="logo" />
             </Button>
             <Typography variant="h5" color="inherit" noWrap>
-              MaterialNet - {store.datasetLabel}
+              MaterialNet - {store.dataset.label}
               </Typography>
             <div style={{ flex: 1 }}>
             </div>

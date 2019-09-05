@@ -350,9 +350,9 @@ export class GeoJSSceneManager {
   }
 
   /* dataset specific */
-  setDiscoveryColor () {
+  setDiscoveryColor (range) {
     this.cmap = ApplicationStore.COLOR_SCALE.copy()
-      .domain(ApplicationStore.colorYearSettings.range);
+      .domain(range);
 
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
