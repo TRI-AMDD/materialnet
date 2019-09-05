@@ -71,7 +71,7 @@ class GraphVisComponent extends Component {
       }
     });
     setAndObserve(() => {
-      this.scene.linksVisible(store.linksVisible);
+      this.scene.linksVisible(store.showLinks);
     });
     setAndObserve(() => {
       this.scene.setNightMode(store.nightMode);
