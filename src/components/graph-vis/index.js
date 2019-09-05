@@ -4,6 +4,7 @@ import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
+import { debounce } from 'lodash-es';
 
 
 @observer
@@ -103,9 +104,10 @@ class GraphVisComponent extends Component {
 
   componentDidMount() {
     this.scene.parent = this.visElement;
-    this.ro = new ResizeObserver(() => {
+    // debounce resize to await the animatiion
+    this.ro = new ResizeObserver(debounce(() => {
       this.scene.resize();
-    });
+    }, 200));
 
     this.ro.observe(this.visElement);
 

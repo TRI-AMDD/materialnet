@@ -19,6 +19,7 @@
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
+    "clsx": "^1.0.4",
     "css-loader": "1.0.0",
     "d3-force": "^1.1.0",
     "d3-scale": "^2.1.0",
