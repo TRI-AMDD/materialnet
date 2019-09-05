@@ -212,15 +212,10 @@ export class GeoJSSceneManager {
 
   hideAfter() { }
   
-  getNodeSizeFactor() {
-    return this.map ? Math.pow(2, this.map.zoom()) : 1;
-  }
-
   setDegreeSize (compute) {
     // const zoom = Math.pow(2, this.map.zoom());
 
-    const factor = this.getNodeSizeFactor();
-    this.points.style('radius', (nodeId, i) => factor * compute(nodeId, i));
+    this.points.style('radius', compute);
     this.map.draw();
   }
 

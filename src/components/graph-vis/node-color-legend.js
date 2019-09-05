@@ -15,6 +15,11 @@ class NodeColorLegend extends React.Component  {
     render() {
         const store = this.context;
         const { classes } = this.props;
+
+        if (store.color === 'none') {
+            return null;
+        }
+
         return <div className={classes.root}>
 
         </div>;

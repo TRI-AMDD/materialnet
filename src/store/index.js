@@ -209,22 +209,28 @@ export class ApplicationStore {
     }
 
     @computed
-    get nodeSizeFunc() {
-        if (this.size === 'none') {
-            return () => 10;
+    get degree2SizeFunc() {
+        const factor = Math.pow(2, this.zoom);
+        switch (this.size) {
+            case 'none':
+                return factor * 10;
+            case 'normal':
+                return (deg) => factor * (10 + Math.sqrt(deg));
+            case 'large':
+                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg)));
+            case 'huge':
+                return (deg) => factor * (10 + deg);
+            default:
+                throw new Error(`bad level option: ${this.size}`);
         }
-        const degree2size = (() => {
-            switch (this.size) {
-                case 'normal':
-                    return (deg) => 10 + Math.sqrt(deg);
-                case 'large':
-                    return (deg) => 10 + Math.sqrt(Math.sqrt(deg * deg * deg));
-                case 'huge':
-                    return (deg) => 10 + deg;
-                default:
-                    throw new Error(`bad level option: ${this.size}`);
-            }
-        })();
+    }
+
+    @computed
+    get nodeSizeFunc() {
+        const degree2size = this.degree2SizeFunc;
+        if (this.size === 'none' || !this.data) {
+            return degree2size;
+        }
         const degrees = this.data.nodeDegrees(this.year);
         const names = this.data.nodeNames();
         return (_nodeId, i) => {
@@ -235,14 +241,18 @@ export class ApplicationStore {
 
     @computed
     get minMaxDegrees() {
-        return this.data.nodeDegrees(this.year).reduce(([min, max], v) => {
+        if (!this.data) {
+            return [0, 10];
+        }
+        const degrees = this.data.nodeDegrees(this.year);
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = degrees[name];
             return [
                 Math.min(min, v),
                 Math.max(max, v)
             ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
     }
-
 
     static COLOR_SCALE = scaleSequential(interpolateViridis);
     static INVALID_VALUE_COLOR = '#ff0000';

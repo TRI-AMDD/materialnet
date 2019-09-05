@@ -10,6 +10,8 @@ import './App.css';
 import Controls from './components/graph-vis/controls';
 import InfoPanel from './components/graph-vis/info-panel';
 import GraphVisComponent from './components/graph-vis';
+import NodeSizeLegend from './components/graph-vis/node-size-legend';
+import NodeColorLegend from './components/graph-vis/node-color-legend';
 
 const appStyles = theme => ({
   root: {
@@ -78,6 +80,8 @@ class App extends React.Component {
               <div className={classes.content}>
                 <GraphVisComponent/>
               </div>
+              <NodeSizeLegend />
+              <NodeColorLegend />
               <InfoPanel />
             </div>
           </div>

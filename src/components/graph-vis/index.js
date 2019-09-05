@@ -4,8 +4,6 @@ import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import NodeSizeLegend from './node-size-legend';
-import NodeColorLegend from './node-color-legend';
 
 
 @observer
@@ -190,16 +188,12 @@ class GraphVisComponent extends Component {
       }
     }
 
-    return (
-      <div
-        style={{width: '100%', height: '100%'}}
-        ref={ref => {this.visElement = ref}}
-        draggable
-        onDragStart={this.onVisDrag}
-      >
-        {store.size !== 'none' && <NodeSizeLegend factor={this.scene.getNodeSizeFactor()} />}
-        {store.color !== 'none' && <NodeColorLegend />}
-      </div>);
+    return (<div
+          style={{width: '100%', height: '100%'}}
+          ref={ref => {this.visElement = ref}}
+          draggable
+          onDragStart={this.onVisDrag}
+    />);
   }
 }
 
