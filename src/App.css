@@ -25,3 +25,10 @@ body {
 .logo {
   height: 2.5rem;
 }
+
+
+.geojs-layer[renderer="webgl"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
