@@ -33,6 +33,9 @@ class GraphVisComponent extends Component {
   }
 
   initSceneListener() {
+    // delete old ones
+    this.clearSceneListener();
+
     const store = this.context;
 
     const setAndObserve = (f) => {
@@ -69,7 +72,7 @@ class GraphVisComponent extends Component {
       }
     });
     setAndObserve(() => {
-      this.scene.linksVisible(store.linksVisible);
+      this.scene.linksVisible(store.showLinks);
     });
     setAndObserve(() => {
       this.scene.setNightMode(store.nightMode);
@@ -109,26 +112,9 @@ class GraphVisComponent extends Component {
     this.ro.observe(this.visElement);
 
     if (this.scene.initScene()) {
-      this.startAnimation();
+      // set defaults
+      this.initSceneListener();
     }
-  }
-
-  startAnimation() {
-    this.clearSceneListener();
-
-    // set defaults
-    this.initSceneListener();
-
-    // dummy render function in GeoJSSceneManager
-    // const animate = () => {
-    //   if (!this.scene.parent || !this.scene.dp) {
-    //     return;
-    //   }
-    //   this.scene.render();
-    //   window.requestAnimationFrame(animate);
-    // }
-    // window.requestAnimationFrame(animate);
-
   }
 
   componentWillUnmount() {
@@ -188,7 +174,8 @@ class GraphVisComponent extends Component {
       this.scene.clear();
       this.scene.dp = store.data;
       if (this.scene.initScene()) {
-        this.startAnimation();
+        // set defaults
+        this.initSceneListener();
       }
     }
 
