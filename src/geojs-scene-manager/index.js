@@ -394,7 +394,12 @@ export class GeoJSSceneManager {
   }
 
   render () {}
-  resize () {}
+  resize() {
+    if (!this.map || !this.parent) {
+      return;
+    }
+    this.map.size(this.parent.getBoundingClientRect());
+  }
   pick () {}
   moveCamera () {}
   clear () {}

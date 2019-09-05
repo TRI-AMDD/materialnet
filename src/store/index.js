@@ -123,6 +123,9 @@ export class ApplicationStore {
     @observable
     structure = null;
 
+    @observable
+    drawerVisible = true;
+
     constructor() {
         // load data and update on dataset change
         autorun(() => {
@@ -131,6 +134,11 @@ export class ApplicationStore {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
+    }
+
+    @computed
+    get datasetLabel() {
+        return ApplicationStore.datasetSettings.options.find((d) => d.value === this.dataset).label;
     }
 
     @computed
