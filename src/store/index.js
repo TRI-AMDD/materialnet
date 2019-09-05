@@ -221,7 +221,7 @@ export class ApplicationStore {
         const factor = Math.pow(2, this.zoom);
         switch (this.size) {
             case 'none':
-                return factor * 10;
+                return () => factor * 10;
             case 'normal':
                 return (deg) => factor * (10 + Math.sqrt(deg));
             case 'large':
