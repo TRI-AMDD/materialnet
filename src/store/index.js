@@ -1,9 +1,10 @@
+import { scaleSequential } from 'd3-scale';
+import { interpolateViridis } from 'd3-scale-chromatic';
 import { observable, autorun, action, computed } from "mobx";
 import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
-
 
 export class ApplicationStore {
     @observable
@@ -206,6 +207,48 @@ export class ApplicationStore {
             }
         });
     }
+
+    @computed
+    get nodeSizeFunc() {
+        if (this.size === 'none') {
+            return () => 10;
+        }
+        const degree2size = (() => {
+            switch (this.size) {
+                case 'normal':
+                    return (deg) => 10 + Math.sqrt(deg);
+                case 'large':
+                    return (deg) => 10 + Math.sqrt(Math.sqrt(deg * deg * deg));
+                case 'huge':
+                    return (deg) => 10 + deg;
+                default:
+                    throw new Error(`bad level option: ${this.size}`);
+            }
+        })();
+        const degrees = this.data.nodeDegrees(this.year);
+        const names = this.data.nodeNames();
+        return (_nodeId, i) => {
+            const name = names[i];
+            return degree2size(degrees[name]);
+        }
+    }
+
+    @computed
+    get minMaxDegrees() {
+        return this.data.nodeDegrees(this.year).reduce(([min, max], v) => {
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
+
+    static COLOR_SCALE = scaleSequential(interpolateViridis);
+    static INVALID_VALUE_COLOR = '#ff0000';
+    static EXISTS_COLOR = 'rgb(81,96,204)';
+    static NOT_EXISTENT_COLOR = '#de2d26';
+    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 }
 
 export default createContext();
