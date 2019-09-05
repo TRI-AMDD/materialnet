@@ -75,6 +75,7 @@ class NodeColorLegend extends React.Component  {
             return <div className={classes.scale} data-from={format(domain[0])} data-to={format(domain[1])} style={{ background: `linear-gradient(to right, ${samples})` }} />;
         };
 
+        /* dataset specific */
         switch (store.color) {
             case 'none':
                 return null;

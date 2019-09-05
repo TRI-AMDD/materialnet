@@ -56,7 +56,8 @@ class Controls extends React.Component {
           label={'Node spacing'}
           onChange={(val) => { store.spacing = val; }}
         />
-        <SliderControl
+        { /* dataset specific */ }
+        <SliderControl 
           value={store.year}
           {...ApplicationStore.yearSettings}
           label={'Discovered before'}
@@ -88,6 +89,7 @@ class Controls extends React.Component {
           label={'Node color'}
           onChange={(val) => { store.color = val; }}
         />
+        { /* dataset specific */}
         <SliderControl
           value={store.colorYear}
           {...ApplicationStore.colorYearSettings}

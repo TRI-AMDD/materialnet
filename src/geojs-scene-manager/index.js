@@ -23,7 +23,8 @@ export class GeoJSSceneManager {
     if (!this.parent || !this.dp) {
       return false;
     }
-
+    
+    /* dataset specific */
     const degrees = dp.nodeDegrees(2020);
 
     let nodes = this.nodes = {};
@@ -223,6 +224,7 @@ export class GeoJSSceneManager {
       return null;
     }
 
+    /* dataset specific */
     const data = {
       name,
       degree: this.dp.nodeProperty(name, 'degree'),
@@ -347,6 +349,7 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
+  /* dataset specific */
   setDiscoveryColor () {
     this.cmap = ApplicationStore.COLOR_SCALE.copy()
       .domain(ApplicationStore.colorYearSettings.range);
@@ -380,6 +383,7 @@ export class GeoJSSceneManager {
     ];
   }
 
+  /* dataset specific */
   setUndiscoveredColor (year) {
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {

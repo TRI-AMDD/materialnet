@@ -28,6 +28,7 @@ export class ApplicationStore {
 
     static templateSettings = {
         options: [
+            // dataset specific
             { label: 'Material', value: 'material' },
             { label: 'Minimal', value: 'minimal' }
         ]
@@ -36,7 +37,7 @@ export class ApplicationStore {
     @observable
     zoom = -2.3;
     static zoomSettings = {
-        range: [-3.75, 3]
+        range: [-3.75, 3] // dataset specific ?
     };
 
     @observable
@@ -53,6 +54,7 @@ export class ApplicationStore {
         step: 0.001
     };
 
+    // dataset specific or not existing
     @observable
     year = 2016;
 
@@ -62,7 +64,7 @@ export class ApplicationStore {
     interval = null;
 
     static yearSettings = {
-        range: [1945, 2016],
+        range: [1945, 2016], // dataset specific
         step: 1,
     };
 
@@ -70,10 +72,10 @@ export class ApplicationStore {
     search = '';
 
     @observable
-    color = 'discovery';
+    color = 'discovery'; // dataset specific
 
     static colorSettings = {
-        options: [
+        options: [ // dataset specific
             { label: 'None', value: 'none' },
             { label: 'Year of discovery', value: 'discovery' },
             { label: 'Discovered/Hypothetical', value: 'boolean' },
@@ -89,10 +91,10 @@ export class ApplicationStore {
     };
 
     @observable
-    colorYear = 2016;
+    colorYear = 2016; // dataset specific
 
     static colorYearSettings = {
-        range: [1945, 2016],
+        range: [1945, 2016], // dataset specific
         step: 1
     };
 
@@ -219,13 +221,13 @@ export class ApplicationStore {
     @computed
     get degree2SizeFunc() {
         const factor = Math.pow(2, this.zoom);
-        switch (this.size) {
+        switch (this.size) {// dataset specific, assumes some degree ranges
             case 'none':
                 return () => factor * 10;
             case 'normal':
                 return (deg) => factor * (10 + Math.sqrt(deg));
             case 'large':
-                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg)));
+                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg))); //x^3/4
             case 'huge':
                 return (deg) => factor * (10 + deg);
             default:
@@ -239,6 +241,7 @@ export class ApplicationStore {
         if (this.size === 'none' || !this.data) {
             return degree2size;
         }
+        // dataset specific
         const degrees = this.data.nodeDegrees(this.year);
         const names = this.data.nodeNames();
         return (_nodeId, i) => {
@@ -279,7 +282,7 @@ export class ApplicationStore {
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
     }
 
-
+    // dataset specific
     propertyFormatter(property) {
         switch (property) {
             case 'synthesis_probability':
