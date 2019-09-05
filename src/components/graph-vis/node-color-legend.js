@@ -3,10 +3,11 @@ import Store, { ApplicationStore } from '../../store';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/core';
 
-const height = 25;
+const height = 20;
 
 const styles = theme => ({
     root: {
+        marginLeft: '1em',
         width: 300,
         paddingBottom: 20,
         display: 'flex',
@@ -66,13 +67,12 @@ class NodeColorLegend extends React.Component  {
 
         const circle = (title, color) => <div className={classes.circle} title={title} style={{ background: color }} />;
         
-        const gradient = (domain) => {
+        const gradient = (domain, format) => {
             const gradientSamples = 10;
             // sample the color scale and create a gradient defintion out of it
             const scale = ApplicationStore.COLOR_SCALE.copy().domain([0, gradientSamples]);
             const samples = Array.from({ length: gradientSamples + 1 }).map((_, i) => `${scale(i)} ${Math.round(i * 100 / gradientSamples)}%`).join(',');
-            // TODO proper value representation
-            return <div className={classes.scale} data-from={Math.round(domain[0])} data-to={Math.round(domain[1])} style={{ background: `linear-gradient(to right, ${samples})` }} />;
+            return <div className={classes.scale} data-from={format(domain[0])} data-to={format(domain[1])} style={{ background: `linear-gradient(to right, ${samples})` }} />;
         };
 
         switch (store.color) {
@@ -90,12 +90,14 @@ class NodeColorLegend extends React.Component  {
                 </div>;
             case 'discovery':
                 return <div className={classes.root}>
-                    {gradient(ApplicationStore.yearSettings.range)}
+                    {gradient(ApplicationStore.yearSettings.range, (d) => d.toString())}
                     {circle('Undiscovered', ApplicationStore.NOT_EXISTENT_COLOR)}
                 </div>;
             default:
+                // property
+                const formatter = store.propertyFormatter(store.color);
                 return <div className={classes.root}>
-                    {gradient(store.minMaxColorRange)}
+                    {gradient(store.minMaxColorRange, formatter)}
                     {circle('Unknown', ApplicationStore.INVALID_VALUE_COLOR)}
                 </div>;
         }

@@ -271,6 +271,19 @@ export class ApplicationStore {
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
     }
 
+
+    propertyFormatter(property) {
+        switch (property) {
+            case 'synthesis_probability':
+                return (v) => `${(v * 100).toFixed(2)}%`;
+            case 'discovery':
+                return (v) => v.toString();
+            default:
+                return (v) => typeof v === 'number' ? v.toFixed(3) : v;
+        }
+    }
+
+
     static COLOR_SCALE = scaleSequential(interpolateViridis);
     static INVALID_VALUE_COLOR = '#ff0000';
     static EXISTS_COLOR = 'rgb(81,96,204)';
