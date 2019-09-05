@@ -3,6 +3,7 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
+import { eq, isEqual } from "lodash-es";
 
 
 export class ApplicationStore {
@@ -164,6 +165,12 @@ export class ApplicationStore {
                 size: this.size,
                 drawerVisible: this.drawerVisible
             };
+
+            if (isEqual(state, window.history.state)) {
+                // no change
+                return;
+            }
+
             const url = new URL(window.location.href);
             url.searchParams.set('ds', this.dataset);
             const title = document.title = `MaterialNet - ${this.datasetLabel}`;
@@ -172,6 +179,15 @@ export class ApplicationStore {
                 window.history.replaceState(state, title, url.href);
             } else {
                 window.history.pushState(state, title, url.href);
+            }
+        }, { delay: 300 }); // debounce 300ms
+        
+        // track history changes by the user (e.g. go back)
+        window.addEventListener('popstate', (evt) => {
+            const state = evt.state;
+            if (state && state.dataset != null) {
+                // use the stored state to update the store
+                Object.assign(this, state);
             }
         });
         
