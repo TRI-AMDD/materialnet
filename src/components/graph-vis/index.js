@@ -1,199 +1,128 @@
 import React, { Component } from 'react';
-
-import { Portal, withStyles, Popper } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
-
 import ResizeObserver from 'resize-observer-polyfill';
-
-import { fetchStructure } from '../../rest';
-
-import InfoPanel from './info-panel';
-
-import { sortStringsLength } from './sort';
-
-import { SceneManager } from '../../scene-manager';
 import { GeoJSSceneManager } from '../../geojs-scene-manager';
-import { DiskDataProvider } from '../../data-provider';
-
-import * as templates from '../../templates';
-
-import Controls from './controls';
-import Structure from './structure';
+import Store from '../../store';
+import { observer } from 'mobx-react';
+import { autorun } from 'mobx';
 
 
-const visStyles = theme => ({
-  popover: {
-    padding: '1rem',
-    minWidth: '15rem',
-    zIndex: 9999,
-    background: grey[100]
-  }
-})
-
-
+@observer
 class GraphVisComponent extends Component {
+  static contextType = Store;
+
   visElement;
-  scene;
-  data;
+  scene = new GeoJSSceneManager({
+    onZoomChanged: (val) => this.context.zoom = val,
+    picked: (data, position) => {
+      this.context.selectNode(data, position);
+    },
+  });
+
   dragging = {
     status: false,
     start: {x: 0, y: 0}
   }
   ro;
 
-  constructor(props) {
-    super(props);
+  autoRunListeners = [];
 
-    this.sceneSetters = {
-      zoom: (val) => { this.scene.zoom = val; },
-      spacing: (val) => { this.scene.expand(val); },
-      year: (val) => {
-        this.scene.hideAfter(val);
-        if (this.props.size.value !== 'none') {
-          this.scene.setDegreeSize(this.props.year.value, this.props.size.value);
-        }
-      },
-      opacity: (val) => { this.scene.setLinkOpacity(val); },
-      search: (val) => {
-        const obj = this.scene.pickName(val);
-        if (obj) {
-          this.scene.display(val, true);
-        } else {
-          this.scene.undisplay();
-          this.onValueChanged(null, 'selected');
-          this.onValueChanged(null, 'structure');
-        }
-      },
-      showLinks: (val) => { this.scene.linksVisible(val); },
-      nightMode: (val) => { this.scene.setNightMode(val); },
-      size: (val) => { this.scene.setDegreeSize(this.props.year.value, val); },
-      color: (val) => {
-        switch (val) {
-          case 'none':
-            this.scene.setConstColor();
-            break;
+  clearSceneListener() {
+    this.autoRunListeners.forEach((v) => v());
+    this.autoRunListeners = [];
+  }
 
-          case 'boolean':
-            this.scene.setBooleanColor();
-            break;
+  initSceneListener() {
+    // delete old ones
+    this.clearSceneListener();
 
-          case 'discovery':
-            this.scene.setDiscoveryColor();
-            break;
+    const store = this.context;
 
-          case 'undiscovered':
-            this.scene.setUndiscoveredColor(this.props.colorYear.value);
-            break;
-
-          default:
-            this.scene.setPropertyColor(val);
-        }
-      },
-      colorYear: (val) => {
-        switch (this.props.color.value) {
-          case 'boolean':
-            this.scene.setBooleanColor();
-            break;
-
-          case 'discovery':
-            this.scene.setDiscoveryColor();
-            break;
-
-          case 'undiscovered':
-            this.scene.setUndiscoveredColor(val);
-            break;
-
-          case 'none':
-            this.scene.setConstColor();
-            break;
-
-          default:
-            throw new Error(`impossible colormap option: ${val}`);
-        }
+    const setAndObserve = (f) => {
+      this.autoRunListeners.push(autorun(f));
+    };
+    setAndObserve(() => {
+      this.scene.zoom = store.zoom;
+    });
+    setAndObserve(() => {
+      this.scene.expand(store.spacing);
+    });
+    setAndObserve(() => {
+      this.scene.hideAfter(store.year);
+      if (store.size !== 'none') {
+        this.scene.setDegreeSize(store.year, store.size);
       }
-    }
+    });
+    setAndObserve(() => {
+      this.scene.setLinkOpacity(store.opacity);
+    });
+    setAndObserve(() => {
+      const obj = this.scene.pickName(store.search);
+      if (obj) {
+        this.scene.display(store.search, true);
+      } else {
+        store.clearSelection();
+      }
+    });
+    setAndObserve(() => {
+      if (store.selected == null) {
+        this.scene.undisplay();
+      } else {
+        this.scene.display(store.selected.name);
+      }
+    });
+    setAndObserve(() => {
+      this.scene.linksVisible(store.showLinks);
+    });
+    setAndObserve(() => {
+      this.scene.setNightMode(store.nightMode);
+    });
+
+    setAndObserve(() => {
+      switch (store.color) {
+        case 'none':
+          this.scene.setConstColor();
+          break;
+
+        case 'boolean':
+          this.scene.setBooleanColor();
+          break;
+
+        case 'discovery':
+          this.scene.setDiscoveryColor();
+          break;
+
+        case 'undiscovered':
+          this.scene.setUndiscoveredColor(store.colorYear);
+          break;
+
+        default:
+          this.scene.setPropertyColor(store.color);
+      }
+    });
   }
 
   componentDidMount() {
-    const { edges, nodes } = this.props;
-    this.data = new DiskDataProvider(nodes, edges);
-    this.searchOptions = this.data.nodeNames().slice().sort(sortStringsLength).map(val=>({label: val}));
-    this.scene = new GeoJSSceneManager({
-      el: this.visElement,
-      dp: this.data,
-      onValueChanged: this.onValueChanged,
-      picked: (data, position) => {
-        this.selectNode(data, position);
-      },
-    });
-
-    this.setDefaults();
-
-    const animate = (e) => {
-      this.scene.render();
-      window.requestAnimationFrame(animate);
-    }
-
-    window.requestAnimationFrame(animate);
-
+    this.scene.parent = this.visElement;
     this.ro = new ResizeObserver(() => {
       this.scene.resize();
     });
 
     this.ro.observe(this.visElement);
+
+    if (this.scene.initScene()) {
+      // set defaults
+      this.initSceneListener();
+    }
   }
 
   componentWillUnmount() {
     if (this.ro) {
       this.ro.unobserve(this.visElement);
     }
-  }
 
-  setDefaults() {
-    for (let key in this.props) {
-      if (this.props[key] && this.props[key].value ){
-        const value = this.props[key].value;
-        if (key !== 'colorYear' || ['discovery', 'boolean', 'undiscovered'].indexOf(value) !== -1) {
-          this.onValueChanged(value, key);
-        }
-      }
-    }
-  }
-
-  onValueChanged = (value, key) => {
-    if (key in this.props) {
-      if (this.props.update) {
-        this.props.update(value, key);
-      }
-    }
-    if (key in this.sceneSetters) {
-      this.sceneSetters[key](value);
-    }
-  }
-
-  selectNode (obj, position) {
-    const currentName = this.props.selected.value ? this.props.selected.value.name : '';
-    if (obj.name === currentName) {
-      this.scene.undisplay();
-      obj = null;
-    } else {
-      this.scene.display(obj.name);
-    }
-
-    this.onValueChanged(obj, 'selected');
-    this.onValueChanged(position, 'selectedPosition');
-    this.onValueChanged(null, 'structure');
-
-    if (!obj) {
-      return;
-    }
-
-    fetchStructure(obj.name)
-    .then(cjson => {
-      if (cjson) {
-        this.onValueChanged(cjson, 'structure');
-      }
-    })
+    this.clearSceneListener();
+    this.scene.clear();
+    this.scene.parent = null;
   }
 
   onVisDrag = (event) => {
@@ -201,7 +130,7 @@ class GraphVisComponent extends Component {
     this.dragging.status = true;
     this.dragging.start = {x: event.clientX, y: event.clientY};
 
-    const linksOn = this.props.showLinks.value;
+    const linksOn = this.context.showLinks;
     if (linksOn) {
       this.scene.linksVisible(false);
     }
@@ -225,30 +154,6 @@ class GraphVisComponent extends Component {
     window.addEventListener('mouseup', mouseUpListener);
   }
 
-  toggleAutoplay = () => {
-    const {year} = this.props;
-    let interval = year.interval;
-    let play = !year.play;
-
-    if (year.play && year.interval) {
-      clearInterval(year.interval);
-      interval = null;
-    }
-
-    if (!year.play) {
-      interval = setInterval(() => {
-        const {year} = this.props;
-        let nextYear = year.value + 1;
-        if (year.value === year.max) {
-          nextYear = year.min;
-        }
-        this.onValueChanged(nextYear, 'year');
-      }, 1000);
-    }
-
-    this.props.setPlayState(play, interval);
-  }
-
   onDrag = (e) => {
     if (!this.dragging.status) {
       return;
@@ -259,97 +164,27 @@ class GraphVisComponent extends Component {
     this.dragging.start = {x: e.clientX, y: e.clientY};
   }
 
-  onClearSelection = () => {
-    this.scene.undisplay();
-    this.onValueChanged(null, 'selected');
-    this.onValueChanged(null, 'structure');
-  }
-
-
-  renderControls() {
-    const {
-      dataset,
-      template,
-      zoom,
-      spacing,
-      opacity,
-      year,
-      search,
-      size,
-      color,
-      colorYear,
-      showLinks,
-      nightMode
-    } = this.props;
-    const props = {
-      dataset,
-      template,
-      zoom,
-      spacing,
-      opacity,
-      year,
-      search,
-      size,
-      color,
-      colorYear,
-      showLinks,
-      nightMode,
-      searchOptions: this.searchOptions,
-      onValueChanged: this.onValueChanged,
-      toggleAutoplay: this.toggleAutoplay,
-    }
-
-    return <Controls {...props}/>;
-  }
-
   render() {
-    const {
-      nodes,
-      edges,
-      selectedPosition,
-      drawerRef,
-      selected,
-      template,
-      structure, 
-      classes
-    } = this.props;
+    const store = this.context;
 
-    const dataChanged = this.datasetName !== this.props.dataset.value;
-    if (dataChanged) {
-      console.log('DATA CHANGED');
-      if (this.scene) {
-        this.scene.clear();
-
-        this.data = new DiskDataProvider(nodes, edges);
-
-        this.scene.initScene(this.data);
-        this.setDefaults();
+    if (this.scene.dp !== store.data) {
+      // data has changed
+      this.scene.clear();
+      this.scene.dp = store.data;
+      if (this.scene.initScene()) {
+        // set defaults
+        this.initSceneListener();
       }
     }
-    this.datasetName = this.props.dataset.value;
 
-    return (<>
+    return (
       <div
         style={{width: '100%', height: '100%'}}
         ref={ref => {this.visElement = ref}}
         draggable
         onDragStart={this.onVisDrag}
-      />
-
-      {/* drawer on the left */}
-      <Portal container={drawerRef ? drawerRef.current : null}>
-        {this.renderControls()}
-      </Portal>
-
-      {/* popup detail information */}
-      <Popper open={selected.value != null} anchorEl={this.visElement} placement="right-end" className={classes.popover} modifiers={{ inner: { enabled: true } }}>
-        <InfoPanel {...selected.value} onClear={this.onClearSelection} template={templates[template.value]} />
-        <div style={{ width: '100%', height: '15rem' }}>
-          <Structure cjson={structure.value} />
-        </div>
-      </Popper>
-    </>);
+      />);
   }
 }
 
-export default withStyles(visStyles)(GraphVisComponent);
+export default GraphVisComponent;

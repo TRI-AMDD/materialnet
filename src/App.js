@@ -4,9 +4,12 @@ import { withStyles, Drawer } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import GraphVis from './containers/graph-vis';
 import Header from './components/header';
+import Store, { ApplicationStore } from './store';
 import './App.css';
+import Controls from './components/graph-vis/controls';
+import InfoPanel from './components/graph-vis/info-panel';
+import GraphVisComponent from './components/graph-vis';
 
 const appStyles = theme => ({
   root: {
@@ -29,6 +32,7 @@ const appStyles = theme => ({
   contentContainer: {
     flexGrow: 1,
     display: 'flex',
+    position: 'relative',
     flexDirection: 'column'
   },
   content: {
@@ -42,6 +46,8 @@ const appStyles = theme => ({
   }
 })
 
+const store = new ApplicationStore();
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -51,27 +57,32 @@ class App extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <Header />
-        <div className={classes.body}>
-          <Drawer
-            variant='persistent'
-            open
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-          >
-            <div style={{width: '100%'}} ref={this.drawerRef}></div>
-          </Drawer>
+      <Store.Provider value={store}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <Header />
+          <div className={classes.body}>
+            <Drawer
+              variant='persistent'
+              open
+              classes={{
+                paper: classes.drawerPaper,
+              }}
+            >
+              <div style={{ width: '100%' }}>
+                <Controls/>
+              </div>
+            </Drawer>
 
-          <div className={classes.contentContainer}>
-            <div className={classes.content}>
-              <GraphVis drawerRef={this.drawerRef}></GraphVis>
+            <div className={classes.contentContainer}>
+              <div className={classes.content}>
+                <GraphVisComponent/>
+              </div>
+              <InfoPanel />
             </div>
           </div>
         </div>
-      </div>
+      </Store.Provider>
     );
   }
 }

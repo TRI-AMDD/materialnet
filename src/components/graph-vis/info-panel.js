@@ -1,13 +1,45 @@
-import { Component } from 'react';
+import React from 'react';
+import Store from '../../store';
+import * as templates from '../../templates';
+import { withStyles, Paper } from '@material-ui/core';
+import Structure from './structure';
+import { grey } from '@material-ui/core/colors';
+import { observer } from 'mobx-react';
 
-class InfoPanel extends Component {
+
+const visStyles = theme => ({
+  root: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    padding: '1rem',
+    minWidth: '15rem',
+    zIndex: 9999,
+    background: grey[100]
+  }
+})
+
+@observer
+class InfoPanel extends React.Component {
+  static contextType = Store;
+
   render() {
-    const {
-      template
-    } = this.props;
+    const store = this.context;
+    const { classes } = this.props;
+    const template = templates[store.template];
 
-    return template(this.props);
+    const templateProps = { ...store.selected, onClear: () => store.clearSelection() };
+
+    if (!store.selected) {
+      return null;
+    }
+    return <Paper className={classes.root}>
+      {template(templateProps)}
+      <div style={{ width: '100%', height: '15rem' }}>
+        <Structure cjson={store.structure} />
+      </div>
+    </Paper>;
   }
 }
 
-export default InfoPanel;
+export default withStyles(visStyles)(InfoPanel);

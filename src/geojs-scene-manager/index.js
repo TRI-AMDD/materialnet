@@ -1,6 +1,5 @@
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
-import { color as d3Color } from 'd3-color';
 import { select } from 'd3-selection';
 
 import geo from 'geojs';
@@ -8,17 +7,23 @@ import geo from 'geojs';
 import './tooltip.css';
 
 export class GeoJSSceneManager {
-  constructor({el, dp, onValueChanged, picked}) {
-    this.parent = el;
-    this.initScene(dp);
-    this.onValueChanged = onValueChanged;
+  constructor({ onZoomChanged, picked }) {
+    this.dp = null;
+    this.parent = null;
+    this.onZoomChanged = onZoomChanged;
     this.picked = picked;
     this.lineSelected = new Set([]);
     this.expansion = 1;
+    this.map = null;
   }
 
-  initScene(dp) {
-    this.dp = dp;
+  initScene() {
+    this.map = null;
+    const dp = this.dp;
+
+    if (!this.parent || !this.dp) {
+      return false;
+    }
 
     const degrees = dp.nodeDegrees(2020);
 
@@ -118,7 +123,6 @@ export class GeoJSSceneManager {
       onNode = true;
 
       const name = evt.data;
-      const node = nodes[name];
 
       tooltip.position(evt.mouse.geo);
       tooltipElem.innerText = name;
@@ -163,10 +167,12 @@ export class GeoJSSceneManager {
 
     map.geoOn(geo.event.zoom, () => {
       points.dataTime().modified();
-      this.onValueChanged(map.zoom(), 'zoom');
+      this.onZoomChanged(map.zoom());
     });
 
     map.draw();
+
+    return true;
   }
 
   expand (m) {
@@ -236,7 +242,6 @@ export class GeoJSSceneManager {
 
           default:
             throw new Error(`bad level option: ${level}`);
-            break;
         }
       });
 
@@ -307,7 +312,10 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  undisplay () {
+  undisplay() {
+    if (!this.map) {
+      return;
+    }
     this.points.style('fillOpacity', 0.8);
     this.points.style('strokeOpacity', 0.8);
     this.setLinkOpacity(this.linkOpacity);
