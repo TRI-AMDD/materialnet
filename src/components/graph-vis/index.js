@@ -4,6 +4,8 @@ import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
+import NodeSizeLegend from './node-size-legend';
+import NodeColorLegend from './node-color-legend';
 
 
 @observer
@@ -45,9 +47,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.hideAfter(store.year);
-      if (store.size !== 'none') {
-        this.scene.setDegreeSize(store.year, store.size);
-      }
+      this.scene.setDegreeSize(store.nodeSizeFunc);
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
@@ -196,7 +196,10 @@ class GraphVisComponent extends Component {
         ref={ref => {this.visElement = ref}}
         draggable
         onDragStart={this.onVisDrag}
-      />);
+      >
+        {store.size !== 'none' && <NodeSizeLegend factor={this.scene.getNodeSizeFactor()} />}
+        {store.color !== 'none' && <NodeColorLegend />}
+      </div>);
   }
 }
 
