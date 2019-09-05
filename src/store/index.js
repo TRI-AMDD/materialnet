@@ -254,6 +254,23 @@ export class ApplicationStore {
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
     }
 
+    @computed
+    get minMaxColorRange() {
+        if (!this.data) {
+            return [0, 10];
+        }
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = this.data.nodeProperty(name, this.color);
+            if (v == null) {
+                return [min, max];
+            }
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
     static COLOR_SCALE = scaleSequential(interpolateViridis);
     static INVALID_VALUE_COLOR = '#ff0000';
     static EXISTS_COLOR = 'rgb(81,96,204)';

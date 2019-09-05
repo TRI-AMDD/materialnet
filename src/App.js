@@ -41,6 +41,14 @@ const appStyles = theme => ({
     flexGrow:1,
     height: '100%'
   },
+  legend: {
+    zIndex: 100,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    display: 'flex',
+    alignItems: 'flex-end'
+  },
   footer: {
   },
   chris: {
@@ -80,8 +88,10 @@ class App extends React.Component {
               <div className={classes.content}>
                 <GraphVisComponent/>
               </div>
-              <NodeSizeLegend />
-              <NodeColorLegend />
+              <div className={classes.legend}>
+                <NodeSizeLegend />
+                <NodeColorLegend />
+              </div>
               <InfoPanel />
             </div>
           </div>

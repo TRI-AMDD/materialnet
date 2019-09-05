@@ -4,12 +4,11 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/core';
 import { scaleLinear } from 'd3-scale';
 
+const width = 300;
+
 const styles = theme => ({
     root: {
-        zIndex: 100,
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
+        width,
     },
     circle: {
         position: 'absolute',
@@ -45,7 +44,6 @@ class NodeSizeLegend extends React.Component  {
         const maxRadius = compute(minMax[1]);
         const marginLeft = 20; // 20px left offset
         const marginBottom = 20;
-        const width = 300;
 
         const scale = scaleLinear().domain(minMax).range([0, width]);
         const count = Math.max(2, Math.min(10, Math.floor(width / (2 * maxRadius))));
