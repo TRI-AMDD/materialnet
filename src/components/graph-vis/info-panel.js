@@ -13,12 +13,14 @@ const visStyles = theme => ({
     position: 'absolute',
     right: 0,
     top: 0,
+    overflow: 'auto',
+    maxHeight: '100%',
     padding: '1rem',
     minWidth: '15rem',
     zIndex: 9999,
     background: grey[100]
   }
-})
+});
 
 
 

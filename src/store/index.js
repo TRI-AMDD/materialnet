@@ -120,6 +120,9 @@ export class ApplicationStore {
     @observable
     structure = null;
 
+    @observable
+    drawerVisible = true;
+
     constructor() {
         // load data and update on dataset change
         autorun(() => {
@@ -134,6 +137,11 @@ export class ApplicationStore {
     get infoTemplate() {
         const found = templates.find((d) => d.label === this.template);
         return found ? found : templates[0];
+    }
+
+    @computed
+    get datasetLabel() {
+        return ApplicationStore.datasetSettings.options.find((d) => d.value === this.dataset).label;
     }
 
     @computed

@@ -123,7 +123,6 @@ export class GeoJSSceneManager {
       onNode = true;
 
       const name = evt.data;
-      // const node = nodes[name];
 
       tooltip.position(evt.mouse.geo);
       tooltipElem.innerText = name;
@@ -427,7 +426,12 @@ export class GeoJSSceneManager {
   }
 
   render () {}
-  resize () {}
+  resize() {
+    if (!this.map || !this.parent) {
+      return;
+    }
+    this.map.size(this.parent.getBoundingClientRect());
+  }
   pick () {}
   moveCamera () {}
   clear () {}

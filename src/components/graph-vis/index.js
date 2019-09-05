@@ -4,6 +4,7 @@ import { GeoJSSceneManager } from '../../geojs-scene-manager';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
+import { debounce } from 'lodash-es';
 
 
 @observer
@@ -32,6 +33,9 @@ class GraphVisComponent extends Component {
   }
 
   initSceneListener() {
+    // delete old ones
+    this.clearSceneListener();
+
     const store = this.context;
 
     const setAndObserve = (f) => {
@@ -68,7 +72,7 @@ class GraphVisComponent extends Component {
       }
     });
     setAndObserve(() => {
-      this.scene.linksVisible(store.linksVisible);
+      this.scene.linksVisible(store.showLinks);
     });
     setAndObserve(() => {
       this.scene.setNightMode(store.nightMode);
@@ -100,33 +104,17 @@ class GraphVisComponent extends Component {
 
   componentDidMount() {
     this.scene.parent = this.visElement;
-    this.ro = new ResizeObserver(() => {
+    // debounce resize to await the animatiion
+    this.ro = new ResizeObserver(debounce(() => {
       this.scene.resize();
-    });
+    }, 200));
 
     this.ro.observe(this.visElement);
 
     if (this.scene.initScene()) {
-      this.startAnimation();
+      // set defaults
+      this.initSceneListener();
     }
-  }
-
-  startAnimation() {
-    this.clearSceneListener();
-
-    // set defaults
-    this.initSceneListener();
-
-    // dummy render function in GeoJSSceneManager
-    // const animate = () => {
-    //   if (!this.scene.parent || !this.scene.dp) {
-    //     return;
-    //   }
-    //   this.scene.render();
-    //   window.requestAnimationFrame(animate);
-    // }
-    // window.requestAnimationFrame(animate);
-
   }
 
   componentWillUnmount() {
@@ -186,7 +174,8 @@ class GraphVisComponent extends Component {
       this.scene.clear();
       this.scene.dp = store.data;
       if (this.scene.initScene()) {
-        this.startAnimation();
+        // set defaults
+        this.initSceneListener();
       }
     }
 
