@@ -80,18 +80,18 @@ class NodeColorLegend extends React.Component  {
                 return null;
             case 'boolean':
                 return <div className={classes.root}>
-                    {circle('Discovered', ApplicationStore.EXISTS_COLOR)}
-                    {circle('Hypothetical', ApplicationStore.NOT_EXISTENT_COLOR)}
+                    {circle('Discovered', ApplicationStore.DISCOVERED_COLOR)}
+                    {circle('Hypothetical', ApplicationStore.UNDISCOVERED_COLOR)}
                 </div>;
             case 'undiscovered':
                 return <div className={classes.root}>
-                    {circle('Discovered', ApplicationStore.EXISTS_COLOR)}
-                    {circle('Undiscovered', ApplicationStore.NOT_EXISTENT_COLOR)}
+                    {circle('Discovered', ApplicationStore.DISCOVERED_COLOR)}
+                    {circle('Undiscovered', ApplicationStore.UNDISCOVERED_COLOR)}
                 </div>;
             case 'discovery':
                 return <div className={classes.root}>
                     {gradient(ApplicationStore.yearSettings.range, (d) => d.toString())}
-                    {circle('Undiscovered', ApplicationStore.NOT_EXISTENT_COLOR)}
+                    {circle('Undiscovered', ApplicationStore.UNDISCOVERED_COLOR)}
                 </div>;
             default:
                 // property

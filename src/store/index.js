@@ -217,7 +217,7 @@ export class ApplicationStore {
     }
 
     @computed
-    get degree2SizeFunc() {
+    get degreeToSizeFunc() {
         const factor = Math.pow(2, this.zoom);
         switch (this.size) {
             case 'none':
@@ -235,7 +235,7 @@ export class ApplicationStore {
 
     @computed
     get nodeSizeFunc() {
-        const degree2size = this.degree2SizeFunc;
+        const degree2size = this.degreeToSizeFunc;
         if (this.size === 'none' || !this.data) {
             return degree2size;
         }
@@ -294,8 +294,8 @@ export class ApplicationStore {
 
     static COLOR_SCALE = scaleSequential(interpolateViridis);
     static INVALID_VALUE_COLOR = '#ff0000';
-    static EXISTS_COLOR = 'rgb(81,96,204)';
-    static NOT_EXISTENT_COLOR = '#de2d26';
+    static DISCOVERED_COLOR = 'rgb(81,96,204)';
+    static UNDISCOVERED_COLOR = '#de2d26';
     static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 }
 

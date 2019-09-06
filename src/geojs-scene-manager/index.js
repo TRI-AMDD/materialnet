@@ -316,7 +316,7 @@ export class GeoJSSceneManager {
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
       const exists = this.dp.nodeExists(name);
-      const color = exists ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;;
+      const color = exists ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;;
 
       colors[i] = color;
     });
@@ -359,7 +359,7 @@ export class GeoJSSceneManager {
       if (discovery !== null) {
         color = (this.cmap(discovery));
       } else {
-        color = ApplicationStore.NOT_EXISTENT_COLOR;
+        color = ApplicationStore.UNDISCOVERED_COLOR;
       }
 
       colors.push(color);
@@ -384,7 +384,7 @@ export class GeoJSSceneManager {
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
       const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
-      const color = existsYet ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;
+      const color = existsYet ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
 
       colors[i] = color;
     });

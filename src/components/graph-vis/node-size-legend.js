@@ -48,7 +48,7 @@ class NodeSizeLegend extends React.Component  {
             return null;
         }
 
-        const compute = store.degree2SizeFunc;
+        const compute = store.degreeToSizeFunc;
         const minMax = store.minMaxDegrees;
         const maxRadius = compute(minMax[1]);
         const marginLeft = 20; // 20px left offset
