@@ -11,6 +11,7 @@ const visStyles = theme => ({
     border: `1px solid rgba(0, 0, 0, 0.75)`,
     color: 'black',
     padding: '0.25rem',
+    pointerEvents: ['none', '!important'],
 
     // based on https://popper.js.org/index.html
     '&[x-placement^= "top"]': {

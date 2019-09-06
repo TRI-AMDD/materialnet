@@ -1,7 +1,4 @@
 export class DataProvider {
-  constructor () {
-    console.log('hi');
-  }
 }
 
 export function computeGraph (edges) {

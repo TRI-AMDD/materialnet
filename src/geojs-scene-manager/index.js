@@ -103,7 +103,6 @@ export class GeoJSSceneManager {
       const radius = points.style("radius")(evt.data);
       // position relative to canvas
       const position = this.points.featureGcsToDisplay(onNode);
-      console.log(radius, position);
       this.hovered(onNode, position, radius);
     });
     points.geoOn(geo.event.feature.mouseoff, evt => {
