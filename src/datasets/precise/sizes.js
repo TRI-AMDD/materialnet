@@ -5,6 +5,12 @@ import { scalePow } from 'd3-scale';
 
 function degreeFunction(exponent) {
     return (store) => {
+        if (!store.data) {
+            return {
+                legend: () => null,
+                scale: () => 10
+            };
+        }
         // map lookup
         const degrees = store.data.nodeDegrees(store.year);
         const minMax = Object.values(degrees).reduce(([min, max], v) => {

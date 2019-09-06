@@ -14,8 +14,8 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
-    picked: (data, position) => {
-      this.context.selectNode(data, position);
+    picked: (node, position) => {
+      this.context.selectNode(node, position);
     },
   });
 
@@ -49,7 +49,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.hideAfter(store.year);
-      this.scene.setDegreeSize(store.nodeSizeFunc);
+      this.scene.setNodeSize(store.nodeSizer.scale);
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
@@ -77,26 +77,7 @@ class GraphVisComponent extends Component {
     });
 
     setAndObserve(() => {
-      switch (store.color) {
-        case 'none':
-          this.scene.setConstColor();
-          break;
-
-        case 'boolean':
-          this.scene.setBooleanColor();
-          break;
-
-        case 'discovery':
-          this.scene.setDiscoveryColor(store.yearRange);
-          break;
-
-        case 'undiscovered':
-          this.scene.setUndiscoveredColor(store.colorYear);
-          break;
-
-        default:
-          this.scene.setPropertyColor(store.color);
-      }
+      this.scene.setNodeColor(store.nodeColorer.scale);
     });
   }
 

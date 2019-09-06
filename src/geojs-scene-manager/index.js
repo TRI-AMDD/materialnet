@@ -1,9 +1,5 @@
-import { select } from 'd3-selection';
-
 import geo from 'geojs';
-
 import './tooltip.css';
-import { ApplicationStore } from '../store';
 
 export class GeoJSSceneManager {
   constructor({ onZoomChanged, picked }) {
@@ -95,7 +91,7 @@ export class GeoJSSceneManager {
         fillColor: 'gray',
         strokeOpacity: 0.8,
         fillOpacity: 0.8,
-        radius: name => Math.max(2, Math.sqrt(nodes[name].degree)),
+        radius: name => 10,
       },
       position: name => nodes[name],
     })
@@ -212,10 +208,10 @@ export class GeoJSSceneManager {
 
   hideAfter() { }
   
-  setDegreeSize (compute) {
-    // const zoom = Math.pow(2, this.map.zoom());
+  setNodeSize(scale) {
+    const factor = Math.pow(2, this.map.zoom());
 
-    this.points.style('radius', compute);
+    this.points.style('radius', (nodeId) => factor * scale(this.nodes[nodeId]));
     this.map.draw();
   }
 
@@ -224,21 +220,7 @@ export class GeoJSSceneManager {
       return null;
     }
 
-    /* dataset specific */
-    const data = {
-      name,
-      degree: this.dp.nodeProperty(name, 'degree'),
-      discovery: this.dp.nodeProperty(name, 'discovery'),
-      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
-      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
-      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
-      degCent: this.dp.nodeProperty(name, 'deg_cent'),
-      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
-    };
-
-    return data;
+    return this.nodes[name];
   }
 
   display (name) {
@@ -303,97 +285,13 @@ export class GeoJSSceneManager {
     const strokeColor = night ? 'white' : 'black';
     const linkColor = strokeColor;
 
-    select(this.parent)
-      .style('background-color', bgColor);
+    this.parent.style.backgroundColor = bgColor;
     this.lines.style('strokeColor', linkColor);
     this.map.draw();
   }
 
-  setConstColor () {
-    this.points.style('fillColor', ApplicationStore.FIXED_COLOR);
-    this.map.draw();
-  }
-
-  setBooleanColor () {
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const exists = this.dp.nodeExists(name);
-      const color = exists ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;;
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  setPropertyColor (prop) {
-    const [low, high] = this.propMinMax(prop);
-
-    this.cmap = ApplicationStore.COLOR_SCALE.copy()
-      .domain([low, high]);
-
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const val = this.dp.nodeProperty(name, prop);
-
-      let color = this.cmap(val);
-      if (!color) {
-        color = ApplicationStore.INVALID_VALUE_COLOR;
-      }
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  /* dataset specific */
-  setDiscoveryColor (range) {
-    this.cmap = ApplicationStore.COLOR_SCALE.copy()
-      .domain(range);
-
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const discovery = this.dp.nodeProperty(name, 'discovery');
-
-      let color;
-      if (discovery !== null) {
-        color = (this.cmap(discovery));
-      } else {
-        color = ApplicationStore.NOT_EXISTENT_COLOR;
-      }
-
-      colors.push(color);
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  propMinMax (prop) {
-    const props = this.dp.nodeNames()
-      .map(name => this.dp.nodeProperty(name, prop))
-      .filter(d => d !== undefined);
-
-    return [
-      Math.min.apply(null, props),
-      Math.max.apply(null, props)
-    ];
-  }
-
-  /* dataset specific */
-  setUndiscoveredColor (year) {
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
-      const color = existsYet ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
+  setNodeColor(scale) {
+    this.points.style('fillColor', (nodeId) => scale(this.nodes[nodeId]));
     this.map.draw();
   }
 

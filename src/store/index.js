@@ -199,7 +199,7 @@ export class ApplicationStore {
                 scale: () => ApplicationStore.FIXED_COLOR
             };
         }
-        return this.color(this);
+        return this.color.factory(this);
     }
 
     @computed
@@ -210,7 +210,7 @@ export class ApplicationStore {
                 scale: () => 10
             };
         }
-        return this.size(this);
+        return this.size.factory(this);
     }
 }
 
