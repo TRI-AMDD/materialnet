@@ -19,6 +19,8 @@ export class ApplicationStore {
             { label: 'Sample 1', value: 'sample1' },
             { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
             { label: 'Sample 2', value: 'sample2' },
+            { label: 'Sample 1k edges', value: 'sample_cooccurence' },
+            { label: 'Full .5M edges', value: 'full_cooccurence' }
         ]
     };
 

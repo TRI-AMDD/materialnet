@@ -388,7 +388,7 @@ export class GeoJSSceneManager {
       const discovery = this.dp.nodeProperty(name, 'discovery');
 
       let color;
-      if (discovery !== null) {
+      if (discovery != null) {
         color = (this.cmap(discovery));
       } else {
         color = ('#de2d26');
