@@ -84,17 +84,14 @@ export class DiskDataProvider extends DataProvider {
     };
   }
 
-  nodeDegrees (year) {
+  nodeDegrees (filter) {
     let table = {};
     const countEdge = (node, other) => {
       if (!table.hasOwnProperty(node)) {
         table[node] = 0;
       }
 
-      // dataset specific
-      const discovery = this.nodeProperty(other, 'discovery') || 2016;
-
-      if (this.nodeExists(other) && discovery <= year) {
+      if (this.nodeExists(other) && filter(this.nodes[node])) {
         table[node]++;
       }
     }

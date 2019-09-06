@@ -14,7 +14,7 @@ function degreeFunction(createScale) {
             };
         }
         // map lookup
-        const degrees = store.data.nodeDegrees(store.year);
+        const degrees = store.data.nodeDegrees((node) => node.discovery == null || node.discovery <= store.year);
         const minMax = Object.values(degrees).reduce(([min, max], v) => {
             if (v == null) {
                 return [min, max];

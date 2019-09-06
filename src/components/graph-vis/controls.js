@@ -112,8 +112,9 @@ class Controls extends React.Component {
           step={1}
           label={'Color year'}
           digits={0}
+          disabled={!store.color || store.color.label !== 'Discovered/Undiscovered'}
           onChange={(val) => { store.colorYear = val; }}
-        />{/* TODO disabled={store.color !== 'undiscovered'} */}
+        />
         <CheckboxControl
           label="Show Legend"
           value={store.showLegend}
