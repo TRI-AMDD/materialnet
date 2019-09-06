@@ -1,9 +1,7 @@
 import React from 'react';
 import Store from '../../store';
 import { withStyles, Popper } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
-import CloseIcon from '@material-ui/icons/Close';
 
 
 const visStyles = theme => ({

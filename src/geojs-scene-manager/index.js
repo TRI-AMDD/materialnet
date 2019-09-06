@@ -2,12 +2,14 @@ import geo from 'geojs';
 import './tooltip.css';
 
 export class GeoJSSceneManager {
-  constructor({ onZoomChanged, picked }) {
+  constructor({ onZoomChanged, picked, hovered, hoveredLine }) {
     this.dp = null;
     this.parent = null;
     this.onZoomChanged = onZoomChanged;
     this.picked = picked;
     this.lineSelected = new Set([]);
+    this.hovered = hovered;
+    this.hoveredLine = hoveredLine;
     this.expansion = 1;
     this.map = null;
   }
@@ -71,7 +73,7 @@ export class GeoJSSceneManager {
     });
 
     const edges = dp.edges;
-    const lines = this.lines = layer.createFeature('line')
+    this.lines = layer.createFeature('line')
       .data(edges)
       .style({
         position: name => nodes[name],
@@ -93,69 +95,47 @@ export class GeoJSSceneManager {
     })
       .data(Object.keys(nodes));
 
-    const ui = map.createLayer('ui', {
-      zIndex: 2,
-    });
-
-    const tooltip = ui.createWidget('dom', {
-      position: {
-        x: 0,
-        y: 0,
-      },
-    });
-
-    const tooltipElem = tooltip.canvas();
-    tooltipElem.setAttribute('id', 'tooltip');
-    tooltipElem.classList.toggle('hidden', true);
-    tooltipElem.style['pointer-events'] = 'none';
-
-    let onNode = false;
+    let onNode = null;
 
     points.geoOn(geo.event.feature.mouseon, evt => {
-      onNode = true;
+      onNode = this.dp.nodes[evt.data];
 
-      const name = evt.data;
-
-      tooltip.position(evt.mouse.geo);
-      tooltipElem.innerText = name;
-      tooltipElem.classList.toggle('hidden', false);
+      // how to get the center and the size of this element at this zoom level
+      
+      this.hovered(onNode, evt.mouse.geo);
     });
-    points.geoOn(geo.event.feature.mousemove, evt => {
-      tooltip.position(evt.mouse.geo);
-    });
+    // points.geoOn(geo.event.feature.mousemove, evt => {
+    //   this.hovered(onNode, evt.mouse.geo);
+    // });
     points.geoOn(geo.event.feature.mouseoff, evt => {
-      onNode = false;
-
-      tooltipElem.classList.toggle('hidden', true);
+      onNode = null;
+      this.hovered(null, null);
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        const data = this.pickName(evt.data);
-        this.picked(data, evt.mouse.map);
+        this.picked(this.dp.nodes[evt.data], evt.mouse.geo);
       }
     });
 
-    lines.geoOn(geo.event.feature.mouseon, evt => {
-      if (onNode) {
-        return;
-      }
-
-      const text = `${evt.data[0]} - ${evt.data[1]}`;
-
-      tooltip.position(evt.mouse.geo);
-      tooltipElem.innerText = text;
-      tooltipElem.classList.toggle('hidden', false);
-    });
-    lines.geoOn(geo.event.feature.mousemove, evt => {
-      tooltip.position(evt.mouse.geo);
-    });
-    lines.geoOn(geo.event.feature.mouseoff, evt => {
-      if (onNode) {
-        return;
-      }
-
-      tooltipElem.classList.toggle('hidden', true);
-    });
+    // NOTE: disable line hovering for now till figured out where to show
+    // let onLine = null;
+    // lines.geoOn(geo.event.feature.mouseon, evt => {
+    //   if (onNode) {
+    //     return;
+    //   }
+    //   onLine = evt.data.map((d) => this.dp.nodes[d]);
+    //   this.hoveredLine(onLine[0], onLine[1], evt.mouse.geo);
+    // });
+    // lines.geoOn(geo.event.feature.mousemove, evt => {
+    //   this.hoveredLine(onLine[0], onLine[1], evt.mouse.geo);
+    // });
+    // lines.geoOn(geo.event.feature.mouseoff, evt => {
+    //   if (onNode) {
+    //     return;
+    //   }
+    //   onLine = null;
+    //   this.hoveredLine(null, null, null);
+    // });
 
     map.geoOn(geo.event.zoom, () => {
       points.dataTime().modified();

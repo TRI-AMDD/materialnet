@@ -95,6 +95,19 @@ export class ApplicationStore {
     selectedPosition = null;
 
     @observable
+    hovered = {
+            node: null,
+            position: null
+    };
+    @observable
+    hoveredLine = {
+            node1: null,
+            node2: null,
+            position: null
+    };
+
+    
+    @observable
     drawerVisible = true;
 
     @observable
@@ -105,8 +118,6 @@ export class ApplicationStore {
     showLegend = true;
 
     constructor() {
-        this.initState();
-
         // load data and update on dataset change        
         autorun(() => {
             // set the defaults from the dataset
@@ -117,6 +128,9 @@ export class ApplicationStore {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
+
+        // after loading defaults
+        this.initState();
 
         // auto inject the structure
         autorun(() => {
@@ -133,22 +147,34 @@ export class ApplicationStore {
 
     initState() {
         const integrateState = (state) => {
-            
-        }
+            state = { ...state }; // copy to manipuate
+            ['dataset', 'color', 'size'].forEach((attr) => {
+                const value = state[attr];
+                delete state[attr];
+                if (!value) {
+                    return;
+                }
+                // find by label
+                const found = this[`${attr}s`].find((d) => d.label === value);
+                if (found) {
+                    this[attr] = found;
+                }
+            });
+            // rest pure copy
+            Object.assign(this, state);
+        };
 
         const state = window.history.state;
         if (state && state.dataset != null) {
             // use the stored state to init
-            Object.assign(this, state);
+            integrateState(state);
         } else {
             // try using the url
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
-            // update with the stored one
-            const found = this.datasets.find.find((d) => d.label === dataset);
-            if (found) {
-                this.dataset = found;
-            }
+            integrateState({
+                dataset
+            });
         }
         
         let firstRun = true;
@@ -156,10 +182,10 @@ export class ApplicationStore {
         autorun(() => {
             const state = {
                 dataset: this.dataset.label,
-                zoom: this.zoom,
                 color: this.color.label,
-                colorYear: this.colorYear,
                 size: this.size.label,
+                zoom: this.zoom,
+                colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible
             };
 
@@ -183,8 +209,7 @@ export class ApplicationStore {
         window.addEventListener('popstate', (evt) => {
             const state = evt.state;
             if (state && state.dataset != null) {
-                // use the stored state to update the store
-                Object.assign(this, state);
+                integrateState(state);
             }
         });
         
