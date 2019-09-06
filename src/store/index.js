@@ -18,13 +18,13 @@ export class ApplicationStore {
     dataset = datasets[0];
 
     @observable
-    template = 'material';
-
-    @observable
     templates = [
         { label: 'Material', value: 'material' },
         { label: 'Minimal', value: 'minimal' }
     ];
+
+    @observable
+    template = this.templates[0];
 
     @observable
     zoom = -2.3;
@@ -238,11 +238,15 @@ export class ApplicationStore {
 
     @computed
     get minMaxColorRange() {
+        return this.minMaxProperty(this.color);
+    }
+
+    minMaxProperty(property) {
         if (!this.data) {
             return [0, 10];
         }
-        return this.data.nodeNames().reduce(([min, max], name) => {
-            const v = this.data.nodeProperty(name, this.color);
+        return this.nodes.reduce(([min, max], node) => {
+            const v = node[property];
             if (v == null) {
                 return [min, max];
             }
@@ -265,8 +269,9 @@ export class ApplicationStore {
         }
     }
 
+    @observable
+    colorScale = scaleSequential(interpolateViridis);
 
-    static COLOR_SCALE = scaleSequential(interpolateViridis);
     static INVALID_VALUE_COLOR = '#ff0000';
     static EXISTS_COLOR = 'rgb(81,96,204)';
     static NOT_EXISTENT_COLOR = '#de2d26';
