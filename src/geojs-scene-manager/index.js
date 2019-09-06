@@ -209,8 +209,8 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  hideAfter() { }
-  
+  hideAfter() {}
+
   setDegreeSize (compute) {
     // const zoom = Math.pow(2, this.map.zoom());
 
