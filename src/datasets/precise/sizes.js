@@ -27,7 +27,7 @@ function degreeFunction(createScale) {
 
         const scale = createScale(minMax).range([minSize, maxSize]).clamp(true);
         return {
-            legend: () => <SizeLegend scale={scale} />,
+            legend: (factor) => <SizeLegend scale={scale} factor={factor}/>,
             scale: (node) => {
                 const degree = degrees[node.name] || 0;
                 return scale(degree);

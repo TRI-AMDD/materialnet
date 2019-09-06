@@ -40,14 +40,14 @@ const styles = theme => ({
 
 class SizeLegend extends React.Component {
     render() {
-        const { classes, scale } = this.props;
+        const { classes, scale, factor } = this.props;
 
         // number of points to draw
         let count = 3;
         for (; count < 10; count++) {
             // ticks does some magic so compute all the time
             const actWidth = scale.ticks(count).reduce((sum, v) => {
-                const width = Math.max(scale(v) * 2, 30);
+                const width = Math.max(factor * scale(v) * 2, 30);
                 return sum + width;
             }, 0);
             if (actWidth > width) {
@@ -59,7 +59,7 @@ class SizeLegend extends React.Component {
         // use divs to fake circles
         return <div className={classes.root}>
             {scale.ticks(count).map((v) => {
-                const radius = scale(v);
+                const radius = factor * scale(v);
                 return <div key={v} className={classes.circle} title={v}>
                     <div className={classes.innerCircle} style={{
                         width: `${radius * 2}px`,

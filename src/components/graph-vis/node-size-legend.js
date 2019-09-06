@@ -16,7 +16,7 @@ class NodeSizeLegend extends React.Component  {
     render() {
         const store = this.context;
         
-        return store.nodeSizer.legend();
+        return store.nodeSizer.legend(store.zoomNodeSizeFactor);
     }
 }
 
