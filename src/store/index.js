@@ -97,7 +97,8 @@ export class ApplicationStore {
     @observable
     hovered = {
             node: null,
-            position: null
+            position: null,
+            radius: null
     };
     @observable
     hoveredLine = {

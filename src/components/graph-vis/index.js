@@ -17,8 +17,8 @@ class GraphVisComponent extends Component {
     picked: (node, position) => {
       this.context.selectNode(node, position);
     },
-    hovered: (node, position) => {
-      this.context.hovered = { node, position };
+    hovered: (node, position, radius) => {
+      this.context.hovered = { node, position, radius };
     },
     hoveredLine: (node1, node2, position) => {
       this.context.hoveredLine = { node1, node2, position };

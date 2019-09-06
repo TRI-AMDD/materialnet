@@ -1,5 +1,4 @@
 import geo from 'geojs';
-import './tooltip.css';
 
 export class GeoJSSceneManager {
   constructor({ onZoomChanged, picked, hovered, hoveredLine }) {
@@ -100,16 +99,16 @@ export class GeoJSSceneManager {
     points.geoOn(geo.event.feature.mouseon, evt => {
       onNode = this.dp.nodes[evt.data];
 
-      // how to get the center and the size of this element at this zoom level
-      
-      this.hovered(onNode, evt.mouse.geo);
+      // compute point dimensions
+      const radius = points.style("radius")(evt.data);
+      // position relative to canvas
+      const position = this.points.featureGcsToDisplay(onNode);
+      console.log(radius, position);
+      this.hovered(onNode, position, radius);
     });
-    // points.geoOn(geo.event.feature.mousemove, evt => {
-    //   this.hovered(onNode, evt.mouse.geo);
-    // });
     points.geoOn(geo.event.feature.mouseoff, evt => {
       onNode = null;
-      this.hovered(null, null);
+      this.hovered(null, null, null);
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {

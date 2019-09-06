@@ -5,7 +5,8 @@ import { Typography } from "@material-ui/core";
 const templates = [
     {
         label: 'Basic',
-        render: (node) =>  <Typography gutterBottom variant="h4">{node.name}</Typography>
+        render: (node) => <Typography gutterBottom variant="h4">{node.name}</Typography>,
+        tooltip: (node) => node.name
     }
 ]
 

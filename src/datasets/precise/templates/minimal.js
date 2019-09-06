@@ -23,5 +23,6 @@ export default {
                 <Structure cjson={node.structure} />
             </div>
         </>;
-    }
+    },
+    tooltip: (node) => node.name
 }
