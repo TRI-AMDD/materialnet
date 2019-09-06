@@ -9,9 +9,8 @@ const visStyles = theme => ({
     background: `rgba(255, 255, 255, 0.75)`,
     borderRadius: 3,
     border: `1px solid rgba(0, 0, 0, 0.75)`,
-    fontSize: 12,
     color: 'black',
-    padding: '0.5em',
+    padding: '0.25rem',
 
     // based on https://popper.js.org/index.html
     '&[x-placement^= "top"]': {
@@ -101,7 +100,7 @@ class Tooltip extends React.Component {
     } : null;
 
     return <Popper open={open} placement="top" anchorEl={anchorFake} className={classes.root} disablePortal>
-      {hovered.node && store.template.tooltip(hovered.node)}
+      {hovered.node && store.template.tooltip(hovered.node, store)}
       <div x-arrow="x" className={classes.arrow}/>
     </Popper>;
   }

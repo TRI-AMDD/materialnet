@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
+import tooltip from './tooltip';
 import InfoBlock from '../../../components/graph-vis/info-block';
 import Structure from '../../../components/graph-vis/structure';
 
@@ -31,5 +32,5 @@ export default {
             </div>
         </>;
     },
-    tooltip: (node) => node.name
+    tooltip
 }
