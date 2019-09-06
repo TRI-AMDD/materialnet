@@ -12,7 +12,20 @@ const templates = [
 const colors = [
     {
         label: 'None',
-        factors: () => () => ApplicationStore.FIXED_COLOR
+        factory: () => ({
+            legend: () => null,
+            scale: () => ApplicationStore.FIXED_COLOR
+        })
+    },
+]
+
+const sizes = [
+    {
+        label: 'None',
+        factory: ({
+            legend: () => null,
+            scale: () => 10,
+        })
     },
 ]
 
@@ -25,4 +38,11 @@ export default {
 
     zoom: -2.3,
     zoomRange: [-3.75, 3],
+
+    sizes,
+    size: sizes[0], 
+
+    properties: {
+        
+    }
 }

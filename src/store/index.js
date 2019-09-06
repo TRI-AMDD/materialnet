@@ -99,9 +99,6 @@ export class ApplicationStore {
     selectedPosition = null;
 
     @observable
-    structure = null;
-
-    @observable
     drawerVisible = true;
 
     constructor() {
@@ -112,6 +109,17 @@ export class ApplicationStore {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
+
+        // auto inject the structure
+        autorun(() => {
+            const node = this.selected;
+            if (!node || node.structure) {
+                return; // already fetched
+            }
+            node.structurePromise = fetchStructure(node.name).then(cjson => {
+                return node.structure = cjson;
+            });
+        })
     }
 
     @computed
@@ -141,7 +149,6 @@ export class ApplicationStore {
     @action
     clearSelection() {
         this.selected = null;
-        this.structure = null;
     }
 
     @action
@@ -168,25 +175,14 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(obj, position) {
+    selectNode(node, position) {
         const currentName = this.selected ? this.selected.name : '';
         // toggle if click on selected
-        if (obj.name === currentName) {
-            obj = null;
+        if (node.name === currentName) {
+            node = null;
         }
-        this.selected = obj;
+        this.selected = node;
         this.selectedPosition = position;
-        this.structure = null;
-
-        if (!obj) {
-            return;
-        }
-
-        fetchStructure(obj.name).then(cjson => {
-            if (cjson) {
-                this.structure = cjson;
-            }
-        });
     }
 
     @computed
@@ -203,21 +199,6 @@ export class ApplicationStore {
                 return (deg) => factor * (10 + deg);
             default:
                 throw new Error(`bad level option: ${this.size}`);
-        }
-    }
-
-    @computed
-    get nodeSizeFunc() {
-        const degree2size = this.degree2SizeFunc;
-        if (this.size === 'none' || !this.data) {
-            return degree2size;
-        }
-        // dataset specific
-        const degrees = this.data.nodeDegrees(this.year);
-        const names = this.data.nodeNames();
-        return (_nodeId, i) => {
-            const name = names[i];
-            return degree2size(degrees[name]);
         }
     }
 
