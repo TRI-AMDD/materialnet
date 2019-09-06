@@ -126,6 +126,9 @@ export class ApplicationStore {
     @observable
     drawerVisible = true;
 
+    @observable
+    showLegend = true;
+
     constructor() {
         // load data and update on dataset change
         autorun(() => {

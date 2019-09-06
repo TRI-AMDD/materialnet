@@ -97,6 +97,11 @@ class Controls extends React.Component {
           onChange={(val) => { store.colorYear = val; }}
         />
         <CheckboxControl
+          label="Show Legend"
+          value={store.showLegend}
+          onChange={(val) => { store.showLegend = val; }}
+        />
+        <CheckboxControl
           label="Night mode"
           value={store.nightMode}
           onChange={(val) => { store.nightMode = val; }}
