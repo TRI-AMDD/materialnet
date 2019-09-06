@@ -17,7 +17,7 @@ export default {
         },
         formation_energy: {
             label: "Formation energy",
-            format: (v) => `${format(".3f")(v)} eV /atom`
+            format: (v) => `${format(".3f")(v)} eV/atom`
         },
         synthesis_probability: {
             label: "Synthesis probability",

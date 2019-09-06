@@ -95,7 +95,9 @@ class Controls extends React.Component {
           value={toOption(store.size).value}
           options={store.sizes.map(toOption)}
           label={'Node size'}
-          onChange={(val) => { store.size = store.sizes.find((d) => toOption(d).value === val); }}
+          onChange={(val) => {
+            store.size = store.sizes.find((d) => toOption(d).value === val);
+          }}
         />
         <SelectControl
           value={toOption(store.color).value}

@@ -38,6 +38,9 @@ export class DiskDataProvider extends DataProvider {
     this._nodeIndex = graph.nodeIndex;
     this.edgeIndex = graph.edgeIndex;
 
+    // inject the name of the node into the object
+    Object.entries(nodes).forEach(([k, v]) => v.name = k);
+
     this._names = Object.keys(this.nodes);
     const bad = this._names.indexOf('value');
     if (bad > -1) {

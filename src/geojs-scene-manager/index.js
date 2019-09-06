@@ -209,9 +209,7 @@ export class GeoJSSceneManager {
   hideAfter() { }
   
   setNodeSize(scale) {
-    const factor = Math.pow(2, this.map.zoom());
-
-    this.points.style('radius', (nodeId) => factor * scale(this.nodes[nodeId]));
+    this.points.style('radius', (nodeId) => scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
 
@@ -220,7 +218,7 @@ export class GeoJSSceneManager {
       return null;
     }
 
-    return this.nodes[name];
+    return this.dp.nodes[name];
   }
 
   display (name) {
@@ -291,7 +289,7 @@ export class GeoJSSceneManager {
   }
 
   setNodeColor(scale) {
-    this.points.style('fillColor', (nodeId) => scale(this.nodes[nodeId]));
+    this.points.style('fillColor', (nodeId) => scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
 

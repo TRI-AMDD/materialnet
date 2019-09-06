@@ -106,8 +106,7 @@ export class ApplicationStore {
             Object.assign(this, this.dataset.defaults, {});
 
             // load data and update on dataset change
-            const datafile = `sample-data/${this.dataset.label}.json`;
-            fetch(datafile).then(resp => resp.json()).then(data => {
+            fetch(this.dataset.fileName).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
@@ -133,13 +132,31 @@ export class ApplicationStore {
     get edges() {
         return this.data.edges;
     }
+
+    @computed
+    get zoomNodeSizeFactor() {
+        return Math.pow(2, this.zoom);
+    }
     
     @computed
     get searchOptions() {
         if (!this.data) {
             return null;
         }
-        return this.data.nodes.slice().sort(sortStringsLength).map(val => ({ label: val }));
+        return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
+    }
+
+    minMaxProperty(property) {
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = this.data.nodeProperty(name, property);
+            if (v == null) {
+                return [min, max];
+            }
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
     }
 
     @action

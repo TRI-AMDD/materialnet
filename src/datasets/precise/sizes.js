@@ -24,12 +24,13 @@ function degreeFunction(exponent) {
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
         
         // TODO a proper range max
-        const scale = scalePow().exponent(exponent).domain(minMax).range([10, 100]);
+        const scale = scalePow().exponent(exponent).domain(minMax).range([10, 40]);
         return {
-            legend: () => <SizeLegend scale={scale} />,
+            legend: () => <SizeLegend scale={scale} factor={store.zoomNodeSizeFactor} />,
             scale: (node) => {
                 const degree = degrees[node.name] || 0;
-                return scale(degree);
+                const factor = store.zoomNodeSizeFactor;
+                return factor * scale(degree);
             },
         };
     }
@@ -38,7 +39,7 @@ function degreeFunction(exponent) {
 export default [
     {
         label: 'None',
-        factory: ({
+        factory: () => ({
             legend: () => null,
             scale: () => 10,
         })

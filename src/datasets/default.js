@@ -22,7 +22,7 @@ const colors = [
 const sizes = [
     {
         label: 'None',
-        factory: ({
+        factory: () => ({
             legend: () => null,
             scale: () => 10,
         })
