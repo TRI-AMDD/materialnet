@@ -1,21 +1,24 @@
 import React from 'react';
 import { ApplicationStore } from '../../store';
 import { withStyles } from '@material-ui/core';
-import { scaleLinear } from 'd3-scale';
 
 const width = 300;
-const marginBottom = 20;
+const minWidth = 30;
 
 const styles = theme => ({
     root: {
         width,
+        display: 'flex',
+        paddingBottom: 20,
+        justifyContent: 'space-between',
         alignSelf: 'stretch'
     },
     circle: {
-        position: 'absolute',
-        bottom: marginBottom,
-        height: `calc(100% - ${marginBottom}px)`,
+        margin: '0 2px',
+        minWidth,
+        position: 'relative',
         display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
         '&::before': {
@@ -39,25 +42,28 @@ class SizeLegend extends React.Component {
     render() {
         const { classes, scale } = this.props;
 
-        const minMax = scale.domain();
-        const maxRadius = scale(minMax[1]);
-        const marginLeft = 20; // 20px left offset
-
-        // number of circles to draw
-        const maxCircleWidth = Math.max(maxRadius * 2, 30); // at least 50px width for the label
-        const count = Math.max(2, Math.min(10, Math.floor((width - marginLeft * 2) / maxCircleWidth)));
-        const alignScale = scaleLinear().domain(minMax).range([marginLeft, width - maxRadius - marginLeft]);
+        // number of points to draw
+        let count = 3;
+        for (; count < 10; count++) {
+            // ticks does some magic so compute all the time
+            const actWidth = scale.ticks(count).reduce((sum, v) => {
+                const width = Math.max(scale(v) * 2, 30);
+                return sum + width;
+            }, 0);
+            if (actWidth > width) {
+                count--; // one too much
+                break;
+            }
+        }
 
         // use divs to fake circles
-        return <div className={classes.root} style={{ height: `${maxRadius * 2 + marginBottom}px` }}>
-            {alignScale.ticks(count).map((v) => {
+        return <div className={classes.root}>
+            {scale.ticks(count).map((v) => {
                 const radius = scale(v);
-                return <div key={v} className={classes.circle} title={v} style={{
-                    transform: `translate(${scale(v)}px, ${0}px)`,
-                    width: `${radius * 2}px`
-                }}>
+                return <div key={v} className={classes.circle} title={v}>
                     <div className={classes.innerCircle} style={{
-                        height: `${radius * 2}px`
+                        width: `${radius * 2}px`,
+                        height: `${radius * 2}px`,
                     }} />
                 </div>;
             })}

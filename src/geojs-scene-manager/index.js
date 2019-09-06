@@ -19,17 +19,13 @@ export class GeoJSSceneManager {
     if (!this.parent || !this.dp) {
       return false;
     }
-    
-    /* dataset specific */
-    const degrees = dp.nodeDegrees(2020);
 
     let nodes = this.nodes = {};
     dp.nodeNames().forEach(name => {
       const pos = dp.nodePosition(name);
       nodes[name] = {
         x: pos.x,
-        y: pos.y,
-        degree: degrees[name],
+        y: pos.y
       };
     });
 
@@ -91,7 +87,7 @@ export class GeoJSSceneManager {
         fillColor: 'gray',
         strokeOpacity: 0.8,
         fillOpacity: 0.8,
-        radius: name => 10,
+        radius: 10,
       },
       position: name => nodes[name],
     })

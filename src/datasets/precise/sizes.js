@@ -1,14 +1,16 @@
 import React from 'react';
 import { SizeLegend } from '../../components/legend';
-import { scalePow } from 'd3-scale';
+import { scalePow, scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
+const minSize = 2;
+const maxSize = 40;
 
-function degreeFunction(exponent) {
+function degreeFunction(createScale) {
     return (store) => {
         if (!store.data) {
             return {
                 legend: () => null,
-                scale: () => 10
+                scale: () => minSize
             };
         }
         // map lookup
@@ -22,15 +24,13 @@ function degreeFunction(exponent) {
                 Math.max(max, v)
             ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
-        
-        // TODO a proper range max
-        const scale = scalePow().exponent(exponent).domain(minMax).range([10, 40]);
+
+        const scale = createScale(minMax).range([minSize, maxSize]).clamp(true);
         return {
-            legend: () => <SizeLegend scale={scale} factor={store.zoomNodeSizeFactor} />,
+            legend: () => <SizeLegend scale={scale} />,
             scale: (node) => {
                 const degree = degrees[node.name] || 0;
-                const factor = store.zoomNodeSizeFactor;
-                return factor * scale(degree);
+                return scale(degree);
             },
         };
     }
@@ -41,19 +41,23 @@ export default [
         label: 'None',
         factory: () => ({
             legend: () => null,
-            scale: () => 10,
+            scale: () => minSize,
         })
     },
     {
-        label: 'Degree',
-        factory: degreeFunction(0.5)
+        label: 'Degree - Linear',
+        factory: degreeFunction((domain) => scaleLinear().domain(domain))
     },
     {
-        label: 'Degree - Large',
-        factory: degreeFunction(0.75)
+        label: 'Degree - Sqrt',
+        factory: degreeFunction((domain) => scaleSqrt().domain(domain))
     },
     {
-        label: 'Degree - Huge',
-        factory: degreeFunction(1)
+        label: 'Degree - Power 2',
+        factory: degreeFunction((domain) => scalePow().domain(domain).exponent(2))
+    },
+    {
+        label: 'Degree - Log',
+        factory: degreeFunction((domain) => scaleLog().domain([Math.max(1, domain[0]), domain[1]]))
     }
 ]
