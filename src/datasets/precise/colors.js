@@ -40,11 +40,11 @@ export default [
             return {
                 legend: () => <>
                     <LegendGradient scale={scale} format={(v) => v.toString()} />
-                    <LegendCircle label="Undiscovered" color={ApplicationStore.NOT_EXISTENT_COLOR} />
+                    <LegendCircle label="Undiscovered" color={ApplicationStore.UNDISCOVERED_COLOR} />
                 </>,
                 scale: (node) => {
                     const discovery = node.discovery;
-                    return discovery != null ? scale(discovery) : ApplicationStore.NOT_EXISTENT_COLOR;
+                    return discovery != null ? scale(discovery) : ApplicationStore.UNDISCOVERED_COLOR;
                 }
             }
         }
@@ -53,12 +53,12 @@ export default [
         label: 'Discovered/Hypothetical',
         factory: () => ({
             legend: () => <>
-                <LegendCircle label="Discovered" color={ApplicationStore.EXISTS_COLOR} />
-                <LegendCircle label="Hypothetical" color={ApplicationStore.NOT_EXISTENT_COLOR} />
+                <LegendCircle label="Discovered" color={ApplicationStore.DISCOVERED_COLOR} />
+                <LegendCircle label="Hypothetical" color={ApplicationStore.UNDISCOVERED_COLOR} />
             </>,
             scale: (node) => {
                 const discovery = node.discovery;
-                return discovery != null ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;
+                return discovery != null ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
             }
         })
     },
@@ -68,12 +68,12 @@ export default [
             const year = store.colorYear;
             return {
                 legend: () => <>
-                    <LegendCircle label="Discovered" color={ApplicationStore.EXISTS_COLOR} />
-                    <LegendCircle label="Undiscovered" color={ApplicationStore.NOT_EXISTENT_COLOR} />
+                    <LegendCircle label="Discovered" color={ApplicationStore.DISCOVERED_COLOR} />
+                    <LegendCircle label="Undiscovered" color={ApplicationStore.UNDISCOVERED_COLOR} />
                 </>,
                 scale: (node) => {
                     const discovery = node.discovery;
-                    return discovery != null && discovery <= year ? ApplicationStore.EXISTS_COLOR : ApplicationStore.NOT_EXISTENT_COLOR;
+                    return discovery != null && discovery <= year ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
                 }
             };
         }

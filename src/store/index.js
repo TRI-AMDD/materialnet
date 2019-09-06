@@ -10,8 +10,8 @@ import { isEqual } from "lodash-es";
 
 export class ApplicationStore {
     static INVALID_VALUE_COLOR = '#ff0000';
-    static EXISTS_COLOR = 'rgb(81,96,204)';
-    static NOT_EXISTENT_COLOR = '#de2d26';
+    static DISCOVERED_COLOR = 'rgb(81,96,204)';
+    static UNDISCOVERED_COLOR = '#de2d26';
     static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 
     @observable
