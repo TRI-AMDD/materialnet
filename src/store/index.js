@@ -1,10 +1,11 @@
+import { scaleSequential } from 'd3-scale';
+import { interpolateViridis } from 'd3-scale-chromatic';
 import { observable, autorun, action, computed } from "mobx";
 import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import { isEqual } from "lodash-es";
-
 
 export class ApplicationStore {
     @observable
@@ -127,6 +128,9 @@ export class ApplicationStore {
 
     @observable
     drawerVisible = true;
+
+    @observable
+    showLegend = true;
 
     constructor() {
         this.initState();
@@ -274,6 +278,88 @@ export class ApplicationStore {
             }
         });
     }
+
+    @computed
+    get degreeToSizeFunc() {
+        const factor = Math.pow(2, this.zoom);
+        switch (this.size) {
+            case 'none':
+                return () => factor * 10;
+            case 'normal':
+                return (deg) => factor * (10 + Math.sqrt(deg));
+            case 'large':
+                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg)));
+            case 'huge':
+                return (deg) => factor * (10 + deg);
+            default:
+                throw new Error(`bad level option: ${this.size}`);
+        }
+    }
+
+    @computed
+    get nodeSizeFunc() {
+        const degree2size = this.degreeToSizeFunc;
+        if (this.size === 'none' || !this.data) {
+            return degree2size;
+        }
+        const degrees = this.data.nodeDegrees(this.year);
+        const names = this.data.nodeNames();
+        return (_nodeId, i) => {
+            const name = names[i];
+            return degree2size(degrees[name]);
+        }
+    }
+
+    @computed
+    get minMaxDegrees() {
+        if (!this.data) {
+            return [0, 10];
+        }
+        const degrees = this.data.nodeDegrees(this.year);
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = degrees[name];
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
+    @computed
+    get minMaxColorRange() {
+        if (!this.data) {
+            return [0, 10];
+        }
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = this.data.nodeProperty(name, this.color);
+            if (v == null) {
+                return [min, max];
+            }
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
+
+    propertyFormatter(property) {
+        switch (property) {
+            case 'synthesis_probability':
+                return (v) => `${(v * 100).toFixed(2)}%`;
+            case 'discovery':
+                return (v) => v.toString();
+            default:
+                return (v) => typeof v === 'number' ? v.toFixed(3) : v;
+        }
+    }
+
+
+    static COLOR_SCALE = scaleSequential(interpolateViridis);
+    static INVALID_VALUE_COLOR = '#ff0000';
+    static DISCOVERED_COLOR = 'rgb(81,96,204)';
+    static UNDISCOVERED_COLOR = '#de2d26';
+    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 }
 
 export default createContext();

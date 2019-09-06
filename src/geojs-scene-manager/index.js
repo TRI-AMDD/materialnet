@@ -1,10 +1,9 @@
-import { scaleSequential } from 'd3-scale';
-import { interpolateViridis } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 
 import geo from 'geojs';
 
 import './tooltip.css';
+import { ApplicationStore } from '../store';
 
 export class GeoJSSceneManager {
   constructor({ onZoomChanged, picked }) {
@@ -210,44 +209,13 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  hideAfter () {}
+  hideAfter() {}
 
-  setDegreeSize (year, level) {
+  setDegreeSize (compute) {
     // const zoom = Math.pow(2, this.map.zoom());
 
-    if (level === 'none') {
-      this.points.style('radius', () => {
-        return Math.pow(2, this.map.zoom()) * 10;
-      });
-      this.map.draw();
-    } else {
-      const degrees = this.dp.nodeDegrees(year);
-
-      let sizes = [];
-      this.dp.nodeNames().forEach((name, i) => {
-        const deg = degrees[name];
-
-        switch(level) {
-          case 'normal':
-            sizes[i] = 10 + Math.sqrt(deg);
-            break;
-
-          case 'large':
-            sizes[i] = 10 + Math.sqrt(Math.sqrt(deg * deg * deg));
-            break;
-
-          case 'huge':
-            sizes[i] = 10 + deg;
-            break;
-
-          default:
-            throw new Error(`bad level option: ${level}`);
-        }
-      });
-
-      this.points.style('radius', (nodeId, i) => Math.pow(2, this.map.zoom()) * sizes[i]);
-      this.map.draw();
-    }
+    this.points.style('radius', compute);
+    this.map.draw();
   }
 
   pickName (name) {
@@ -340,7 +308,7 @@ export class GeoJSSceneManager {
   }
 
   setConstColor () {
-    this.points.style('fillColor', `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`);
+    this.points.style('fillColor', ApplicationStore.FIXED_COLOR);
     this.map.draw();
   }
 
@@ -348,7 +316,7 @@ export class GeoJSSceneManager {
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
       const exists = this.dp.nodeExists(name);
-      const color = exists ? 'rgb(81,96,204)' : '#de2d26';
+      const color = exists ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;;
 
       colors[i] = color;
     });
@@ -360,7 +328,7 @@ export class GeoJSSceneManager {
   setPropertyColor (prop) {
     const [low, high] = this.propMinMax(prop);
 
-    this.cmap = scaleSequential(interpolateViridis)
+    this.cmap = ApplicationStore.COLOR_SCALE.copy()
       .domain([low, high]);
 
     let colors = [];
@@ -369,7 +337,7 @@ export class GeoJSSceneManager {
 
       let color = this.cmap(val);
       if (!color) {
-        color = '#ff0000';
+        color = ApplicationStore.INVALID_VALUE_COLOR;
       }
 
       colors[i] = color;
@@ -380,8 +348,8 @@ export class GeoJSSceneManager {
   }
 
   setDiscoveryColor () {
-    this.cmap = scaleSequential(interpolateViridis)
-      .domain([1945, 2015]);
+    this.cmap = ApplicationStore.COLOR_SCALE.copy()
+      .domain(ApplicationStore.colorYearSettings.range);
 
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
@@ -391,7 +359,7 @@ export class GeoJSSceneManager {
       if (discovery != null) {
         color = (this.cmap(discovery));
       } else {
-        color = ('#de2d26');
+        color = ApplicationStore.UNDISCOVERED_COLOR;
       }
 
       colors.push(color);
@@ -416,7 +384,7 @@ export class GeoJSSceneManager {
     let colors = [];
     this.dp.nodeNames().forEach((name, i) => {
       const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
-      const color = existsYet ? 'rgb(81,96,204)' : '#de2d26';
+      const color = existsYet ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
 
       colors[i] = color;
     });

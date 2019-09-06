@@ -49,9 +49,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.hideAfter(store.year);
-      if (store.size !== 'none') {
-        this.scene.setDegreeSize(store.year, store.size);
-      }
+      this.scene.setDegreeSize(store.nodeSizeFunc);
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
@@ -179,13 +177,12 @@ class GraphVisComponent extends Component {
       }
     }
 
-    return (
-      <div
-        style={{width: '100%', height: '100%'}}
-        ref={ref => {this.visElement = ref}}
-        draggable
-        onDragStart={this.onVisDrag}
-      />);
+    return (<div
+          style={{width: '100%', height: '100%'}}
+          ref={ref => {this.visElement = ref}}
+          draggable
+          onDragStart={this.onVisDrag}
+    />);
   }
 }
 

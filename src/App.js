@@ -14,6 +14,8 @@ import clsx from 'clsx';
 import Store from './store';
 import { observer } from 'mobx-react';
 import './App.css';
+import NodeSizeLegend from './components/graph-vis/node-size-legend';
+import NodeColorLegend from './components/graph-vis/node-color-legend';
 
 // based on https://material-ui.com/components/drawers/
 const drawerWidth = 360;
@@ -82,6 +84,14 @@ const appStyles = theme => ({
   content: {
     position: 'relative',
     flexGrow: 1
+  },
+  legend: {
+    zIndex: 100,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    display: 'flex',
+    alignItems: 'flex-end'
   }
 })
 
@@ -143,6 +153,10 @@ class App extends React.Component {
           <div className={classes.drawerHeader} />
           <div className={classes.content}>
             <GraphVisComponent />
+            {store.showLegend && <div className={classes.legend}>
+              <NodeSizeLegend />
+              <NodeColorLegend />
+            </div>}
             <InfoPanel />
           </div>
         </div>
