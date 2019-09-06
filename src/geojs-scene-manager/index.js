@@ -79,7 +79,8 @@ export class GeoJSSceneManager {
         width: 1,
         strokeColor: 'black',
         strokeOpacity: 0.1,
-      });
+      })
+      .visible(false); // disable by default
 
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
@@ -102,7 +103,7 @@ export class GeoJSSceneManager {
       // compute point dimensions
       const radius = points.style("radius")(evt.data);
       // position relative to canvas
-      const position = this.points.featureGcsToDisplay(onNode);
+      const position = this.points.featureGcsToDisplay(points.position()(evt.data));
       this.hovered(onNode, position, radius);
     });
     points.geoOn(geo.event.feature.mouseoff, evt => {
