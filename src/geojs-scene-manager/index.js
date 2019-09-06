@@ -13,7 +13,7 @@ export class GeoJSSceneManager {
     this.map = null;
   }
 
-  initScene() {
+  initScene(zoomRange) {
     this.map = null;
     const dp = this.dp;
 
@@ -59,8 +59,8 @@ export class GeoJSSceneManager {
     params.map.maxBounds.bottom += maxwh * factor;
 
     // allow zoomming in until 1 unit of space is 2^(value) bigger.
-    params.map.max += 3;
-    params.map.min -= 3;
+    params.map.min = zoomRange[0];
+    params.map.max = zoomRange[1];
 
     const map = this.map = geo.map(params.map);
 
@@ -184,7 +184,8 @@ export class GeoJSSceneManager {
   hideAfter() {}
 
   setNodeSize(scale) {
-    this.points.style('radius', (nodeId) => scale(this.dp.nodes[nodeId]));
+    const factor = Math.pow(2, this.zoom);
+    this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
 

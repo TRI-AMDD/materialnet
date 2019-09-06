@@ -96,7 +96,7 @@ class GraphVisComponent extends Component {
 
     this.ro.observe(this.visElement);
 
-    if (this.scene.initScene()) {
+    if (this.scene.initScene(this.context.zoomRange)) {
       // set defaults
       this.initSceneListener();
     }
@@ -158,7 +158,7 @@ class GraphVisComponent extends Component {
       // data has changed
       this.scene.clear();
       this.scene.dp = store.data;
-      if (this.scene.initScene()) {
+      if (this.scene.initScene(store.zoomRange)) {
         // set defaults
         this.initSceneListener();
       }
