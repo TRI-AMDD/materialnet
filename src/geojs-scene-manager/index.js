@@ -202,8 +202,8 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  hideAfter() { }
-  
+  hideAfter() {}
+
   setNodeSize(scale) {
     this.points.style('radius', (nodeId) => scale(this.dp.nodes[nodeId]));
     this.map.draw();

@@ -119,10 +119,10 @@ export class DiskDataProvider extends DataProvider {
   }
 
   nodeExists (name) {
-    return this.nodes[name].discovery !== null;
+    return this.nodes[name].discovery != null;
   }
 
   hasNode (name) {
-    return this.nodes[name] !== undefined;
+    return this.nodes[name] != null;
   }
 }

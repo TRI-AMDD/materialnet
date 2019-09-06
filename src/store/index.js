@@ -6,6 +6,7 @@ import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import datasets from '../datasets';
+import { isEqual } from "lodash-es";
 
 export class ApplicationStore {
     static INVALID_VALUE_COLOR = '#ff0000';
@@ -100,7 +101,13 @@ export class ApplicationStore {
     colorScale = scaleSequential(interpolateViridis);
 
 
+    @observable
+    showLegend = true;
+
     constructor() {
+        this.initState();
+
+        // load data and update on dataset change        
         autorun(() => {
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults, {});
@@ -121,7 +128,68 @@ export class ApplicationStore {
                 return node.structure = cjson;
             });
         })
+
     }
+
+    initState() {
+        const integrateState = (state) => {
+            
+        }
+
+        const state = window.history.state;
+        if (state && state.dataset != null) {
+            // use the stored state to init
+            Object.assign(this, state);
+        } else {
+            // try using the url
+            const url = new URL(window.location.href);
+            const dataset = url.searchParams.get('ds');
+            // update with the stored one
+            const found = this.datasets.find.find((d) => d.label === dataset);
+            if (found) {
+                this.dataset = found;
+            }
+        }
+        
+        let firstRun = true;
+        // track state and update the url automatically
+        autorun(() => {
+            const state = {
+                dataset: this.dataset.label,
+                zoom: this.zoom,
+                color: this.color.label,
+                colorYear: this.colorYear,
+                size: this.size.label,
+                drawerVisible: this.drawerVisible
+            };
+
+            if (isEqual(state, window.history.state)) {
+                // no change
+                return;
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('ds', this.dataset.label);
+            const title = document.title = `MaterialNet - ${this.dataset.label}`;
+            if (firstRun) {
+                firstRun = false;
+                window.history.replaceState(state, title, url.href);
+            } else {
+                window.history.pushState(state, title, url.href);
+            }
+        }, { delay: 300 }); // debounce 300ms
+        
+        // track history changes by the user (e.g. go back)
+        window.addEventListener('popstate', (evt) => {
+            const state = evt.state;
+            if (state && state.dataset != null) {
+                // use the stored state to update the store
+                Object.assign(this, state);
+            }
+        });
+        
+    }
+
 
     @computed
     get nodes() {

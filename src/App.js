@@ -153,10 +153,10 @@ class App extends React.Component {
           <div className={classes.drawerHeader} />
           <div className={classes.content}>
             <GraphVisComponent />
-            <div className={classes.legend}>
+            {store.showLegend && <div className={classes.legend}>
               <NodeSizeLegend />
               <NodeColorLegend />
-            </div>
+            </div>}
             <InfoPanel />
           </div>
         </div>
