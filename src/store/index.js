@@ -8,8 +8,10 @@ import { fetchStructure } from "../rest";
 import datasets from '../datasets';
 
 export class ApplicationStore {
-    @observable
-    data = null;
+    static INVALID_VALUE_COLOR = '#ff0000';
+    static EXISTS_COLOR = 'rgb(81,96,204)';
+    static NOT_EXISTENT_COLOR = '#de2d26';
+    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 
     @observable
     datasets = datasets;
@@ -18,18 +20,23 @@ export class ApplicationStore {
     dataset = datasets[0];
 
     @observable
-    templates = [
-        { label: 'Material', value: 'material' },
-        { label: 'Minimal', value: 'minimal' }
-    ];
+    data = null;
 
     @observable
-    template = this.templates[0];
+    template = null;
+
+    @computed
+    get templates() {
+        return this.dataset.templates;
+    }
 
     @observable
-    zoom = -2.3;
-    @observable
-    zoomRange = [-3.75, 3]; // dataset specific ?
+    zoom = 1;
+
+    @computed
+    get zoomRange() {
+        return this.dataset.zoomRange;
+    }
 
     @observable
     spacing = 1;
@@ -39,52 +46,40 @@ export class ApplicationStore {
     @observable
     opacity = 0.01;
 
-    // dataset specific or not existing
-    @observable
-    year = 2016;
-
     @observable
     play = false;
     @observable
     interval = null;
 
     @observable
-    yearRange = [1945, 2016]; // dataset specific
+    year = null;
+
+    @observable
+    colorYear = null;
+
+    @computed
+    get yearRange() {
+        return this.dataset.yearRange;
+    }
 
     @observable
     search = '';
 
     @observable
-    color = 'discovery'; // dataset specific
+    color = null;
+
+    @computed
+    get colors() {
+        return this.dataset.colors;
+    }
 
     @observable
-    colors = [
-        { label: 'None', value: 'none' },
-        { label: 'Year of discovery', value: 'discovery' },
-        { label: 'Discovered/Hypothetical', value: 'boolean' },
-        { label: 'Discovered/Undiscovered', value: 'undiscovered' },
-        { label: 'Formation Energy', value: 'formation_energy' },
-        { label: 'Synthesis Probability', value: 'synthesis_probability' },
-        { label: 'Clustering Coefficient', value: 'clus_coeff' },
-        { label: 'Eigenvector Centrality', value: 'eigen_cent' },
-        { label: 'Degree Centrality', value: 'deg_cent' },
-        { label: 'Shortest path', value: 'shortest_path' },
-        { label: 'Degree Neighborhood', value: 'deg_neigh' },
-    ];
+    size = null;
 
-    @observable
-    colorYear = 2016; // dataset specific
-
-    @observable
-    size = 'normal';
-
-    @observable
-    sizes = [
-        { label: 'None', value: 'none' },
-        { label: 'Degree', value: 'normal' },
-        { label: 'Degree - Large', value: 'large' },
-        { label: 'Degree - Huge', value: 'huge' }
-    ];
+    @computed
+    get sizes() {
+        return this.dataset.sizes;
+    }
 
     @observable
     showLinks = false;
@@ -101,9 +96,16 @@ export class ApplicationStore {
     @observable
     drawerVisible = true;
 
+    @observable
+    colorScale = scaleSequential(interpolateViridis);
+
+
     constructor() {
-        // load data and update on dataset change
         autorun(() => {
+            // set the defaults from the dataset
+            Object.assign(this, this.dataset.defaults, {});
+
+            // load data and update on dataset change
             const datafile = `sample-data/${this.dataset.label}.json`;
             fetch(datafile).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
@@ -137,18 +139,13 @@ export class ApplicationStore {
         if (!this.data) {
             return null;
         }
-        return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
+        return this.data.nodes.slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
     @action
     setPlayState(play, interval) {
         this.play = play;
         this.interval = interval;
-    }
-
-    @action
-    clearSelection() {
-        this.selected = null;
     }
 
     @action
@@ -185,78 +182,36 @@ export class ApplicationStore {
         this.selectedPosition = position;
     }
 
-    @computed
-    get degree2SizeFunc() {
-        const factor = Math.pow(2, this.zoom);
-        switch (this.size) {// dataset specific, assumes some degree ranges
-            case 'none':
-                return () => factor * 10;
-            case 'normal':
-                return (deg) => factor * (10 + Math.sqrt(deg));
-            case 'large':
-                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg))); //x^3/4
-            case 'huge':
-                return (deg) => factor * (10 + deg);
-            default:
-                throw new Error(`bad level option: ${this.size}`);
+    getFormatter(property) {
+        const props = this.dataset.properties || {};
+        const info = props[property];
+        if (info && info.format) {
+            return info.format;
         }
+        return (v) => typeof v === 'number' ? v.toFixed(3) : v;
     }
 
     @computed
-    get minMaxDegrees() {
-        if (!this.data) {
-            return [0, 10];
+    get nodeColorer() {
+        if (!this.color) {
+            return {
+                legend: () => null,
+                scale: () => ApplicationStore.FIXED_COLOR
+            };
         }
-        const degrees = this.data.nodeDegrees(this.year);
-        return this.data.nodeNames().reduce(([min, max], name) => {
-            const v = degrees[name];
-            return [
-                Math.min(min, v),
-                Math.max(max, v)
-            ];
-        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+        return this.color(this);
     }
 
     @computed
-    get minMaxColorRange() {
-        return this.minMaxProperty(this.color);
-    }
-
-    minMaxProperty(property) {
-        if (!this.data) {
-            return [0, 10];
+    get nodeSizer() {
+        if (!this.size) {
+            return {
+                legend: () => null,
+                scale: () => 10
+            };
         }
-        return this.nodes.reduce(([min, max], node) => {
-            const v = node[property];
-            if (v == null) {
-                return [min, max];
-            }
-            return [
-                Math.min(min, v),
-                Math.max(max, v)
-            ];
-        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+        return this.size(this);
     }
-
-    // dataset specific
-    propertyFormatter(property) {
-        switch (property) {
-            case 'synthesis_probability':
-                return (v) => `${(v * 100).toFixed(2)}%`;
-            case 'discovery':
-                return (v) => v.toString();
-            default:
-                return (v) => typeof v === 'number' ? v.toFixed(3) : v;
-        }
-    }
-
-    @observable
-    colorScale = scaleSequential(interpolateViridis);
-
-    static INVALID_VALUE_COLOR = '#ff0000';
-    static EXISTS_COLOR = 'rgb(81,96,204)';
-    static NOT_EXISTENT_COLOR = '#de2d26';
-    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 }
 
 export default createContext();

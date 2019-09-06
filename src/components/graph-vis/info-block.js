@@ -14,7 +14,7 @@ function defaultFormatter(v) {
 
 export default class InfoBlock extends React.Component {
     render() {
-        const { label, value, format, children, suffix } = this.props;
+        const { label, value, format, children } = this.props;
 
         const formatValue = typeof format === 'function' ? format : (format ? d3Format(format): defaultFormatter);
 
@@ -24,7 +24,6 @@ export default class InfoBlock extends React.Component {
                 </Typography>
             <Typography paragraph>
                 {formatValue(value)}
-                {suffix}
                 {children}
             </Typography>
         </>;

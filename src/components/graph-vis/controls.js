@@ -14,6 +14,18 @@ import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
 import Store from '../../store';
 import { observer } from 'mobx-react';
+import { deburr } from 'lodash-es';
+
+function simplify(label) {
+  // simplify the label for better values
+  return deburr(label).replace(/[ ,.<>/|\\[]{}-_=+()*&^%$#@!~\t\n\r]+/gm, '');
+}
+
+function toOption(v) {
+  const label = v.label;
+  const value = v.value || simplify(label);
+  return { label, value };
+}
 
 @observer
 class Controls extends React.Component {
@@ -24,16 +36,16 @@ class Controls extends React.Component {
     return (
       <Grid>
         <SelectControl
-          value={store.dataset.value}
-          options={store.datasets}
+          value={toOption(store.dataset).value}
+          options={store.datasets.map(toOption)}
           label={'Dataset'}
-          onChange={(val) => { store.dataset = store.datasets.find((d) => d.value === val); }}
+          onChange={(val) => { store.dataset = store.datasets.find((d) => toOption(d).value === val); }}
         />
         <SelectControl
-          value={store.template.value}
-          options={store.templates}
+          value={toOption(store.template).value}
+          options={store.templates.map(toOption)}
           label={'Template'}
-          onChange={(val) => { store.template = store.templates.find((d) => d.value === val); }}
+          onChange={(val) => { store.template = store.templates.find((d) => toOption(d).value === val); }}
         />
         <SliderControl
           value={store.zoom}
@@ -80,16 +92,16 @@ class Controls extends React.Component {
           onChange={(_e, val) => { store.search = val.newValue; }}
         />
         <SelectControl
-          value={store.size}
-          options={store.sizes}
+          value={toOption(store.size).value}
+          options={store.sizes.map(toOption)}
           label={'Node size'}
-          onChange={(val) => { store.size = val; }}
+          onChange={(val) => { store.size = store.sizes.find((d) => toOption(d).value === val); }}
         />
         <SelectControl
-          value={store.color}
-          options={store.colors}
+          value={toOption(store.color).value}
+          options={store.colors.map(toOption)}
           label={'Node color'}
-          onChange={(val) => { store.color = val; }}
+          onChange={(val) => { store.color = store.colors.find((d) => toOption(d).value === val); }}
         />
         { /* dataset specific */}
         <SliderControl
@@ -98,9 +110,8 @@ class Controls extends React.Component {
           step={1}
           label={'Color year'}
           digits={0}
-          disabled={store.color !== 'undiscovered'}
           onChange={(val) => { store.colorYear = val; }}
-        />
+        />{/* TODO disabled={store.color !== 'undiscovered'} */}
         <CheckboxControl
           label="Night mode"
           value={store.nightMode}

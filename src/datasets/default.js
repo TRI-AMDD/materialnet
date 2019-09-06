@@ -31,18 +31,22 @@ const sizes = [
 
 export default {
     templates,
-    template: templates[0],
 
     colors,
-    color: colors[0],
-
-    zoom: -2.3,
     zoomRange: [-3.75, 3],
-
     sizes,
-    size: sizes[0], 
+    yearRange: [1945, 2016],
 
     properties: {
         
-    }
+    },
+
+    defaults: {
+        template: templates[0],
+        color: colors[0],
+        zoom: -2.3,
+        size: sizes[0],
+        year: 2016,
+        colorYear: 2016
+    },
 }

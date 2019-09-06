@@ -59,7 +59,7 @@ class GraphVisComponent extends Component {
       if (obj) {
         this.scene.display(store.search, true);
       } else {
-        store.clearSelection();
+        store.selected = null;
       }
     });
     setAndObserve(() => {
