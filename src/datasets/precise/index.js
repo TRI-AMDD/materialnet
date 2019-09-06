@@ -1,16 +1,5 @@
-import { material, minimal } from '../templates';
 import { ApplicationStore } from '../store';
-
-const templates = [
-    {
-        label: 'Material',
-        render: (node) => material(node)
-    },
-    {
-        label: 'Minimal',
-        render: (node) => minimal(node)
-    }
-];
+import templates from './templates';
 
 /**
  * coloring factory by color

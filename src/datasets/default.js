@@ -1,10 +1,11 @@
 import { ApplicationStore } from "../store"
 import React from 'react';
+import { Typography } from "@material-ui/core";
 
 const templates = [
     {
-        label: 'Dummy',
-        render: () => <h4>Dummy</h4>
+        label: 'Basic',
+        render: (node) =>  <Typography gutterBottom variant="h4">{node.name}</Typography>
     }
 ]
 
