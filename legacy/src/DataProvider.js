@@ -109,6 +109,6 @@ export class DiskDataProvider extends DataProvider {
   }
 
   nodeExists (name) {
-    return this.nodes[name].discovery !== null;
+    return this.nodes[name].discovery != null;
   }
 }

@@ -21,3 +21,7 @@ yarn-debug.log*
 yarn-error.log*
 
 public/sample-data/
+
+/data/co-occurence/*
+!/data/co-occurence/*.py
+!/data/co-occurence/*.ipynb

@@ -5,6 +5,7 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
+import { isEqual } from "lodash-es";
 
 export class ApplicationStore {
     @observable
@@ -20,6 +21,8 @@ export class ApplicationStore {
             { label: 'Sample 1', value: 'sample1' },
             { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
             { label: 'Sample 2', value: 'sample2' },
+            { label: 'Sample 1k edges', value: 'sample_cooccurence' },
+            { label: 'Full .5M edges', value: 'full_cooccurence' }
         ]
     };
 
@@ -130,13 +133,70 @@ export class ApplicationStore {
     showLegend = true;
 
     constructor() {
-        // load data and update on dataset change
+        this.initState();
+
+        // load data and update on dataset change        
         autorun(() => {
             const datafile = `sample-data/${this.dataset}.json`;
             fetch(datafile).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
+
+    }
+
+    initState() {
+        const state = window.history.state;
+        if (state && state.dataset != null) {
+            // use the stored state to init
+            Object.assign(this, state);
+        } else {
+            // try using the url
+            const url = new URL(window.location.href);
+            const dataset = url.searchParams.get('ds');
+            // update with the stored one
+            if (dataset && ApplicationStore.datasetSettings.options.find((d) => d.value === dataset)) {
+                this.dataset = dataset;
+            }
+        }
+        
+        let firstRun = true;
+        // track state and update the url automatically
+        autorun(() => {
+            const state = {
+                dataset: this.dataset,
+                zoom: this.zoom,
+                color: this.color,
+                colorYear: this.colorYear,
+                size: this.size,
+                drawerVisible: this.drawerVisible
+            };
+
+            if (isEqual(state, window.history.state)) {
+                // no change
+                return;
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('ds', this.dataset);
+            const title = document.title = `MaterialNet - ${this.datasetLabel}`;
+            if (firstRun) {
+                firstRun = false;
+                window.history.replaceState(state, title, url.href);
+            } else {
+                window.history.pushState(state, title, url.href);
+            }
+        }, { delay: 300 }); // debounce 300ms
+        
+        // track history changes by the user (e.g. go back)
+        window.addEventListener('popstate', (evt) => {
+            const state = evt.state;
+            if (state && state.dataset != null) {
+                // use the stored state to update the store
+                Object.assign(this, state);
+            }
+        });
+        
     }
 
     @computed

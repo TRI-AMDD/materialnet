@@ -109,7 +109,7 @@ export class SceneManager {
 
       let color;
       const discovery = this.dp.nodeProperty(name, 'discovery');
-      if (discovery !== null) {
+      if (discovery != null) {
         color = d3Color(this.cmap(discovery));
       } else {
         color = d3Color('#de2d26');
@@ -276,7 +276,7 @@ export class SceneManager {
       const discovery = this.dp.nodeProperty(name, 'discovery');
 
       let color;
-      if (discovery !== null) {
+      if (discovery != null) {
         color = d3Color(this.cmap(discovery));
       } else {
         color = d3Color('#de2d26');
@@ -458,7 +458,7 @@ export class SceneManager {
   }
 
   select (name, center = false) {
-    if (this.selected !== null) {
+    if (this.selected != null) {
       this.geometry.attributes.selected.array[this.selected] = 0;
     }
 
