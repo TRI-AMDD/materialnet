@@ -353,12 +353,16 @@ export class ApplicationStore {
     }
 
     getFilteredDomain(property) {
-        if (!this.filterFunc) {
+        if (!this.filterFunc || this._isFixedDomain(property)) {
             return this.getPropertyMetaData(property).domain;
         }
         // compute locally
         return this._minMaxProperty(property, this.filteredNodeNames);
+    }
 
+    _isFixedDomain(property) {
+        const prop = this.dataset.properties[property];
+        return prop && prop.domain != null; // defined in the dataset thus fixed
     }
 
     @action
