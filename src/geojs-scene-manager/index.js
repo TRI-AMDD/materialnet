@@ -71,9 +71,8 @@ export class GeoJSSceneManager {
       ],
     });
 
-    const edges = dp.edges;
     this.lines = layer.createFeature('line')
-      .data(edges)
+      .data(dp.edges)
       .style({
         position: name => nodes[name],
         width: 1,
