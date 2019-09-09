@@ -133,10 +133,15 @@ export class ApplicationStore {
     constructor() {
         // load data and update on dataset change        
         autorun(() => {
+            const toLoad = this.dataset.fileName;
+
+            // reset state
+            this.hovered = { node: null, position: null, radius: null };
+            this.hoveredLine = { node1: null, node2: null, position: null };
+            this.filters = {};
+
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults || {});
-
-            const toLoad = this.dataset.fileName;
 
             this.data = null;
             // load data and update on dataset change

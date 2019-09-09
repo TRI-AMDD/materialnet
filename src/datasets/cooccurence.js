@@ -8,9 +8,11 @@ const properties = {
     },
     deg_cent: {
         label: "Degree Centrality",
+        filterAble: true,
     },
     eigen_cent: {
-        label: "Eigenvector Centrality"
+        label: "Eigenvector Centrality",
+        filterAble: true,
     },
 };
 
