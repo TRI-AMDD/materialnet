@@ -104,7 +104,7 @@ export class GeoJSSceneManager {
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        this.picked(this.dp.nodes[evt.data], evt.mouse.geo);
+        this.picked(this.dp.nodes[evt.data]);
       }
     });
 

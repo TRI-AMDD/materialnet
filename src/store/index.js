@@ -93,9 +93,6 @@ export class ApplicationStore {
     selected = null;
 
     @observable
-    selectedPosition = null;
-
-    @observable
     hovered = {
             node: null,
             position: null,
@@ -429,14 +426,13 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(node, position) {
+    selectNode(node) {
         const currentName = this.selected ? this.selected.name : '';
         // toggle if click on selected
         if (node.name === currentName) {
             node = null;
         }
         this.selected = node;
-        this.selectedPosition = position;
     }
 
     @computed

@@ -14,8 +14,8 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
-    picked: (node, position) => {
-      this.context.selectNode(node, position);
+    picked: (node) => {
+      this.context.selectNode(node);
     },
     hovered: (node, position, radius) => {
       this.context.hovered = { node, position, radius };
