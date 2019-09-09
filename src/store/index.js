@@ -139,6 +139,8 @@ export class ApplicationStore {
             this.hovered = { node: null, position: null, radius: null };
             this.hoveredLine = { node1: null, node2: null, position: null };
             this.filters = {};
+            this.selected = null;
+            this.pinnedNodes = [];
 
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults || {});
@@ -184,16 +186,21 @@ export class ApplicationStore {
                     this[attr] = found;
                 }
             });
-            if (state.selected) {
+            if (state.selected || state.pinned) {
                 // selected by name when data is 
                 const toSelect = state.selected;
+                const toPin = state.pinned;
                 delete state.selected;
+                delete state.pinned;
+
                 autorun((reaction) => {
                     if (!this.data) {
                         return;
                     }
                     // lookup by name
                     this.selected = this.data.nodes[toSelect];
+                    this.pinnedNodes = toPin.map((d) => this.data.nodes[d]).filter((d) => d != null);
+
                     reaction.dispose(); // stop updating
                 });
             }
@@ -227,7 +234,8 @@ export class ApplicationStore {
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
                 filters: toJS(this.filters),
-                selected: this.selected ? this.selected.name : null
+                selected: this.selected ? this.selected.name : null,
+                pinned: this.pinnedNodes.map((d) => d.name)
             };
 
             if (isEqual(state, window.history.state)) {
