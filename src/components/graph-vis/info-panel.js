@@ -50,8 +50,8 @@ class InfoPanel extends React.Component {
       return null;
     }
     return <Paper className={classes.root}>
-      <IconButton style={{ float: 'right' }} onClick={this.onClear} aria-label="Clear Selection" size="small"><Close /></IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} aria-label="Pin Selection" size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}><Room /></IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}><Room /></IconButton>
       
 
       {store.template && store.template.render(node, store)}
