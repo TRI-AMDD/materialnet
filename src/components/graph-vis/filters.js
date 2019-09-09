@@ -4,6 +4,8 @@ import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import RangeSliderControlComponent from '../controls/rangeslider';
+import SelectControlComponent from '../controls/select';
+import { Chip } from '@material-ui/core';
 
 @observer
 class Filters extends React.Component {
@@ -28,6 +30,14 @@ class Filters extends React.Component {
           }
         }}
       />)}
+      <SelectControlComponent
+        label="Elements"
+        options={store.knownElements}
+        onChange={(val) => { store.filterElements.push(val); }}
+      />
+      <div>
+        {store.filterElements.map((elem) => <Chip key={elem} label={elem} onDelete={() => { store.filterElements = store.filterElements.filter((d) => d !== elem); }} variant="small"/>)}
+      </div>
     </Grid>
     );
   }
