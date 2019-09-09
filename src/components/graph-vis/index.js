@@ -69,12 +69,17 @@ class GraphVisComponent extends Component {
       }
       const obj = this.scene.pickName(store.search);
       if (obj) {
-        this.scene.display(store.search, true);
+        this.scene.display(store.search);
       } else {
         store.selected = null;
       }
     });
     setAndObserve(() => {
+      if (store.pinnedNodes.length > 0) {
+        this.scene.displayFocus(store.pinnedNodes.map((d) => d.name), store.selected ? store.selected.name : null);
+        return;
+      }
+      // no pinned nodes, default behavior
       if (store.selected == null) {
         this.scene.undisplay();
       } else {
