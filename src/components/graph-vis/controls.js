@@ -69,8 +69,7 @@ class Controls extends React.Component {
           label={'Node spacing'}
           onChange={(val) => { store.spacing = val; }}
         />
-        { /* dataset specific */ }
-        <SliderControl 
+        {store.yearRange && <SliderControl
           value={store.year}
           range={store.yearRange}
           step={1}
@@ -83,7 +82,7 @@ class Controls extends React.Component {
           >
             {store.play ? <Pause /> : <PlayArrow />}
           </IconButton>
-        </SliderControl>
+        </SliderControl>}
         <SearchControl
           label={'Search'}
           options={store.searchOptions}
@@ -105,8 +104,7 @@ class Controls extends React.Component {
           label={'Node color'}
           onChange={(val) => { store.color = store.colors.find((d) => toOption(d).value === val); }}
         />
-        { /* dataset specific */}
-        <SliderControl
+        {store.yearRange && <SliderControl
           value={store.colorYear}
           range={store.yearRange}
           step={1}
@@ -114,7 +112,7 @@ class Controls extends React.Component {
           digits={0}
           disabled={!store.color || store.color.label !== 'Discovered/Undiscovered'}
           onChange={(val) => { store.colorYear = val; }}
-        />
+        />}
         <CheckboxControl
           label="Show Legend"
           value={store.showLegend}

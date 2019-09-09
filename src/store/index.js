@@ -273,6 +273,9 @@ export class ApplicationStore {
 
     @action
     toggleAutoplay() {
+        if (!this.yearRange) {
+            return;
+        }
         let interval = this.interval;
         let play = !this.play;
 
