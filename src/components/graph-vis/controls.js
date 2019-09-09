@@ -76,6 +76,7 @@ class Controls extends React.Component {
               <SliderControl
                 value={store.spacing}
                 range={store.spacingRange}
+                step={0.1}
                 label={'Node spacing'}
                 onChange={(val) => { store.spacing = val; }}
               />
