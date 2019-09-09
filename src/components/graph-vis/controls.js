@@ -16,7 +16,7 @@ import SearchControl from '../controls/search';
 import SliderControl from '../controls/slider';
 import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
-import RangeSliderControl from '../controls/rangeslider';
+import Filters from './filters';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
@@ -58,16 +58,7 @@ class Controls extends React.Component {
             <Typography>Filter</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Grid>
-              {store.propertyList.filter((meta) => meta.filterAble).map((meta) => <RangeSliderControl
-                key={meta.label}
-                value={store.filters[meta.property] ? store.filters[meta.property] : meta.domain.slice()}
-                range={meta.domain}
-                label={meta.label}
-                format={meta.format}
-                onChange={(val) => { store.filters[meta.property] = val; }}
-              />)}              
-            </Grid>
+            <Filters/>
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <ExpansionPanel expanded={store.drawerExpanded === 'ui'} onChange={(_, isExpanded) => { store.drawerExpanded = isExpanded ? 'ui' : false }}>
