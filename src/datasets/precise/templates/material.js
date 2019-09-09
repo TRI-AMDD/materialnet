@@ -14,9 +14,9 @@ export default {
 
             <Typography gutterBottom variant="title">Material Properties</Typography>
 
-            {node.degree != null && <InfoBlock label="Derived materials" value={node.degree} format={store.getFormatter('degree')} />}
-            {node.formation_energy != null && <InfoBlock label="Formation energy" value={node.formation_energy} format={store.getFormatter('formation_energy')} />}
-            {node.synthesis_probability != null && <InfoBlock label="Synthesis probability" value={node.synthesis_probability} format={store.getFormatter('synthesis_probability')} />}
+            {node.degree != null && <InfoBlock label="Derived materials" value={node.degree} {...store.getPropertyMetaData('degree')} />}
+            {node.formation_energy != null && <InfoBlock label="Formation energy" value={node.formation_energy} {...store.getPropertyMetaData('formation_energy')} />}
+            {node.synthesis_probability != null && <InfoBlock label="Synthesis probability" value={node.synthesis_probability} {...store.getPropertyMetaData('synthesis_probability')} />}
 
             <Typography gutterBottom variant="title">Network Properties</Typography>
 

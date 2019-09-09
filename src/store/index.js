@@ -244,6 +244,9 @@ export class ApplicationStore {
     }
 
     minMaxProperty(property) {
+        if (!this.data) {
+            return [0, 10];
+        }
         return this.data.nodeNames().reduce(([min, max], name) => {
             const v = this.data.nodeProperty(name, property);
             if (v == null) {
@@ -296,13 +299,11 @@ export class ApplicationStore {
         this.selectedPosition = position;
     }
 
-    getFormatter(property) {
+    getPropertyMetaData(property) {
         const props = this.dataset.properties || {};
-        const info = props[property];
-        if (info && info.format) {
-            return info.format;
-        }
-        return (v) => typeof v === 'number' ? v.toFixed(3) : v;
+        return Object.assign({
+            format: (v) => typeof v === 'number' ? v.toFixed(3) : v
+        }, props[property] || {});
     }
 
     @computed

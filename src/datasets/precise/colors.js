@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApplicationStore } from '../../store';
 import { LegendGradient, LegendCircle } from '../../components/legend';
-import { propertyColorFactory } from '../utils';
+import { propertyColorFactory, booleanColorFactory } from '../utils';
 import defaultTemplate from '../default';
 
 export default [
@@ -25,16 +25,7 @@ export default [
     },
     {
         label: 'Discovered/Hypothetical',
-        factory: () => ({
-            legend: () => <>
-                <LegendCircle label="Discovered" color={ApplicationStore.DISCOVERED_COLOR} />
-                <LegendCircle label="Hypothetical" color={ApplicationStore.UNDISCOVERED_COLOR} />
-            </>,
-            scale: (node) => {
-                const discovery = node.discovery;
-                return discovery != null ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
-            }
-        })
+        factory: booleanColorFactory('discovery', 'Discovered', 'Hypothetical')
     },
     {
         label: 'Discovered/Undiscovered',

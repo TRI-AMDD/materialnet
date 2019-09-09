@@ -9,7 +9,7 @@ import { scaleLinear } from 'd3-scale';
  */
 export function propertyColorFactory(prop) {
     return (store) => {
-        const format = store.getFormatter(prop);
+        const format = store.getPropertyMetaData(prop).format;
         const scale = store.colorScale.copy().domain(store.minMaxProperty(prop));
 
         return {
@@ -20,6 +20,25 @@ export function propertyColorFactory(prop) {
             scale: (node) => {
                 const value = node[prop];
                 return value != null ? scale(value) : ApplicationStore.INVALID_VALUE_COLOR;
+            }
+        };
+    }
+}
+
+/**
+ * coloring factory by property existence
+ * @param {string} prop property to visualize
+ */
+export function booleanColorFactory(prop, existent, notExistent) {
+    return (store) => {
+        return {
+            legend: () => <>
+                <LegendCircle label={existent} color={ApplicationStore.DISCOVERED_COLOR} />
+                <LegendCircle label={notExistent} color={ApplicationStore.UNDISCOVERED_COLOR} />
+            </>,
+            scale: (node) => {
+                const value = node[prop];
+                return value != null ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
             }
         };
     }
@@ -41,7 +60,7 @@ export function propertySizeFactory(prop, createScale = createDefaultScale) {
                 scale: () => store.sizeScaleRange[0]
             };
         }
-        const format = store.getFormatter(prop);
+        const format = store.getPropertyMetaData(prop).format;
         const scale = createScale(store.minMaxProperty(prop)).range(store.sizeScaleRange).clamp(true);
 
         return {
