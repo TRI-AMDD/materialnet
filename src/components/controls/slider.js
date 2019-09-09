@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {
   FormControl,
-  Typography
+  Typography,
+  Slider
 } from '@material-ui/core';
-import { Slider} from '@material-ui/lab';
 
 class SliderControlComponent extends Component {
 
@@ -34,7 +34,6 @@ class SliderControlComponent extends Component {
           </div>
           <div style={{flexGrow: 1, paddingLeft: 16, paddingRight}}>
             <Slider
-              {...this.props}
               min={range[0]} max={range[1]} step={step}
               value={value}
               onChange={(_e, val) => { onChange(val); }}

@@ -42,7 +42,7 @@ const appStyles = theme => ({
     }),
   },
   menuButton: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   hide: {
     display: 'none'
@@ -55,7 +55,7 @@ const appStyles = theme => ({
     width: drawerWidth,
     position: 'relative',
     backgroundColor: grey['100'],
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     paddingTop: 0,
     overflowX: 'hidden'
   },

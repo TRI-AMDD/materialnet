@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {
   FormControl,
-  Typography
+  Typography,
+  Slider
 } from '@material-ui/core';
-import { Slider} from '@material-ui/lab';
 
 class RangeSliderControlComponent extends Component {
 
@@ -21,8 +21,6 @@ class RangeSliderControlComponent extends Component {
 
     const child = children ? React.Children.only(children) : undefined;
 
-    const paddingRight = child ? 16 : 0;
-
     return (
       <FormControl fullWidth>
         <Typography variant='caption'>
@@ -32,9 +30,8 @@ class RangeSliderControlComponent extends Component {
           <div>
             {format ? format(value[0]) : value[0].toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
-          <div style={{flexGrow: 1, paddingLeft: 16, paddingRight}}>
+          <div style={{flexGrow: 1, paddingLeft: 16, paddingRight: 16}}>
             <Slider
-              {...this.props}
               min={range[0]} max={range[1]} step={step}
               value={value}
               onChange={(_e, val) => { onChange(val); }}

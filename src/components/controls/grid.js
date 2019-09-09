@@ -11,7 +11,7 @@ export default (props) => {
   children = React.Children.toArray(children);
 
   return (
-    <Grid container spacing={24}>
+    <Grid container spacing={1}>
       {children.map((child, i) => {
         const gridsize = child.props.gridsize || {xs: 12}
         return (
