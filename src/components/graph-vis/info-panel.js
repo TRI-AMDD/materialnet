@@ -20,8 +20,6 @@ const visStyles = theme => ({
   }
 });
 
-
-
 @observer
 class InfoPanel extends React.Component {
   static contextType = Store;
