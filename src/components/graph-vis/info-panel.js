@@ -1,10 +1,9 @@
 import React from 'react';
 import Store from '../../store';
-import * as templates from '../../templates';
-import { withStyles, Paper } from '@material-ui/core';
-import Structure from './structure';
+import { withStyles, Paper, IconButton } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
+import CloseIcon from '@material-ui/icons/Close';
 
 
 const visStyles = theme => ({
@@ -25,21 +24,20 @@ const visStyles = theme => ({
 class InfoPanel extends React.Component {
   static contextType = Store;
 
+  onClear = () => this.context.selected = null;
+
   render() {
     const store = this.context;
     const { classes } = this.props;
-    const template = templates[store.template];
+    const node = store.selected;
 
-    const templateProps = { ...store.selected, onClear: () => store.clearSelection() };
-
-    if (!store.selected) {
+    if (!node) {
       return null;
     }
     return <Paper className={classes.root}>
-      {template(templateProps)}
-      <div style={{ width: '100%', height: '15rem' }}>
-        <Structure cjson={store.structure} />
-      </div>
+      <IconButton style={{ float: 'right' }} onClick={this.onClear}><CloseIcon /></IconButton>
+
+      {store.template && store.template.render(node, store)}
     </Paper>;
   }
 }

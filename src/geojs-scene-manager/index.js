@@ -1,22 +1,19 @@
-import { select } from 'd3-selection';
-
 import geo from 'geojs';
 
-import './tooltip.css';
-import { ApplicationStore } from '../store';
-
 export class GeoJSSceneManager {
-  constructor({ onZoomChanged, picked }) {
+  constructor({ onZoomChanged, picked, hovered, hoveredLine }) {
     this.dp = null;
     this.parent = null;
     this.onZoomChanged = onZoomChanged;
     this.picked = picked;
     this.lineSelected = new Set([]);
+    this.hovered = hovered;
+    this.hoveredLine = hoveredLine;
     this.expansion = 1;
     this.map = null;
   }
 
-  initScene() {
+  initScene(zoomRange) {
     this.map = null;
     const dp = this.dp;
 
@@ -24,15 +21,12 @@ export class GeoJSSceneManager {
       return false;
     }
 
-    const degrees = dp.nodeDegrees(2020);
-
     let nodes = this.nodes = {};
     dp.nodeNames().forEach(name => {
       const pos = dp.nodePosition(name);
       nodes[name] = {
         x: pos.x,
-        y: pos.y,
-        degree: degrees[name],
+        y: pos.y
       };
     });
 
@@ -65,8 +59,8 @@ export class GeoJSSceneManager {
     params.map.maxBounds.bottom += maxwh * factor;
 
     // allow zoomming in until 1 unit of space is 2^(value) bigger.
-    params.map.max += 3;
-    params.map.min -= 3;
+    params.map.min = zoomRange[0];
+    params.map.max = zoomRange[1];
 
     const map = this.map = geo.map(params.map);
 
@@ -78,14 +72,15 @@ export class GeoJSSceneManager {
     });
 
     const edges = dp.edges;
-    const lines = this.lines = layer.createFeature('line')
+    this.lines = layer.createFeature('line')
       .data(edges)
       .style({
         position: name => nodes[name],
         width: 1,
         strokeColor: 'black',
         strokeOpacity: 0.1,
-      });
+      })
+      .visible(false); // disable by default
 
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
@@ -94,75 +89,52 @@ export class GeoJSSceneManager {
         fillColor: 'gray',
         strokeOpacity: 0.8,
         fillOpacity: 0.8,
-        radius: name => Math.max(2, Math.sqrt(nodes[name].degree)),
+        radius: 10,
       },
       position: name => nodes[name],
     })
       .data(Object.keys(nodes));
 
-    const ui = map.createLayer('ui', {
-      zIndex: 2,
-    });
-
-    const tooltip = ui.createWidget('dom', {
-      position: {
-        x: 0,
-        y: 0,
-      },
-    });
-
-    const tooltipElem = tooltip.canvas();
-    tooltipElem.setAttribute('id', 'tooltip');
-    tooltipElem.classList.toggle('hidden', true);
-    tooltipElem.style['pointer-events'] = 'none';
-
-    let onNode = false;
+    let onNode = null;
 
     points.geoOn(geo.event.feature.mouseon, evt => {
-      onNode = true;
+      onNode = this.dp.nodes[evt.data];
 
-      const name = evt.data;
-
-      tooltip.position(evt.mouse.geo);
-      tooltipElem.innerText = name;
-      tooltipElem.classList.toggle('hidden', false);
-    });
-    points.geoOn(geo.event.feature.mousemove, evt => {
-      tooltip.position(evt.mouse.geo);
+      // compute point dimensions
+      const radius = points.style("radius")(evt.data);
+      // position relative to canvas
+      const position = this.points.featureGcsToDisplay(points.position()(evt.data));
+      this.hovered(onNode, position, radius);
     });
     points.geoOn(geo.event.feature.mouseoff, evt => {
-      onNode = false;
-
-      tooltipElem.classList.toggle('hidden', true);
+      onNode = null;
+      this.hovered(null, null, null);
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        const data = this.pickName(evt.data);
-        this.picked(data, evt.mouse.map);
+        this.picked(this.dp.nodes[evt.data], evt.mouse.geo);
       }
     });
 
-    lines.geoOn(geo.event.feature.mouseon, evt => {
-      if (onNode) {
-        return;
-      }
-
-      const text = `${evt.data[0]} - ${evt.data[1]}`;
-
-      tooltip.position(evt.mouse.geo);
-      tooltipElem.innerText = text;
-      tooltipElem.classList.toggle('hidden', false);
-    });
-    lines.geoOn(geo.event.feature.mousemove, evt => {
-      tooltip.position(evt.mouse.geo);
-    });
-    lines.geoOn(geo.event.feature.mouseoff, evt => {
-      if (onNode) {
-        return;
-      }
-
-      tooltipElem.classList.toggle('hidden', true);
-    });
+    // NOTE: disable line hovering for now till figured out where to show
+    // let onLine = null;
+    // lines.geoOn(geo.event.feature.mouseon, evt => {
+    //   if (onNode) {
+    //     return;
+    //   }
+    //   onLine = evt.data.map((d) => this.dp.nodes[d]);
+    //   this.hoveredLine(onLine[0], onLine[1], evt.mouse.geo);
+    // });
+    // lines.geoOn(geo.event.feature.mousemove, evt => {
+    //   this.hoveredLine(onLine[0], onLine[1], evt.mouse.geo);
+    // });
+    // lines.geoOn(geo.event.feature.mouseoff, evt => {
+    //   if (onNode) {
+    //     return;
+    //   }
+    //   onLine = null;
+    //   this.hoveredLine(null, null, null);
+    // });
 
     map.geoOn(geo.event.zoom, () => {
       points.dataTime().modified();
@@ -211,10 +183,8 @@ export class GeoJSSceneManager {
 
   hideAfter() {}
 
-  setDegreeSize (compute) {
-    // const zoom = Math.pow(2, this.map.zoom());
-
-    this.points.style('radius', compute);
+  setNodeSize(scale, factor) {
+    this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
 
@@ -223,20 +193,7 @@ export class GeoJSSceneManager {
       return null;
     }
 
-    const data = {
-      name,
-      degree: this.dp.nodeProperty(name, 'degree'),
-      discovery: this.dp.nodeProperty(name, 'discovery'),
-      formationEnergy: this.dp.nodeProperty(name, 'formation_energy'),
-      synthesisProbability: this.dp.nodeProperty(name, 'synthesis_probability'),
-      clusCoeff: this.dp.nodeProperty(name, 'clus_coeff'),
-      eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
-      degCent: this.dp.nodeProperty(name, 'deg_cent'),
-      shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
-    };
-
-    return data;
+    return this.dp.nodes[name];
   }
 
   display (name) {
@@ -301,95 +258,13 @@ export class GeoJSSceneManager {
     const strokeColor = night ? 'white' : 'black';
     const linkColor = strokeColor;
 
-    select(this.parent)
-      .style('background-color', bgColor);
+    this.parent.style.backgroundColor = bgColor;
     this.lines.style('strokeColor', linkColor);
     this.map.draw();
   }
 
-  setConstColor () {
-    this.points.style('fillColor', ApplicationStore.FIXED_COLOR);
-    this.map.draw();
-  }
-
-  setBooleanColor () {
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const exists = this.dp.nodeExists(name);
-      const color = exists ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;;
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  setPropertyColor (prop) {
-    const [low, high] = this.propMinMax(prop);
-
-    this.cmap = ApplicationStore.COLOR_SCALE.copy()
-      .domain([low, high]);
-
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const val = this.dp.nodeProperty(name, prop);
-
-      let color = this.cmap(val);
-      if (!color) {
-        color = ApplicationStore.INVALID_VALUE_COLOR;
-      }
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  setDiscoveryColor () {
-    this.cmap = ApplicationStore.COLOR_SCALE.copy()
-      .domain(ApplicationStore.colorYearSettings.range);
-
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const discovery = this.dp.nodeProperty(name, 'discovery');
-
-      let color;
-      if (discovery != null) {
-        color = (this.cmap(discovery));
-      } else {
-        color = ApplicationStore.UNDISCOVERED_COLOR;
-      }
-
-      colors.push(color);
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
-    this.map.draw();
-  }
-
-  propMinMax (prop) {
-    const props = this.dp.nodeNames()
-      .map(name => this.dp.nodeProperty(name, prop))
-      .filter(d => d !== undefined);
-
-    return [
-      Math.min.apply(null, props),
-      Math.max.apply(null, props)
-    ];
-  }
-
-  setUndiscoveredColor (year) {
-    let colors = [];
-    this.dp.nodeNames().forEach((name, i) => {
-      const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
-      const color = existsYet ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
-
-      colors[i] = color;
-    });
-
-    this.points.style('fillColor', (nodeId, i) => colors[i]);
+  setNodeColor(scale) {
+    this.points.style('fillColor', (nodeId) => scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
 

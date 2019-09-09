@@ -14,9 +14,15 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
-    picked: (data, position) => {
-      this.context.selectNode(data, position);
+    picked: (node, position) => {
+      this.context.selectNode(node, position);
     },
+    hovered: (node, position, radius) => {
+      this.context.hovered = { node, position, radius };
+    },
+    hoveredLine: (node1, node2, position) => {
+      this.context.hoveredLine = { node1, node2, position };
+    }
   });
 
   dragging = {
@@ -49,7 +55,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.hideAfter(store.year);
-      this.scene.setDegreeSize(store.nodeSizeFunc);
+      this.scene.setNodeSize(store.nodeSizer.scale, store.zoomNodeSizeFactor);
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
@@ -59,7 +65,7 @@ class GraphVisComponent extends Component {
       if (obj) {
         this.scene.display(store.search, true);
       } else {
-        store.clearSelection();
+        store.selected = null;
       }
     });
     setAndObserve(() => {
@@ -77,26 +83,7 @@ class GraphVisComponent extends Component {
     });
 
     setAndObserve(() => {
-      switch (store.color) {
-        case 'none':
-          this.scene.setConstColor();
-          break;
-
-        case 'boolean':
-          this.scene.setBooleanColor();
-          break;
-
-        case 'discovery':
-          this.scene.setDiscoveryColor();
-          break;
-
-        case 'undiscovered':
-          this.scene.setUndiscoveredColor(store.colorYear);
-          break;
-
-        default:
-          this.scene.setPropertyColor(store.color);
-      }
+      this.scene.setNodeColor(store.nodeColorer.scale);
     });
   }
 
@@ -109,7 +96,7 @@ class GraphVisComponent extends Component {
 
     this.ro.observe(this.visElement);
 
-    if (this.scene.initScene()) {
+    if (this.scene.initScene(this.context.zoomRange)) {
       // set defaults
       this.initSceneListener();
     }
@@ -171,7 +158,7 @@ class GraphVisComponent extends Component {
       // data has changed
       this.scene.clear();
       this.scene.dp = store.data;
-      if (this.scene.initScene()) {
+      if (this.scene.initScene(store.zoomRange)) {
         // set defaults
         this.initSceneListener();
       }

@@ -1,7 +1,4 @@
 export class DataProvider {
-  constructor () {
-    console.log('hi');
-  }
 }
 
 export function computeGraph (edges) {
@@ -37,6 +34,9 @@ export class DiskDataProvider extends DataProvider {
     const graph = computeGraph(edges);
     this._nodeIndex = graph.nodeIndex;
     this.edgeIndex = graph.edgeIndex;
+
+    // inject the name of the node into the object
+    Object.entries(nodes).forEach(([k, v]) => v.name = k);
 
     this._names = Object.keys(this.nodes);
     const bad = this._names.indexOf('value');
@@ -84,16 +84,14 @@ export class DiskDataProvider extends DataProvider {
     };
   }
 
-  nodeDegrees (year) {
+  nodeDegrees (filter) {
     let table = {};
     const countEdge = (node, other) => {
       if (!table.hasOwnProperty(node)) {
         table[node] = 0;
       }
 
-      const discovery = this.nodeProperty(other, 'discovery') || 2016;
-
-      if (this.nodeExists(other) && discovery <= year) {
+      if (this.nodeExists(other) && filter(this.nodes[node])) {
         table[node]++;
       }
     }

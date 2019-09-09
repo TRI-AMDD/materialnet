@@ -5,111 +5,83 @@ import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
+import datasets from '../datasets';
 import { isEqual } from "lodash-es";
+import { createFormatter } from './format';
 
 export class ApplicationStore {
+    static INVALID_VALUE_COLOR = '#ff0000';
+    static DISCOVERED_COLOR = 'rgb(81,96,204)';
+    static UNDISCOVERED_COLOR = '#de2d26';
+    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
+
+    @observable
+    datasets = datasets;
+
+    @observable
+    dataset = datasets[0];
+
     @observable
     data = null;
 
     @observable
-    dataset = 'precise';
+    template = null;
 
-    static datasetSettings = {
-        options: [
-            { label: 'Precise', value: 'precise' },
-            { label: 'Precise - Gephi', value: 'precise-gephi' },
-            { label: 'Sample 1', value: 'sample1' },
-            { label: 'Sample 1 - Gephi', value: 'sample1-gephi' },
-            { label: 'Sample 2', value: 'sample2' },
-            { label: 'Sample 1k edges', value: 'sample_cooccurence' },
-            { label: 'Full .5M edges', value: 'full_cooccurence' }
-        ]
-    };
+    @computed
+    get templates() {
+        return this.dataset.templates;
+    }
 
     @observable
-    template = 'material';
+    zoom = 1;
 
-    static templateSettings = {
-        options: [
-            { label: 'Material', value: 'material' },
-            { label: 'Minimal', value: 'minimal' }
-        ]
-    };
-
-    @observable
-    zoom = -2.3;
-    static zoomSettings = {
-        range: [-3.75, 3]
-    };
+    @computed
+    get zoomRange() {
+        return this.dataset.zoomRange;
+    }
 
     @observable
     spacing = 1;
-    static spacingSettings = {
-        range: [0.1, 10]
-    };
-
+    @observable
+    spacingRange = [0.1, 10];
 
     @observable
     opacity = 0.01;
-    static opacitySettings = {
-        range: [0, 0.1],
-        step: 0.001
-    };
-
-    @observable
-    year = 2016;
 
     @observable
     play = false;
     @observable
     interval = null;
 
-    static yearSettings = {
-        range: [1945, 2016],
-        step: 1,
-    };
+    @observable
+    year = null;
+
+    @observable
+    colorYear = null;
+
+    @computed
+    get yearRange() {
+        return this.dataset.yearRange;
+    }
 
     @observable
     search = '';
 
     @observable
-    color = 'discovery';
+    color = null;
 
-    static colorSettings = {
-        options: [
-            { label: 'None', value: 'none' },
-            { label: 'Year of discovery', value: 'discovery' },
-            { label: 'Discovered/Hypothetical', value: 'boolean' },
-            { label: 'Discovered/Undiscovered', value: 'undiscovered' },
-            { label: 'Formation Energy', value: 'formation_energy' },
-            { label: 'Synthesis Probability', value: 'synthesis_probability' },
-            { label: 'Clustering Coefficient', value: 'clus_coeff' },
-            { label: 'Eigenvector Centrality', value: 'eigen_cent' },
-            { label: 'Degree Centrality', value: 'deg_cent' },
-            { label: 'Shortest path', value: 'shortest_path' },
-            { label: 'Degree Neighborhood', value: 'deg_neigh' },
-        ]
-    };
+    @computed
+    get colors() {
+        return this.dataset.colors;
+    }
 
     @observable
-    colorYear = 2016;
+    size = null;
 
-    static colorYearSettings = {
-        range: [1945, 2016],
-        step: 1
-    };
-
-    @observable
-    size = 'normal';
-
-    static sizeSettings = {
-        options: [
-            { label: 'None', value: 'none' },
-            { label: 'Degree', value: 'normal' },
-            { label: 'Degree - Large', value: 'large' },
-            { label: 'Degree - Huge', value: 'huge' }
-        ]
-    };
+    @computed
+    get sizes() {
+        return this.dataset.sizes;
+    }
 
     @observable
     showLinks = false;
@@ -124,51 +96,101 @@ export class ApplicationStore {
     selectedPosition = null;
 
     @observable
-    structure = null;
+    hovered = {
+            node: null,
+            position: null,
+            radius: null
+    };
+    @observable
+    hoveredLine = {
+            node1: null,
+            node2: null,
+            position: null
+    };
 
+    
     @observable
     drawerVisible = true;
+
+    @observable
+    colorScale = scaleSequential(interpolateViridis);
+
+    @observable
+    sizeScaleRange = [2, 40];
+
 
     @observable
     showLegend = true;
 
     constructor() {
-        this.initState();
-
         // load data and update on dataset change        
         autorun(() => {
-            const datafile = `sample-data/${this.dataset}.json`;
-            fetch(datafile).then(resp => resp.json()).then(data => {
+            // set the defaults from the dataset
+            Object.assign(this, this.dataset.defaults, {});
+
+            // load data and update on dataset change
+            fetch(this.dataset.fileName).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);
             });
         });
 
+        // after loading defaults
+        this.initState();
+
+        // auto inject the structure
+        autorun(() => {
+            const node = this.selected;
+            if (!node || node.structure) {
+                return; // already fetched
+            }
+            node.structurePromise = fetchStructure(node.name).then(cjson => {
+                return node.structure = cjson;
+            });
+        })
+
     }
 
     initState() {
+        const integrateState = (state) => {
+            state = { ...state }; // copy to manipuate
+            ['dataset', 'color', 'size'].forEach((attr) => {
+                const value = state[attr];
+                delete state[attr];
+                if (!value) {
+                    return;
+                }
+                // find by label
+                const found = this[`${attr}s`].find((d) => d.label === value);
+                if (found) {
+                    this[attr] = found;
+                }
+            });
+            // rest pure copy
+            Object.assign(this, state);
+        };
+
         const state = window.history.state;
         if (state && state.dataset != null) {
             // use the stored state to init
-            Object.assign(this, state);
+            integrateState(state);
         } else {
             // try using the url
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
-            // update with the stored one
-            if (dataset && ApplicationStore.datasetSettings.options.find((d) => d.value === dataset)) {
-                this.dataset = dataset;
-            }
+            integrateState({
+                dataset
+            });
         }
         
         let firstRun = true;
         // track state and update the url automatically
         autorun(() => {
             const state = {
-                dataset: this.dataset,
+                dataset: this.dataset.label,
+                color: this.color.label,
+                size: this.size.label,
                 zoom: this.zoom,
-                color: this.color,
                 colorYear: this.colorYear,
-                size: this.size,
                 drawerVisible: this.drawerVisible
             };
 
@@ -178,8 +200,8 @@ export class ApplicationStore {
             }
 
             const url = new URL(window.location.href);
-            url.searchParams.set('ds', this.dataset);
-            const title = document.title = `MaterialNet - ${this.datasetLabel}`;
+            url.searchParams.set('ds', this.dataset.label);
+            const title = document.title = `MaterialNet - ${this.dataset.label}`;
             if (firstRun) {
                 firstRun = false;
                 window.history.replaceState(state, title, url.href);
@@ -192,17 +214,12 @@ export class ApplicationStore {
         window.addEventListener('popstate', (evt) => {
             const state = evt.state;
             if (state && state.dataset != null) {
-                // use the stored state to update the store
-                Object.assign(this, state);
+                integrateState(state);
             }
         });
         
     }
 
-    @computed
-    get datasetLabel() {
-        return ApplicationStore.datasetSettings.options.find((d) => d.value === this.dataset).label;
-    }
 
     @computed
     get nodes() {
@@ -213,6 +230,11 @@ export class ApplicationStore {
     get edges() {
         return this.data.edges;
     }
+
+    @computed
+    get zoomNodeSizeFactor() {
+        return Math.pow(2, this.zoom);
+    }
     
     @computed
     get searchOptions() {
@@ -222,16 +244,26 @@ export class ApplicationStore {
         return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
+    minMaxProperty(property) {
+        if (!this.data) {
+            return [0, 10];
+        }
+        return this.data.nodeNames().reduce(([min, max], name) => {
+            const v = this.data.nodeProperty(name, property);
+            if (v == null) {
+                return [min, max];
+            }
+            return [
+                Math.min(min, v),
+                Math.max(max, v)
+            ];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
     @action
     setPlayState(play, interval) {
         this.play = play;
         this.interval = interval;
-    }
-
-    @action
-    clearSelection() {
-        this.selected = null;
-        this.structure = null;
     }
 
     @action
@@ -247,8 +279,8 @@ export class ApplicationStore {
         if (!this.play) {
             interval = setInterval(() => {
                 let nextYear = this.year + 1;
-                if (this.year === ApplicationStore.yearSettings.range[1]) {
-                    nextYear = ApplicationStore.yearSettings.range[0];
+                if (this.year === this.yearRange[1]) {
+                    nextYear = this.yearRange[0];
                 }
                 this.year = nextYear;
             }, 1000);
@@ -258,108 +290,50 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(obj, position) {
+    selectNode(node, position) {
         const currentName = this.selected ? this.selected.name : '';
         // toggle if click on selected
-        if (obj.name === currentName) {
-            obj = null;
+        if (node.name === currentName) {
+            node = null;
         }
-        this.selected = obj;
+        this.selected = node;
         this.selectedPosition = position;
-        this.structure = null;
+    }
 
-        if (!obj) {
-            return;
+    getPropertyMetaData(property) {
+        const props = this.dataset.properties || {};
+        const base = Object.assign({
+            format: (v) => typeof v === 'number' ? v.toFixed(3) : v
+        }, props[property] || {});
+
+        if (typeof base.format === 'string') {
+            // create a formatter out of the spec
+            base.format = createFormatter(base.format, base.prefix, base.suffix);
         }
-
-        fetchStructure(obj.name).then(cjson => {
-            if (cjson) {
-                this.structure = cjson;
-            }
-        });
+        return base;
     }
 
     @computed
-    get degreeToSizeFunc() {
-        const factor = Math.pow(2, this.zoom);
-        switch (this.size) {
-            case 'none':
-                return () => factor * 10;
-            case 'normal':
-                return (deg) => factor * (10 + Math.sqrt(deg));
-            case 'large':
-                return (deg) => factor * (10 + Math.sqrt(Math.sqrt(deg * deg * deg)));
-            case 'huge':
-                return (deg) => factor * (10 + deg);
-            default:
-                throw new Error(`bad level option: ${this.size}`);
+    get nodeColorer() {
+        if (!this.color) {
+            return {
+                legend: () => null,
+                scale: () => ApplicationStore.FIXED_COLOR
+            };
         }
+        return this.color.factory(this);
     }
 
     @computed
-    get nodeSizeFunc() {
-        const degree2size = this.degreeToSizeFunc;
-        if (this.size === 'none' || !this.data) {
-            return degree2size;
+    get nodeSizer() {
+        if (!this.size) {
+            return {
+                legend: () => null,
+                scale: () => 10
+            };
         }
-        const degrees = this.data.nodeDegrees(this.year);
-        const names = this.data.nodeNames();
-        return (_nodeId, i) => {
-            const name = names[i];
-            return degree2size(degrees[name]);
-        }
+        return this.size.factory(this);
     }
-
-    @computed
-    get minMaxDegrees() {
-        if (!this.data) {
-            return [0, 10];
-        }
-        const degrees = this.data.nodeDegrees(this.year);
-        return this.data.nodeNames().reduce(([min, max], name) => {
-            const v = degrees[name];
-            return [
-                Math.min(min, v),
-                Math.max(max, v)
-            ];
-        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
-    }
-
-    @computed
-    get minMaxColorRange() {
-        if (!this.data) {
-            return [0, 10];
-        }
-        return this.data.nodeNames().reduce(([min, max], name) => {
-            const v = this.data.nodeProperty(name, this.color);
-            if (v == null) {
-                return [min, max];
-            }
-            return [
-                Math.min(min, v),
-                Math.max(max, v)
-            ];
-        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
-    }
-
-
-    propertyFormatter(property) {
-        switch (property) {
-            case 'synthesis_probability':
-                return (v) => `${(v * 100).toFixed(2)}%`;
-            case 'discovery':
-                return (v) => v.toString();
-            default:
-                return (v) => typeof v === 'number' ? v.toFixed(3) : v;
-        }
-    }
-
-
-    static COLOR_SCALE = scaleSequential(interpolateViridis);
-    static INVALID_VALUE_COLOR = '#ff0000';
-    static DISCOVERED_COLOR = 'rgb(81,96,204)';
-    static UNDISCOVERED_COLOR = '#de2d26';
-    static FIXED_COLOR = `rgb(${0.2 * 255}, ${0.3 * 255}, ${0.8 * 255})`;
 }
 
 export default createContext();

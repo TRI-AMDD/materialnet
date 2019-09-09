@@ -16,6 +16,7 @@ import { observer } from 'mobx-react';
 import './App.css';
 import NodeSizeLegend from './components/graph-vis/node-size-legend';
 import NodeColorLegend from './components/graph-vis/node-color-legend';
+import Tooltip from './components/graph-vis/tooltip';
 
 // based on https://material-ui.com/components/drawers/
 const drawerWidth = 360;
@@ -125,7 +126,7 @@ class App extends React.Component {
               <img className='logo' src={logo} alt="logo" />
             </Button>
             <Typography variant="h5" color="inherit" noWrap>
-              MaterialNet - {store.datasetLabel}
+              MaterialNet - {store.dataset.label}
               </Typography>
             <div style={{ flex: 1 }}>
             </div>
@@ -158,6 +159,7 @@ class App extends React.Component {
               <NodeColorLegend />
             </div>}
             <InfoPanel />
+            <Tooltip />
           </div>
         </div>
       </div>
