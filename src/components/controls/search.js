@@ -7,7 +7,6 @@ import Autosuggest from 'react-autosuggest';
 import { deburr } from 'lodash-es';
 
 import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
@@ -75,7 +74,11 @@ const styles = theme => ({
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: 'none',
+    listStyleType: 'none'
+  },
+  suggestionsContainer: {
+    maxHeight: '15rem',
+    overflowY: 'scroll'
   }
 });
 
@@ -166,20 +169,19 @@ class IntegrationAutosuggest extends React.Component {
             suggestionsList: classes.suggestionsList,
             suggestion: classes.suggestion,
           }}
-          renderSuggestionsContainer={options => (
-            <Popper anchorEl={this.popperNode} open={Boolean(options.children)} placement='bottom-start'>
-              <Paper
-                square
-                {...options.containerProps}
-                style={{ width: this.popperNode ? this.popperNode.clientWidth : null, height: '15rem', overflowY: 'scroll' }}
+          renderSuggestionsContainer={({containerProps, children, query}) => {
+            return Boolean(children) ? (
+              <Paper square
+                {... containerProps}
+                className={classes.suggestionsContainer}
               >
-                {options.children}
-                {(options.children && options.children.props.items.length === maxItems) &&
+                {children}
+                {(children && children.props.items.length === maxItems) &&
                   <MenuItem disabled>...</MenuItem>
                 }
               </Paper>
-            </Popper>
-          )}
+            ) : null;
+          }}
         />
       </div>
     );
