@@ -40,7 +40,7 @@ const styles = theme => ({
 
 class SizeLegend extends React.Component {
     render() {
-        const { classes, scale, factor } = this.props;
+        const { classes, scale, factor, format } = this.props;
 
         // number of points to draw
         let count = 3;
@@ -60,7 +60,7 @@ class SizeLegend extends React.Component {
         return <div className={classes.root}>
             {scale.ticks(count).map((v) => {
                 const radius = factor * scale(v);
-                return <div key={v} className={classes.circle} title={v}>
+                return <div key={v} className={classes.circle} title={format ? format(v) : v}>
                     <div className={classes.innerCircle} style={{
                         width: `${radius * 2}px`,
                         height: `${radius * 2}px`,

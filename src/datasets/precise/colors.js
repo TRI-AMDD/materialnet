@@ -1,37 +1,11 @@
 import React from 'react';
 import { ApplicationStore } from '../../store';
 import { LegendGradient, LegendCircle } from '../../components/legend';
-
-/**
- * coloring factory by color
- * @param {string} prop property to visualize
- */
-function propertyColorFactory(prop) {
-    return (store) => {
-        const format = store.getFormatter(prop);        
-        const scale = store.colorScale.copy().domain(store.minMaxProperty(prop));
-
-        return {
-            legend: () => <>
-                <LegendGradient scale={scale} format={format} />
-                <LegendCircle label="Unknown" color={ApplicationStore.INVALID_VALUE_COLOR} />
-            </>,
-            scale: (node) => {
-                const value = node[prop];
-                return value != null ? scale(value) : ApplicationStore.INVALID_VALUE_COLOR;
-            }
-        };
-    }
-}
+import { propertyColorFactory } from '../utils';
+import defaultTemplate from '../default';
 
 export default [
-    {
-        label: 'None',
-        factory: () => ({
-            legend: () => null,
-            scale: () => ApplicationStore.FIXED_COLOR
-        })
-    },
+    ...defaultTemplate.sizes,
     {
         label: 'Year of discovery',
         factory: (store) => {

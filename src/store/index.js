@@ -114,6 +114,9 @@ export class ApplicationStore {
     @observable
     colorScale = scaleSequential(interpolateViridis);
 
+    @observable
+    sizeScaleRange = [2, 40];
+
 
     @observable
     showLegend = true;

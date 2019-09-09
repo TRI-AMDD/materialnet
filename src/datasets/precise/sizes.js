@@ -1,16 +1,15 @@
 import React from 'react';
 import { SizeLegend } from '../../components/legend';
 import { scalePow, scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
+import defaultTemplate from '../default';
 
-const minSize = 2;
-const maxSize = 40;
 
 function degreeFunction(createScale) {
     return (store) => {
         if (!store.data) {
             return {
                 legend: () => null,
-                scale: () => minSize
+                scale: () => store.sizeScaleRange[0]
             };
         }
         // map lookup
@@ -25,7 +24,7 @@ function degreeFunction(createScale) {
             ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
 
-        const scale = createScale(minMax).range([minSize, maxSize]).clamp(true);
+        const scale = createScale(minMax).range(store.sizeScaleRange).clamp(true);
         return {
             legend: (factor) => <SizeLegend scale={scale} factor={factor}/>,
             scale: (node) => {
@@ -37,13 +36,7 @@ function degreeFunction(createScale) {
 }
 
 export default [
-    {
-        label: 'None',
-        factory: () => ({
-            legend: () => null,
-            scale: () => minSize,
-        })
-    },
+    ...defaultTemplate.sizes,
     {
         label: 'Degree - Linear',
         factory: degreeFunction((domain) => scaleLinear().domain(domain))
