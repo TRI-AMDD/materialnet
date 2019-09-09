@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography, Backdrop, CircularProgress } from '@material-ui/core';
+import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography, CircularProgress } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -105,6 +105,9 @@ const appStyles = theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  loader: {
+    margin: theme.spacing.unit * 2
   }
 })
 
@@ -172,7 +175,7 @@ class App extends React.Component {
             </div>}
             <InfoPanel />
             <Tooltip />
-            {!store.data && <div className={classes.loaderWrapper}><CircularProgress className={classes.loader} size={100}/></div>}
+            {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
           </div>
         </div>
       </div>
