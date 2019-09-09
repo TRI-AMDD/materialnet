@@ -93,7 +93,6 @@ export class DiskDataProvider extends DataProvider {
         onehop.add(edge[1]);
       }
     }
-    console.log(Array.from(onehop));
     return onehop;
   }
 
