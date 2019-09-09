@@ -258,7 +258,6 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-
   render () {}
   resize() {
     if (!this.map || !this.parent) {
