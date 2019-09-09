@@ -7,6 +7,7 @@ import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import datasets from '../datasets';
 import { isEqual } from "lodash-es";
+import { createFormatter } from './format';
 
 export class ApplicationStore {
     static INVALID_VALUE_COLOR = '#ff0000';
@@ -301,9 +302,15 @@ export class ApplicationStore {
 
     getPropertyMetaData(property) {
         const props = this.dataset.properties || {};
-        return Object.assign({
+        const base = Object.assign({
             format: (v) => typeof v === 'number' ? v.toFixed(3) : v
         }, props[property] || {});
+
+        if (typeof base.format === 'string') {
+            // create a formatter out of the spec
+            base.format = createFormatter(base.format, base.prefix, base.suffix);
+        }
+        return base;
     }
 
     @computed

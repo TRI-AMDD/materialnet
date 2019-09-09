@@ -1,5 +1,4 @@
 import templates from './templates';
-import { format } from 'd3-format';
 import colors from './colors';
 import sizes from './sizes';
 
@@ -13,15 +12,16 @@ export default {
     properties: {
         degree: {
             label: 'Derived materials',
-            format: format('d')
+            format: 'd'
         },
         formation_energy: {
             label: "Formation energy",
-            format: (v) => `${format(".3f")(v)} eV/atom`
+            format: '.3f',
+            suffix: ` eV/atom`
         },
         synthesis_probability: {
             label: "Synthesis probability",
-            format: format(".1%")
+            format: '.1%'
         },
     },
 
