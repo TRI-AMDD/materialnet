@@ -231,7 +231,7 @@ export class ApplicationStore {
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
                 filters: toJS(this.filters),
-                filterElements: this.filterElements,
+                filterElements: toJS(this.filterElements),
                 selected: this.selected ? this.selected.name : null
             };
 
