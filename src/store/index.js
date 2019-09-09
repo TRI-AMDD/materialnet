@@ -146,7 +146,7 @@ export class ApplicationStore {
             node.structurePromise = fetchStructure(node.name).then(cjson => {
                 return node.structure = cjson;
             });
-        })
+        });
 
     }
 
@@ -165,6 +165,19 @@ export class ApplicationStore {
                     this[attr] = found;
                 }
             });
+            if (state.selected) {
+                // selected by name when data is 
+                const toSelect = state.selected;
+                delete state.selected;
+                autorun((reaction) => {
+                    if (!this.data) {
+                        return;
+                    }
+                    // lookup by name
+                    this.selected = this.data.nodes[toSelect];
+                    reaction.dispose(); // stop updating
+                });
+            }
             // rest pure copy
             Object.assign(this, state);
         };
@@ -177,8 +190,10 @@ export class ApplicationStore {
             // try using the url
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
+            const selected = url.searchParams.get('s');
             integrateState({
-                dataset
+                dataset,
+                selected
             });
         }
         
@@ -191,7 +206,8 @@ export class ApplicationStore {
                 size: this.size.label,
                 zoom: this.zoom,
                 colorYear: this.colorYear,
-                drawerVisible: this.drawerVisible
+                drawerVisible: this.drawerVisible,
+                selected: this.selected ? this.selected.name : null
             };
 
             if (isEqual(state, window.history.state)) {
@@ -201,7 +217,12 @@ export class ApplicationStore {
 
             const url = new URL(window.location.href);
             url.searchParams.set('ds', this.dataset.label);
-            const title = document.title = `MaterialNet - ${this.dataset.label}`;
+            if (this.selected) {
+                url.searchParams.set('s', this.selected.name);
+            } else {
+                url.searchParams.delete('s');
+            }
+            const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
                 firstRun = false;
                 window.history.replaceState(state, title, url.href);
@@ -291,6 +312,7 @@ export class ApplicationStore {
 
     @action
     selectNode(node, position) {
+        console.trace('selectnode');
         const currentName = this.selected ? this.selected.name : '';
         // toggle if click on selected
         if (node.name === currentName) {

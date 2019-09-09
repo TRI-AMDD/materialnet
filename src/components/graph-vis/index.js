@@ -61,6 +61,9 @@ class GraphVisComponent extends Component {
       this.scene.setLinkOpacity(store.opacity);
     });
     setAndObserve(() => {
+      if (!store.search) {
+        return;
+      }
       const obj = this.scene.pickName(store.search);
       if (obj) {
         this.scene.display(store.search, true);
