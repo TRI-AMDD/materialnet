@@ -6,7 +6,7 @@ import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import datasets from '../datasets';
-import { isEqual } from "lodash-es";
+import { isEqual, camelCase } from "lodash-es";
 import { createFormatter } from './format';
 
 export class ApplicationStore {
@@ -124,6 +124,11 @@ export class ApplicationStore {
 
     @observable
     showLegend = true;
+
+    @observable
+    filters = {
+        // [property]: value ... filter object
+    };
 
     constructor() {
         // load data and update on dataset change        
@@ -247,7 +252,49 @@ export class ApplicationStore {
         return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
-    minMaxProperty(property) {
+    _createProperty(property, info = {}) {
+        const entry = {
+            property,
+            isFilterAble: false,
+            type: 'numerical',
+            label: camelCase(property),
+            format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
+            ...info
+        };
+        if (typeof entry.format === 'string') {
+            // create a formatter out of the spec
+            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);
+        }
+        if (entry.type === 'numerical' && !entry.domain) {
+            entry.domain = this._minMaxProperty(property);
+        }
+        return entry;
+    }
+
+    @computed
+    get properties() {
+        const properties = {};
+        Object.entries(this.dataset.properties).forEach(([property, info]) => {
+            properties[property] = this._createProperty(property, info);
+        });
+        return properties;
+    }
+
+    @computed
+    get propertyList() {
+        return Object.values(this.properties);
+    }
+
+    getPropertyMetaData(property) {
+        const prop = this.properties[property];
+        if (!prop) {
+            // fake property
+            return this._createProperty(property);
+        }
+        return prop;
+    }
+
+    _minMaxProperty(property) {
         if (!this.data) {
             return [0, 10];
         }
@@ -301,19 +348,6 @@ export class ApplicationStore {
         }
         this.selected = node;
         this.selectedPosition = position;
-    }
-
-    getPropertyMetaData(property) {
-        const props = this.dataset.properties || {};
-        const base = Object.assign({
-            format: (v) => typeof v === 'number' ? v.toFixed(3) : v
-        }, props[property] || {});
-
-        if (typeof base.format === 'string') {
-            // create a formatter out of the spec
-            base.format = createFormatter(base.format, base.prefix, base.suffix);
-        }
-        return base;
     }
 
     @computed

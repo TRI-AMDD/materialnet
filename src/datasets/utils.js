@@ -9,12 +9,12 @@ import { scaleLinear } from 'd3-scale';
  */
 export function propertyColorFactory(prop) {
     return (store) => {
-        const format = store.getPropertyMetaData(prop).format;
-        const scale = store.colorScale.copy().domain(store.minMaxProperty(prop));
+        const meta = store.getPropertyMetaData(prop);
+        const scale = store.colorScale.copy().domain(meta.domain);
 
         return {
             legend: () => <>
-                <LegendGradient scale={scale} format={format} />
+                <LegendGradient scale={scale} format={meta.format} />
                 <LegendCircle label="Unknown" color={ApplicationStore.INVALID_VALUE_COLOR} />
             </>,
             scale: (node) => {
@@ -60,11 +60,11 @@ export function propertySizeFactory(prop, createScale = createDefaultScale) {
                 scale: () => store.sizeScaleRange[0]
             };
         }
-        const format = store.getPropertyMetaData(prop).format;
-        const scale = createScale(store.minMaxProperty(prop)).range(store.sizeScaleRange).clamp(true);
+        const meta = store.getPropertyMetaData(prop);
+        const scale = createScale(meta.domain).range(store.sizeScaleRange).clamp(true);
 
         return {
-            legend: (factor) => <SizeLegend scale={scale} factor={factor} format={format}/>,
+            legend: (factor) => <SizeLegend scale={scale} factor={factor} format={meta.format}/>,
             scale: (node) => {
                 const value = node[prop];
                 return value != null ? scale(value) : scale.range()[0];
