@@ -312,7 +312,6 @@ export class ApplicationStore {
 
     @action
     selectNode(node, position) {
-        console.trace('selectnode');
         const currentName = this.selected ? this.selected.name : '';
         // toggle if click on selected
         if (node.name === currentName) {
