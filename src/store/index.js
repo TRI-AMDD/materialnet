@@ -113,6 +113,9 @@ export class ApplicationStore {
     drawerVisible = true;
 
     @observable
+    drawerExpanded = 'ui';
+
+    @observable
     colorScale = scaleSequential(interpolateViridis);
 
     @observable
