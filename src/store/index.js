@@ -288,9 +288,7 @@ export class ApplicationStore {
         if (!this.data) {
             return null;
         }
-        const filter = this.filterFunc;
-        const base = filter ? this.data.nodeNames().filter((name) => filter(this.data.nodes[name])) : this.data.nodeNames().slice();
-        return base.sort(sortStringsLength).map(val => ({ label: val }));
+        return this.filteredNodeNames.slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
     _createProperty(property, info = {}) {
@@ -335,11 +333,13 @@ export class ApplicationStore {
         return prop;
     }
 
-    _minMaxProperty(property) {
+    _minMaxProperty(property, nodes) {
         if (!this.data) {
             return [0, 10];
         }
-        return this.data.nodeNames().reduce(([min, max], name) => {
+        nodes = nodes || this.data.nodeNames();
+
+        return nodes.reduce(([min, max], name) => {
             const v = this.data.nodeProperty(name, property);
             if (v == null) {
                 return [min, max];
@@ -349,6 +349,15 @@ export class ApplicationStore {
                 Math.max(max, v)
             ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+    }
+
+    getFilteredDomain(property) {
+        if (!this.filterFunc) {
+            return this.getPropertyMetaData(property).domain;
+        }
+        // compute locally
+        return this._minMaxProperty(property, this.filteredNodeNames);
+
     }
 
     @action
