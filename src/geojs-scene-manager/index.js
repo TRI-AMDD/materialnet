@@ -138,6 +138,15 @@ export class GeoJSSceneManager {
     return true;
   }
 
+  setData(nodes, edges) {
+    if (!this.map) {
+      return;
+    }
+    this.points.data(nodes);
+    this.lines.data(edges);
+    this.map.draw();
+  }
+
   expand (m) {
     this.expansion = m;
     this.points.modified();

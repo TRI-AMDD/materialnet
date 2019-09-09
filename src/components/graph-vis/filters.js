@@ -21,7 +21,12 @@ class Filters extends React.Component {
         step={meta.step || 0.0001}
         format={meta.format}
         onChange={(val) => {
-          store.filters[meta.property] = val.every((d, i) => Math.abs(d - meta.domain[i]) < 0.00001) ? null : val.slice()
+          if (val.every((d, i) => Math.abs(d - meta.domain[i]) < 0.00001)) {
+            // same as domain
+            delete store.filters[meta.property];
+          } else {
+            store.filters[meta.property] = val.slice();
+          }
         }}
       />)}
     </Grid>

@@ -229,6 +229,19 @@ export class ApplicationStore {
         
     }
 
+    @computed
+    get filterFunc() {
+        const filters = Object.entries(this.filters);
+        if (filters.length === 0) {
+            return null;
+        }
+        return (node) => {
+            return filters.every(([prop, [min, max]]) => {
+                const value = node[prop];
+                return value != null && value >= min && value <= max;
+            });
+        };
+    }
 
     @computed
     get nodes() {
@@ -241,6 +254,31 @@ export class ApplicationStore {
     }
 
     @computed
+    get filteredNodeNames() {
+        if (!this.data) {
+            return [];
+        }
+        const filter = this.filterFunc;
+        if (!filter) {
+            return this.data.nodeNames();
+        }
+        return this.data.nodeNames().filter((name) => filter(this.data.nodes[name]));
+    }
+
+
+    @computed
+    get filteredEdges() {
+        if (!this.data) {
+            return [];
+        }
+        const filter = this.filterFunc;
+        if (!filter) {
+            return this.data.edges;
+        }
+        return this.data.edges.filter(([a , b]) => filter(this.data.nodes[a]) && filter(this.data.nodes[b]));
+    }
+
+    @computed
     get zoomNodeSizeFactor() {
         return Math.pow(2, this.zoom);
     }
@@ -250,7 +288,9 @@ export class ApplicationStore {
         if (!this.data) {
             return null;
         }
-        return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
+        const filter = this.filterFunc;
+        const base = filter ? this.data.nodeNames().filter((name) => filter(this.data.nodes[name])) : this.data.nodeNames().slice();
+        return base.sort(sortStringsLength).map(val => ({ label: val }));
     }
 
     _createProperty(property, info = {}) {
