@@ -1,6 +1,6 @@
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
-import { observable, autorun, action, computed } from "mobx";
+import { observable, autorun, action, computed, toJS } from "mobx";
 import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
@@ -201,7 +201,7 @@ export class ApplicationStore {
                 zoom: this.zoom,
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
-                filters: this.filters
+                filters: toJS(this.filters)
             };
 
             if (isEqual(state, window.history.state)) {

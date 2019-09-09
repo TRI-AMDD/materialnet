@@ -11,7 +11,6 @@ class Filters extends React.Component {
   
   render() {
     const store = this.context;
-    console.log('render');
     return (<Grid>
       {store.propertyList.filter((meta) => meta.filterAble).map((meta) => <RangeSliderControlComponent
         key={meta.label}
