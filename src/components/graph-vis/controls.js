@@ -6,10 +6,10 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Typography
+  Typography, Chip
 } from '@material-ui/core';
 
-import { PlayArrow, Pause, ExpandMore } from '@material-ui/icons';
+import { PlayArrow, Pause, ExpandMore, Room} from '@material-ui/icons';
 
 import Grid from '../controls/grid';
 import SearchControl from '../controls/search';
@@ -35,7 +35,7 @@ function toOption(v) {
 @observer
 class Controls extends React.Component {
   static contextType = Store;
-  
+
   render() {
     const store = this.context;
     return (
@@ -53,6 +53,11 @@ class Controls extends React.Component {
           maxItems={20}
           onChange={(_e, val) => { store.search = val.newValue; }}
         />
+
+        <div>
+          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<Room color="primary" />} label={node.name} onDelete={() => store.removePinned(node)} />))}
+        </div>
+
         <ExpansionPanel expanded={store.drawerExpanded === 'filter'} onChange={(_, isExpanded) => { store.drawerExpanded = isExpanded ? 'filter' : false }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
             <Typography>Filter</Typography>

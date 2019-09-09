@@ -93,6 +93,9 @@ export class ApplicationStore {
     selected = null;
 
     @observable
+    pinnedNodes = [];
+
+    @observable
     hovered = {
             node: null,
             position: null,
@@ -455,6 +458,22 @@ export class ApplicationStore {
             };
         }
         return this.size.factory(this);
+    }
+
+    @action
+    pushPinned(node) {
+        if (this.pinnedNodes.every((d) => d.name !== node.name)) {
+            this.pinnedNodes.push(node);
+        }
+    }
+
+    isPinned(node) {
+        return this.pinnedNodes.some((d) => d.name === node.name);
+    }
+
+    @action
+    removePinned(node) {
+        this.pinnedNodes = this.pinnedNodes.filter((n) => n.name !== node.name);
     }
 }
 
