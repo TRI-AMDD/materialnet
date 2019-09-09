@@ -82,8 +82,6 @@ const visStyles = theme => ({
 class Tooltip extends React.Component {
   static contextType = Store;
 
-  onClear = () => this.context.selected = null;
-
   render() {
     const store = this.context;
     const { classes } = this.props;
