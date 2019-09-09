@@ -55,7 +55,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.hideAfter(store.year);
-      this.scene.setNodeSize(store.nodeSizer.scale);
+      this.scene.setNodeSize(store.nodeSizer.scale, store.zoomNodeSizeFactor);
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);

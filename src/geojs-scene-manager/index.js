@@ -183,8 +183,7 @@ export class GeoJSSceneManager {
 
   hideAfter() {}
 
-  setNodeSize(scale) {
-    const factor = Math.pow(2, this.zoom);
+  setNodeSize(scale, factor) {
     this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
     this.map.draw();
   }
