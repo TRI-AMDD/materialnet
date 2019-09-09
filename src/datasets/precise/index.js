@@ -23,7 +23,8 @@ export default {
         synthesis_probability: {
             label: "Synthesis probability",
             filterAble: true,
-            format: '.1%'
+            format: '.1%',
+            domain: [0, 1]
         },
         eigen_cent: {
             label: 'Eigenvector centrality',
