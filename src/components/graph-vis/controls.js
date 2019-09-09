@@ -35,18 +35,18 @@ class Controls extends React.Component {
     const store = this.context;
     return (
       <Grid>
-        <SelectControl
+        {store.datasets.length > 1 && <SelectControl
           value={toOption(store.dataset).value}
           options={store.datasets.map(toOption)}
           label={'Dataset'}
           onChange={(val) => { store.dataset = store.datasets.find((d) => toOption(d).value === val); }}
-        />
-        <SelectControl
+        />}
+        {store.templates.length > 1 && <SelectControl
           value={toOption(store.template).value}
           options={store.templates.map(toOption)}
           label={'Template'}
           onChange={(val) => { store.template = store.templates.find((d) => toOption(d).value === val); }}
-        />
+        />}
         <SliderControl
           value={store.zoom}
           range={store.zoomRange}
