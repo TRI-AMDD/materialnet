@@ -29,12 +29,12 @@ export function propertyColorFactory(prop) {
  * coloring factory by property existence
  * @param {string} prop property to visualize
  */
-export function booleanColorFactory(prop, existent, notExistent) {
+export function booleanColorFactory(prop, discovered, undiscovered) {
     return (store) => {
         return {
             legend: () => <>
-                <LegendCircle label={existent} color={ApplicationStore.DISCOVERED_COLOR} />
-                <LegendCircle label={notExistent} color={ApplicationStore.UNDISCOVERED_COLOR} />
+                <LegendCircle label={discovered} color={ApplicationStore.DISCOVERED_COLOR} />
+                <LegendCircle label={undiscovered} color={ApplicationStore.UNDISCOVERED_COLOR} />
             </>,
             scale: (node) => {
                 const value = node[prop];
