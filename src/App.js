@@ -107,7 +107,7 @@ const appStyles = theme => ({
     justifyContent: 'center'
   },
   loader: {
-    margin: theme.spacing.unit * 2
+    margin: theme.spacing(2)
   }
 })
 
