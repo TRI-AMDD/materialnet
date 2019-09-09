@@ -136,6 +136,7 @@ export class ApplicationStore {
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults, {});
 
+            this.data = null;
             // load data and update on dataset change
             fetch(this.dataset.fileName).then(resp => resp.json()).then(data => {
                 this.data = new DiskDataProvider(data.nodes, data.edges);

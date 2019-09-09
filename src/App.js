@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography } from '@material-ui/core';
+import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography, CircularProgress } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -93,6 +93,21 @@ const appStyles = theme => ({
     left: 0,
     display: 'flex',
     alignItems: 'flex-end'
+  },
+  loaderWrapper: {
+    zIndex: 200,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'rgba(255,255,255,0.25)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  loader: {
+    margin: theme.spacing.unit * 2
   }
 })
 
@@ -155,11 +170,12 @@ class App extends React.Component {
           <div className={classes.content}>
             <GraphVisComponent />
             {store.showLegend && <div className={classes.legend}>
-              <NodeSizeLegend />
               <NodeColorLegend />
+              <NodeSizeLegend />
             </div>}
             <InfoPanel />
             <Tooltip />
+            {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
           </div>
         </div>
       </div>
