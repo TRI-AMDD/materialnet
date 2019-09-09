@@ -126,12 +126,17 @@ export class ApplicationStore {
         // load data and update on dataset change        
         autorun(() => {
             // set the defaults from the dataset
-            Object.assign(this, this.dataset.defaults, {});
+            Object.assign(this, this.dataset.defaults || {});
+
+            const toLoad = this.dataset.fileName;
 
             this.data = null;
             // load data and update on dataset change
-            fetch(this.dataset.fileName).then(resp => resp.json()).then(data => {
-                this.data = new DiskDataProvider(data.nodes, data.edges);
+            fetch(toLoad).then(resp => resp.json()).then(data => {
+                if (toLoad === this.dataset.fileName) {
+                    // still the same file to load
+                    this.data = new DiskDataProvider(data.nodes, data.edges);
+                }
             });
         });
 
@@ -290,6 +295,9 @@ export class ApplicationStore {
 
     @action
     toggleAutoplay() {
+        if (!this.yearRange) {
+            return;
+        }
         let interval = this.interval;
         let play = !this.play;
 

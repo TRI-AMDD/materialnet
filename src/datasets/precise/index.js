@@ -1,9 +1,11 @@
 import templates from './templates';
 import colors from './colors';
 import sizes from './sizes';
+import defaultTemplate from '../default';
 
 
 export default {
+    ...defaultTemplate,
     yearRange: [1945, 2016],
     templates,
     colors,
@@ -26,6 +28,7 @@ export default {
     },
 
     defaults: {
+        ...defaultTemplate.defaults,
         template: templates[0],
         color: colors[1],
         zoom: -2.3,
