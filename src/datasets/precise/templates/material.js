@@ -20,7 +20,6 @@ export default {
 
             <Typography gutterBottom variant="title">Network Properties</Typography>
 
-            {node.formation_energy != null && <InfoBlock label="Formation energy" value={node.formation_energy} />}
             {node.eigen_cent != null && <InfoBlock label="Eigenvector centrality" value={node.eigen_cent} />}
             {node.deg_cent != null && <InfoBlock label="Degree centrality" value={node.deg_cent} />}
             {node.shortest_path != null && <InfoBlock label="Shortest path" value={node.shortest_path} />}

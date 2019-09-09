@@ -15,6 +15,7 @@ class SliderControlComponent extends Component {
       step,
       onChange,
       digits,
+      format,
       children
     } = this.props;
 
@@ -29,7 +30,7 @@ class SliderControlComponent extends Component {
         </Typography>
         <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
           <div>
-            {value.toFixed(Number.isInteger(digits) ? digits : 2)}
+            {format ? format(value) : value.toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
           <div style={{flexGrow: 1, paddingLeft: 16, paddingRight}}>
             <Slider

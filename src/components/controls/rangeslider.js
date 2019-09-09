@@ -15,6 +15,7 @@ class RangeSliderControlComponent extends Component {
       step,
       onChange,
       digits,
+      format,
       children
     } = this.props;
 
@@ -29,7 +30,7 @@ class RangeSliderControlComponent extends Component {
         </Typography>
         <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
           <div>
-            {value[0].toFixed(Number.isInteger(digits) ? digits : 2)}
+            {format ? format(value[0]) : value[0].toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
           <div style={{flexGrow: 1, paddingLeft: 16, paddingRight}}>
             <Slider
@@ -40,7 +41,7 @@ class RangeSliderControlComponent extends Component {
             />
           </div>
           <div>
-            {value[1].toFixed(Number.isInteger(digits) ? digits : 2)}
+            {format ? format(value[1]) : value[1].toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
           {child}
         </div>

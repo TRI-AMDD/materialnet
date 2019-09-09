@@ -64,6 +64,7 @@ class Controls extends React.Component {
                 value={store.filters[meta.property] ? store.filters[meta.property] : meta.domain.slice()}
                 range={meta.domain}
                 label={meta.label}
+                format={meta.format}
                 onChange={(val) => { store.filters[meta.property] = val; }}
               />)}              
             </Grid>
