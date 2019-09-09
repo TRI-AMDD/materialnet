@@ -200,7 +200,8 @@ export class ApplicationStore {
                 size: this.size.label,
                 zoom: this.zoom,
                 colorYear: this.colorYear,
-                drawerVisible: this.drawerVisible
+                drawerVisible: this.drawerVisible,
+                filters: this.filters
             };
 
             if (isEqual(state, window.history.state)) {
