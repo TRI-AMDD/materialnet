@@ -86,6 +86,9 @@ const appStyles = theme => ({
     position: 'relative',
     flexGrow: 1
   },
+  contentNightMode: {
+    color: 'white'
+  },
   legend: {
     zIndex: 100,
     position: 'absolute',
@@ -165,6 +168,7 @@ class App extends React.Component {
 
         <div className={clsx(classes.contentContainer, {
           [classes.contentShift]: store.drawerVisible,
+          [classes.contentNightMode]: store.nightMode
         })}>
           <div className={classes.drawerHeader} />
           <div className={classes.content}>
