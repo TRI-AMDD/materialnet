@@ -83,19 +83,6 @@ export class DiskDataProvider extends DataProvider {
     return val;
   }
 
-  neighborsOf(nodeNameOrSet) {
-    const lookup = typeof nodeNameOrSet === 'string' ? new Set([nodeNameOrSet]) : nodeNameOrSet;
-    // Collect neighborhood of selected node.
-    const onehop = new Set(lookup);
-    for (const edge of this.edges) {
-      if (lookup.has(edge[0]) || lookup.has(edge[1])) {
-        onehop.add(edge[0]);
-        onehop.add(edge[1]);
-      }
-    }
-    return onehop;
-  }
-
   edgeNodes (idx) {
     const edge = this.edges[idx];
     return edge;

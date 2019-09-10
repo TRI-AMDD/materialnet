@@ -21,7 +21,7 @@ export class GeoJSSceneManager {
     this.expansion = 1;
     this.selected = null;
     this.focus = new Set();
-    this.highlightNodes = new Set();
+    this.subGraphNodes = new Set();
     this.linkOpacity = 0.01;
     this.linesVisible = false;
   }
@@ -35,7 +35,7 @@ export class GeoJSSceneManager {
     }
 
     const bounds = dp.getBounds();
-    let params = geo.util.pixelCoordinateParams(this.parent, bounds.maxx - bounds.minx, bounds.maxy - bounds.miny);
+    const params = geo.util.pixelCoordinateParams(this.parent, bounds.maxx - bounds.minx, bounds.maxy - bounds.miny);
 
     // the utility function assumes top left is 0, 0.  Move it to minx, miny.
     params.map.maxBounds.left += bounds.minx;
@@ -71,7 +71,7 @@ export class GeoJSSceneManager {
     this.lines = layer.createFeature('line')
       .data(dp.edges)
       .style({
-        position: this._position.bind(this),
+        position: this._position,
         width: 1,
         strokeColor: 'black',
         strokeOpacity: this.linkOpacity,
@@ -81,24 +81,24 @@ export class GeoJSSceneManager {
     this.highlightLines = layer.createFeature('line')
       .data([])
       .style({
-        position: this._position.bind(this),
+        position: this._position,
         width: 1,
         strokeColor: 'black',
         strokeOpacity: this.linkOpacity,
       })
-      .visible(this.linesVisible && this._isHighlighted()); // disable by default
+      .visible(this.linesVisible && this._isHighlighted());
 
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
       style: {
         strokeColor: 'black',
-        strokeWidth: this._strokeWidth.bind(this),
+        strokeWidth: this._strokeWidth,
         fillColor: 'gray',
         strokeOpacity: FOCUS_OPACITY,
         fillOpacity: FOCUS_OPACITY,
         radius: 10,
       },
-      position: this._position.bind(this),
+      position: this._position,
     })
       .data(dp.nodeNames());
 
@@ -159,7 +159,7 @@ export class GeoJSSceneManager {
     return this.selected != null || this.focus.size > 0;
   }
 
-  _position(name) {
+  _position = (name) => {
     const pos = this.dp.nodePosition(name);
     if (this.expansion === 1) {
       return pos;
@@ -170,13 +170,17 @@ export class GeoJSSceneManager {
     };
   }
 
-  _strokeWidth(name) {
+  _strokeWidth = (name) => {
     if (name === this.selected) {
       return SELECTION_STROKE_WIDTH;
     } else if (this.focus.has(name)) {
       return FOCUS_STROKE_WIDTH;
     }
     return DEFAULT_STROKE_WIDTH;
+  }
+
+  _nodeOpacity = (name) => {
+    return this.subGraphNodes.has(name) || name === this.selected ? FOCUS_OPACITY : DEFOCUS_OPACITY;
   }
 
   _handleNodeSpacing() {
@@ -208,13 +212,29 @@ export class GeoJSSceneManager {
     });
   }
 
+  _neighborsOf(nodeNameOrSet) {
+    const lookup = typeof nodeNameOrSet === 'string' ? new Set([nodeNameOrSet]) : nodeNameOrSet;
+    // Collect neighborhood of selected node.
+    const nodes = new Set(lookup);
+    for (const edge of this.lines.data()) {
+      if (lookup.has(edge[0]) || lookup.has(edge[1])) {
+        nodes.add(edge[0]);
+        nodes.add(edge[1]);
+      }
+    }
+    return nodes;
+  }
+
   setData(nodes, edges) {
     if (!this.map) {
       return;
     }
     this.points.data(nodes);
     this.lines.data(edges);
+
     if (this._isHighlighted()) {
+      // recompute subgraph can shrink or grow
+      this.subGraphNodes = this._neighborsOf(this.focus.size > 0 ? this.focus : this.selected);
       this._updateEdgeHighlights();
     }
     this.map.draw();
@@ -284,21 +304,12 @@ export class GeoJSSceneManager {
     return this.dp.nodes[name];
   }
 
-  display (name) {
-    this.selected = name;
-    this.focus = new Set();
-
-    const onehop = this.dp.neighborsOf(name);
-
-    this._focusNodes(onehop);
-  }
-
-  _focusNodes(nodes) {
-    this.highlightNodes = nodes;
+  _showSubGraph(subGraphNodes) {
+    this.subGraphNodes = subGraphNodes;
     // Set opacity of all nodes in accordance with membership in the
     // neighborhood.
-    this.points.style('fillOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
-    this.points.style('strokeOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
+    this.points.style('fillOpacity', this._nodeOpacity);
+    this.points.style('strokeOpacity', this._nodeOpacity);
 
     this._updateEdgeHighlights();
 
@@ -316,13 +327,12 @@ export class GeoJSSceneManager {
       this.highlightLines.data([]);
       return;
     }
-    
-    const toHighlight = this.lines.data().filter(([a, b]) => this.highlightNodes.has(a) && this.highlightNodes.has(b));
-    this.highlightLines.data(toHighlight);
+
+    this.highlightLines.data(this.lines.data().filter(([a, b]) => this.subGraphNodes.has(a) && this.subGraphNodes.has(b)));
     this.highlightLines.visible(true);
   }
 
-  displayFocus(pinned, selected) {
+  display(selected, pinned = []) {
     this.focus = new Set(pinned);
     this.selected = selected;
 
@@ -331,17 +341,15 @@ export class GeoJSSceneManager {
       return;
     }
 
-    const onehop = this.dp.neighborsOf(this.focus);
-    if (selected) {
-      onehop.add(selected); // at least highlight it
-    }
-    this._focusNodes(onehop);
+    const nodes = this._neighborsOf(this.focus.size > 0 ? this.focus : this.selected);
+    this._showSubGraph(nodes);
   }
+
 
   undisplay() {
     this.selected = null;
     this.focus = new Set();
-    this.highlightNodes = new Set();
+    this.subGraphNodes = new Set();
 
     if (!this.map) {
       return;
