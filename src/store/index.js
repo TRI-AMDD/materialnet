@@ -321,6 +321,11 @@ export class ApplicationStore {
     }
 
     @computed
+    get selectedIndex() {
+        return this.selected ? this.filteredNodeNames.indexOf(this.selected.name) : -1;
+    }
+
+    @computed
     get filteredNodeNames() {
         if (!this.data) {
             return [];
@@ -330,6 +335,11 @@ export class ApplicationStore {
             return this.data.nodeNames();
         }
         return this.data.nodeNames().filter((name) => filter(this.data.nodes[name]));
+    }
+
+    @computed
+    get filteredNodes() {
+        return this.filteredNodeNames.map((d) => this.data.nodes[d]);
     }
 
 

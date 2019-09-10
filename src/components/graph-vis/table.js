@@ -10,18 +10,20 @@ class Table extends React.Component {
 
   onSelectionChanged = (selection) => {
     const store = this.context;
-    store.selected = selection.length > 0 ? store.subGraphNodeObjects[selection[0]] : null;
+    store.selected = selection.length > 0 ? store.filteredNodes[selection[0]] : null;
   };
   
   render() {
     const store = this.context;
-    return (<LineUp data={store.subGraphNodeObjects}
-      singleSelection
-      defaultRanking deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal' }}
-      selection={store.selected ? store.subGraphNodeObjects.indexOf(store.selected) : null} onSelectionChanged={this.onSelectionChanged}
+    const selected = store.selectedIndex;
+
+    return (<LineUp data={store.filteredNodes}
+      singleSelection defaultRanking
+      deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal' }}
+      selection={selected >= 0 ? [selected] : undefined} onSelectionChanged={this.onSelectionChanged}
     >
       <LineUpStringColumnDesc column="name" />
-      {store.propertyList.map((prop) => <LineUpNumberColumnDesc key={prop.label} column={prop.property} label={prop.label} domain={prop.domain} custom={{numberFormat: '.3f'}}/>)}
+      {store.propertyList.map((prop) => <LineUpNumberColumnDesc key={prop.label} column={prop.property} label={prop.label} domain={prop.domain} custom={{ numberFormat: '.3f' }} />)}
     </LineUp>);
   }
 }
