@@ -4,12 +4,26 @@ import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import RangeSliderControlComponent from '../controls/rangeslider';
-import SelectControlComponent from '../controls/select';
-import { Chip } from '@material-ui/core';
+import { Chip, FormControl, Input, InputLabel } from '@material-ui/core';
 
 @observer
 class Filters extends React.Component {
   static contextType = Store;
+
+  onKeyPress = (evt) => {
+    const target = evt.target;
+    const value = target.value.trim();
+    const filterElements = this.context.filterElements;
+    const key = evt.key;
+    if (!(key === ' ' || key === 'Enter')) {
+      return;
+    }
+    if (!value || filterElements.some((d) => d === value)) {
+      return;
+    }
+    filterElements.push(value);
+    target.value = '';
+  }
   
   render() {
     const store = this.context;
@@ -30,14 +44,18 @@ class Filters extends React.Component {
           }
         }}
       />)}
-      <SelectControlComponent
-        label="Elements"
-        options={store.knownElements}
-        onChange={(val) => { store.filterElements.push(val); }}
-      />
-      <div>
-        {store.filterElements.map((elem) => <Chip key={elem} label={elem} onDelete={() => { store.filterElements = store.filterElements.filter((d) => d !== elem); }} variant="small"/>)}
-      </div>
+      <FormControl fullWidth>
+        <InputLabel>
+          Elements
+        </InputLabel>
+        <Input placeholder="Press Space or Enter to add" inputProps={{ onKeyPress: this.onKeyPress, onBlur: this.onKeyPress, list: 'elementList' }}/>
+        <datalist id="elementList">
+          {store.knownElements.map((d) => <option key={d} value={d} />)}
+        </datalist>
+        <div>
+          {store.filterElements.map((elem) => <Chip key={elem} label={elem} onDelete={() => { store.filterElements = store.filterElements.filter((d) => d !== elem); }} />)}
+        </div>
+      </FormControl>
     </Grid>
     );
   }
