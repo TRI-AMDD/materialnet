@@ -17,6 +17,10 @@ class GraphVisComponent extends Component {
     picked: (node) => {
       this.context.selectNode(node);
     },
+    onNodeSpacingChanged: (delta) => {
+      const next = this.context.spacing + (delta > 0 ? -0.1 : 0.1);
+      this.context.spacing = Math.max(next, Math.min(this.context.spacingRange[1], this.context.spacingRange[0]));
+    },
     hovered: (node, position, radius) => {
       this.context.hovered = { node, position, radius };
     },
@@ -44,8 +48,8 @@ class GraphVisComponent extends Component {
 
     const store = this.context;
 
-    const setAndObserve = (f) => {
-      this.autoRunListeners.push(autorun(f));
+    const setAndObserve = (f, options) => {
+      this.autoRunListeners.push(autorun(f, options));
     };
     setAndObserve(() => {
       this.scene.zoom = store.zoom;

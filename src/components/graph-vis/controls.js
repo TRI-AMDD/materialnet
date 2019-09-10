@@ -58,17 +58,9 @@ class Controls extends React.Component {
           {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<Room color="primary" />} label={node.name} onDelete={() => store.removePinned(node)} />))}
         </div>
 
-        <ExpansionPanel expanded={store.drawerExpanded === 'filter'} onChange={(_, isExpanded) => { store.drawerExpanded = isExpanded ? 'filter' : false }}>
+        <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Filter</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Filters/>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-        <ExpansionPanel expanded={store.drawerExpanded === 'ui'} onChange={(_, isExpanded) => { store.drawerExpanded = isExpanded ? 'ui' : false }}>
-          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>UI</Typography>
+            <Typography>Options</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Grid>
@@ -81,6 +73,7 @@ class Controls extends React.Component {
               <SliderControl
                 value={store.spacing}
                 range={store.spacingRange}
+                step={0.1}
                 label={'Node spacing'}
                 onChange={(val) => { store.spacing = val; }}
               />
@@ -94,15 +87,6 @@ class Controls extends React.Component {
               >
                 <Checkbox checked={store.showLinks} onChange={(_e, val) => { store.showLinks = val; }} />
               </SliderControl>
-          </Grid>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-        <ExpansionPanel expanded={store.drawerExpanded === 'configuration'} onChange={(_, isExpanded) => { store.drawerExpanded = isExpanded ? 'configuration' : false}}>
-          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Configuration</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Grid>
               {store.templates.length > 1 && <SelectControl
                 value={toOption(store.template).value}
                 options={store.templates.map(toOption)}
@@ -161,7 +145,14 @@ class Controls extends React.Component {
             </Grid>
           </ExpansionPanelDetails>
         </ExpansionPanel>
-        
+        <ExpansionPanel expanded={store.drawerExpanded.filter} onChange={(_, isExpanded) => { store.drawerExpanded.filter = isExpanded }}>
+          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+            <Typography>Filtering</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Filters />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
       </Grid>
     );
   }

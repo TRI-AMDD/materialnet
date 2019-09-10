@@ -50,10 +50,16 @@ const appStyles = theme => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
+    position: 'relative',
   },
   drawerPaper: {
     width: drawerWidth,
-    position: 'relative',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    overflow: 'auto',
     backgroundColor: grey['100'],
     padding: theme.spacing(2),
     paddingTop: 0,
@@ -92,7 +98,7 @@ const appStyles = theme => ({
   legend: {
     zIndex: 100,
     position: 'absolute',
-    bottom: 0,
+    bottom: 3,
     left: 0,
     display: 'flex',
     alignItems: 'flex-end'

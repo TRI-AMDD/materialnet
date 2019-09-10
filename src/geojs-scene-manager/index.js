@@ -7,15 +7,17 @@ const FOCUS_STROKE_WIDTH = 3;
 const DEFAULT_STROKE_WIDTH = 1;
 
 export class GeoJSSceneManager {
-  constructor({ onZoomChanged, picked, hovered, hoveredLine }) {
+  constructor({ onZoomChanged, picked, hovered, hoveredLine, onNodeSpacingChanged }) {
     this.dp = null;
     this.parent = null;
     this.onZoomChanged = onZoomChanged;
+    this.onNodeSpacingChanged = onNodeSpacingChanged;
     this.picked = picked;
     this.lineSelected = new Set([]);
     this.hovered = hovered;
     this.hoveredLine = hoveredLine;
     this.expansion = 1;
+    this.nextExpansionFocus = null;
     this.map = null;
     this.selected = null;
     this.focus = new Set();
@@ -51,6 +53,8 @@ export class GeoJSSceneManager {
     // allow zoomming in until 1 unit of space is 2^(value) bigger.
     params.map.min = zoomRange[0];
     params.map.max = zoomRange[1];
+    params.map.allowRotation = false;
+    params.map.clampBoundsY = params.map.clampBoundsX = false;
 
     const map = this.map = geo.map(params.map);
 
@@ -131,6 +135,8 @@ export class GeoJSSceneManager {
       this.onZoomChanged(map.zoom());
     });
 
+    this._handleNodeSpacing();
+
     map.draw();
 
     return true;
@@ -156,6 +162,35 @@ export class GeoJSSceneManager {
     return DEFAULT_STROKE_WIDTH;
   }
 
+  _handleNodeSpacing() {
+    let deltaDirection = null;
+    let position = null;
+
+    const handle = () => {
+      // run when we have both
+      if (deltaDirection == null || position == null) {
+        return;
+      }
+      this.nextExpansionFocus = position;
+      this.onNodeSpacingChanged(deltaDirection);
+      deltaDirection = null;
+      position = null;
+    };
+
+    // since not provided by geojs
+    this.parent.onwheel = (evt) => {
+      deltaDirection = evt.deltaY;
+      handle();
+    };
+    this.map.geoOn(geo.event.actionwheel, (evt) => {
+      if (!evt.mouse.modifiers.ctrl) {
+        return;
+      }
+      position = evt.mouse.geo;
+      handle();
+    });
+  }
+
   setData(nodes, edges) {
     if (!this.map) {
       return;
@@ -165,8 +200,39 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  expand (m) {
+  expand(m) {
+    if (this.expansion === m) {
+      return;
+    }
+
+    const factor = m / this.expansion;
+
     this.expansion = m;
+    if (!this.map) {
+      return;
+    }
+
+    const center = this.map.center();
+    if (this.nextExpansionFocus) {
+      // set when the user zoomed in via mouse
+      const offCenter = {
+        x: this.nextExpansionFocus.x - center.x,
+        y: this.nextExpansionFocus.y - center.y
+      };
+
+      // same distance from the visible center as before but the new target
+      this.map.center({
+        x: factor * this.nextExpansionFocus.x - offCenter.x,
+        y: factor * this.nextExpansionFocus.y - offCenter.y
+      });
+      this.nextExpansionFocus = null;
+    } else {
+      this.map.center({
+        x: factor * center.x,
+        y: factor * center.y
+      });
+    }
+
     this.points.modified();
     this.lines.modified();
     this.map.draw();

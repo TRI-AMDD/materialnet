@@ -113,7 +113,10 @@ export class ApplicationStore {
     drawerVisible = true;
 
     @observable
-    drawerExpanded = 'ui';
+    drawerExpanded = {
+            options: true,
+            filter: false
+    };
 
     @observable
     colorScale = scaleSequential(interpolateViridis);
@@ -271,7 +274,7 @@ export class ApplicationStore {
 
     @computed
     get filterFunc() {
-        const filters = Object.entries(this.filters);
+        const filters = Object.entries(toJS(this.filters));
         if (filters.length === 0) {
             return null;
         }
@@ -334,7 +337,7 @@ export class ApplicationStore {
     _createProperty(property, info = {}) {
         const entry = {
             property,
-            isFilterAble: false,
+            isfilterable: false,
             type: 'numerical',
             label: camelCase(property),
             format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
@@ -389,19 +392,6 @@ export class ApplicationStore {
                 Math.max(max, v)
             ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
-    }
-
-    getFilteredDomain(property) {
-        if (!this.filterFunc || this._isFixedDomain(property)) {
-            return this.getPropertyMetaData(property).domain;
-        }
-        // compute locally
-        return this._minMaxProperty(property, this.filteredNodeNames);
-    }
-
-    _isFixedDomain(property) {
-        const prop = this.dataset.properties[property];
-        return prop && prop.domain != null; // defined in the dataset thus fixed
     }
 
     @action
