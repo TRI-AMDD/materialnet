@@ -45,6 +45,23 @@ export class DiskDataProvider extends DataProvider {
     }
   }
 
+  getBounds() {
+    return this.nodeNames().reduce((bounds, name) => {
+      const pos = this.nodePosition(name);
+      return {
+        minx: Math.min(pos.x, bounds.minx),
+        maxx: Math.max(pos.x, bounds.maxx),
+        miny: Math.min(pos.y, bounds.miny),
+        maxy: Math.max(pos.y, bounds.maxy),
+      };
+    }, {
+      minx: Number.POSITIVE_INFINITY,
+      maxx: Number.NEGATIVE_INFINITY,
+      miny: Number.POSITIVE_INFINITY,
+      maxy: Number.NEGATIVE_INFINITY,
+    });
+  }
+
   edgeCount () {
     return this.edges.length;
   }

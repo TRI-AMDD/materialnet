@@ -44,8 +44,8 @@ class GraphVisComponent extends Component {
 
     const store = this.context;
 
-    const setAndObserve = (f) => {
-      this.autoRunListeners.push(autorun(f));
+    const setAndObserve = (f, options) => {
+      this.autoRunListeners.push(autorun(f, options));
     };
     setAndObserve(() => {
       this.scene.zoom = store.zoom;
@@ -60,6 +60,9 @@ class GraphVisComponent extends Component {
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
     });
+    setAndObserve(() => {
+      this.scene.setData(store.filteredNodeNames, store.filteredEdges);
+    }, { delay: 250 }); // debounce
     setAndObserve(() => {
       if (!store.search) {
         return;

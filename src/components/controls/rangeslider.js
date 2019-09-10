@@ -5,7 +5,7 @@ import {
   Slider
 } from '@material-ui/core';
 
-class SliderControlComponent extends Component {
+class RangeSliderControlComponent extends Component {
 
   render() {
     const {
@@ -21,8 +21,6 @@ class SliderControlComponent extends Component {
 
     const child = children ? React.Children.only(children) : undefined;
 
-    const paddingRight = child ? 16 : 0;
-
     return (
       <FormControl fullWidth>
         <Typography variant='caption'>
@@ -30,14 +28,17 @@ class SliderControlComponent extends Component {
         </Typography>
         <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
           <div>
-            {format ? format(value) : value.toFixed(Number.isInteger(digits) ? digits : 2)}
+            {format ? format(value[0]) : value[0].toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
-          <div style={{flexGrow: 1, paddingLeft: 16, paddingRight}}>
+          <div style={{flexGrow: 1, paddingLeft: 16, paddingRight: 16}}>
             <Slider
               min={range[0]} max={range[1]} step={step}
               value={value}
               onChange={(_e, val) => { onChange(val); }}
             />
+          </div>
+          <div>
+            {format ? format(value[1]) : value[1].toFixed(Number.isInteger(digits) ? digits : 2)}
           </div>
           {child}
         </div>
@@ -46,4 +47,4 @@ class SliderControlComponent extends Component {
   }
 }
 
-export default SliderControlComponent;
+export default RangeSliderControlComponent;

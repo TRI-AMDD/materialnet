@@ -1,12 +1,12 @@
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
-import { observable, autorun, action, computed } from "mobx";
+import { observable, autorun, action, computed, toJS } from "mobx";
 import { createContext } from "react";
 import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import datasets from '../datasets';
-import { isEqual } from "lodash-es";
+import { isEqual, camelCase } from "lodash-es";
 import { createFormatter } from './format';
 
 export class ApplicationStore {
@@ -113,6 +113,12 @@ export class ApplicationStore {
     drawerVisible = true;
 
     @observable
+    drawerExpanded = {
+            options: true,
+            filter: false
+    };
+
+    @observable
     colorScale = scaleSequential(interpolateViridis);
 
     @observable
@@ -122,13 +128,23 @@ export class ApplicationStore {
     @observable
     showLegend = true;
 
+    @observable
+    filters = {
+        // [property]: value ... filter object
+    };
+
     constructor() {
         // load data and update on dataset change        
         autorun(() => {
+            const toLoad = this.dataset.fileName;
+
+            // reset state
+            this.hovered = { node: null, position: null, radius: null };
+            this.hoveredLine = { node1: null, node2: null, position: null };
+            this.filters = {};
+
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults || {});
-
-            const toLoad = this.dataset.fileName;
 
             this.data = null;
             // load data and update on dataset change
@@ -213,6 +229,7 @@ export class ApplicationStore {
                 zoom: this.zoom,
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
+                filters: toJS(this.filters),
                 selected: this.selected ? this.selected.name : null
             };
 
@@ -247,6 +264,19 @@ export class ApplicationStore {
         
     }
 
+    @computed
+    get filterFunc() {
+        const filters = Object.entries(toJS(this.filters));
+        if (filters.length === 0) {
+            return null;
+        }
+        return (node) => {
+            return filters.every(([prop, [min, max]]) => {
+                const value = node[prop];
+                return value != null && value >= min && value <= max;
+            });
+        };
+    }
 
     @computed
     get nodes() {
@@ -259,6 +289,31 @@ export class ApplicationStore {
     }
 
     @computed
+    get filteredNodeNames() {
+        if (!this.data) {
+            return [];
+        }
+        const filter = this.filterFunc;
+        if (!filter) {
+            return this.data.nodeNames();
+        }
+        return this.data.nodeNames().filter((name) => filter(this.data.nodes[name]));
+    }
+
+
+    @computed
+    get filteredEdges() {
+        if (!this.data) {
+            return [];
+        }
+        const filter = this.filterFunc;
+        if (!filter) {
+            return this.data.edges;
+        }
+        return this.data.edges.filter(([a , b]) => filter(this.data.nodes[a]) && filter(this.data.nodes[b]));
+    }
+
+    @computed
     get zoomNodeSizeFactor() {
         return Math.pow(2, this.zoom);
     }
@@ -268,14 +323,58 @@ export class ApplicationStore {
         if (!this.data) {
             return null;
         }
-        return this.data.nodeNames().slice().sort(sortStringsLength).map(val => ({ label: val }));
+        return this.filteredNodeNames.slice().sort(sortStringsLength).map(val => ({ label: val }));
     }
 
-    minMaxProperty(property) {
+    _createProperty(property, info = {}) {
+        const entry = {
+            property,
+            isfilterable: false,
+            type: 'numerical',
+            label: camelCase(property),
+            format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
+            ...info
+        };
+        if (typeof entry.format === 'string') {
+            // create a formatter out of the spec
+            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);
+        }
+        if (entry.type === 'numerical' && !entry.domain) {
+            entry.domain = this._minMaxProperty(property);
+        }
+        return entry;
+    }
+
+    @computed
+    get properties() {
+        const properties = {};
+        Object.entries(this.dataset.properties).forEach(([property, info]) => {
+            properties[property] = this._createProperty(property, info);
+        });
+        return properties;
+    }
+
+    @computed
+    get propertyList() {
+        return Object.values(this.properties);
+    }
+
+    getPropertyMetaData(property) {
+        const prop = this.properties[property];
+        if (!prop) {
+            // fake property
+            return this._createProperty(property);
+        }
+        return prop;
+    }
+
+    _minMaxProperty(property, nodes) {
         if (!this.data) {
             return [0, 10];
         }
-        return this.data.nodeNames().reduce(([min, max], name) => {
+        nodes = nodes || this.data.nodeNames();
+
+        return nodes.reduce(([min, max], name) => {
             const v = this.data.nodeProperty(name, property);
             if (v == null) {
                 return [min, max];
@@ -328,19 +427,6 @@ export class ApplicationStore {
         }
         this.selected = node;
         this.selectedPosition = position;
-    }
-
-    getPropertyMetaData(property) {
-        const props = this.dataset.properties || {};
-        const base = Object.assign({
-            format: (v) => typeof v === 'number' ? v.toFixed(3) : v
-        }, props[property] || {});
-
-        if (typeof base.format === 'string') {
-            // create a formatter out of the spec
-            base.format = createFormatter(base.format, base.prefix, base.suffix);
-        }
-        return base;
     }
 
     @computed

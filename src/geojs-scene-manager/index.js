@@ -21,25 +21,7 @@ export class GeoJSSceneManager {
       return false;
     }
 
-    let nodes = this.nodes = {};
-    dp.nodeNames().forEach(name => {
-      const pos = dp.nodePosition(name);
-      nodes[name] = {
-        x: pos.x,
-        y: pos.y
-      };
-    });
-
-    const xs = Object.values(nodes).map(d => d.x);
-    const ys = Object.values(nodes).map(d => d.y);
-
-    const bounds = {
-      minx: Math.min(...xs),
-      maxx: Math.max(...xs),
-      miny: Math.min(...ys),
-      maxy: Math.max(...ys),
-    };
-
+    const bounds = dp.getBounds();
     let params = geo.util.pixelCoordinateParams(this.parent, bounds.maxx - bounds.minx, bounds.maxy - bounds.miny);
 
     // the utility function assumes top left is 0, 0.  Move it to minx, miny.
@@ -71,11 +53,21 @@ export class GeoJSSceneManager {
       ],
     });
 
-    const edges = dp.edges;
+    const position = (name) => {
+      const pos = dp.nodePosition(name);
+      if (this.expansion === 1) {
+        return pos;
+      }
+      return {
+        x: pos.x * this.expansion,
+        y: pos.y * this.expansion
+      };
+    };
+
     this.lines = layer.createFeature('line')
-      .data(edges)
+      .data(dp.edges)
       .style({
-        position: name => nodes[name],
+        position,
         width: 1,
         strokeColor: 'black',
         strokeOpacity: 0.1,
@@ -91,9 +83,9 @@ export class GeoJSSceneManager {
         fillOpacity: 0.8,
         radius: 10,
       },
-      position: name => nodes[name],
+      position,
     })
-      .data(Object.keys(nodes));
+      .data(dp.nodeNames());
 
     let onNode = null;
 
@@ -146,21 +138,19 @@ export class GeoJSSceneManager {
     return true;
   }
 
+  setData(nodes, edges) {
+    if (!this.map) {
+      return;
+    }
+    this.points.data(nodes);
+    this.lines.data(edges);
+    this.map.draw();
+  }
+
   expand (m) {
-    const factor = m / this.expansion;
     this.expansion = m;
-
-    let expanded = {...this.nodes};
-    Object.keys(expanded).forEach(node => {
-      expanded[node].x *= factor;
-      expanded[node].y *= factor;
-    });
-
-    const positioner = name => expanded[name];
-
-    this.points.position(positioner);
-    this.lines.position(positioner);
-
+    this.points.modified();
+    this.lines.modified();
     this.map.draw();
   }
 

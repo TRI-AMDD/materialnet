@@ -10,14 +10,14 @@ const templates = [
         render: (node, store) => {
             return <>
                 <Typography gutterBottom variant="h4">{node.name}</Typography>
-                <Typography gutterBottom variant="title">Properties</Typography>
+                <Typography gutterBottom variant="title" component="div">Properties</Typography>
 
-                {Object.entries(store.dataset.properties).map(([prop, info]) => {
-                    const value = node[prop];
+                {store.propertyList.map((prop) => {
+                    const value = node[prop.property];
                     if (value == null) {
                         return null;
                     }
-                    return <InfoBlock key={prop} label={info.label} value={value} {...store.getPropertyMetaData(prop)} />;
+                    return <InfoBlock key={prop.property} value={value} {...prop} />;
                 })}
 
                 <div style={{ width: '100%', height: '15rem' }}>
