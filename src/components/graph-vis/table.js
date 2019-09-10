@@ -23,7 +23,7 @@ class Table extends React.Component {
       selection={selected >= 0 ? [selected] : undefined} onSelectionChanged={this.onSelectionChanged}
     >
       <LineUpStringColumnDesc column="name" />
-      {store.propertyList.map((prop) => <LineUpNumberColumnDesc key={prop.label} column={prop.property} label={prop.label} domain={prop.domain} custom={{ numberFormat: '.3f' }} />)}
+      {store.propertyList.map((prop) => <LineUpNumberColumnDesc key={prop.label} column={prop.property} label={prop.label} domain={prop.domain} custom={{ numberFormat: prop.formatSpecifier }} />)}
     </LineUp>);
   }
 }

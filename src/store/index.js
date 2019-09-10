@@ -374,12 +374,14 @@ export class ApplicationStore {
             isfilterable: false,
             type: 'numerical',
             label: camelCase(property),
+            formatSpecifier: '.3f',
             format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
             ...info
         };
         if (typeof entry.format === 'string') {
             // create a formatter out of the spec
-            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);
+            entry.formatSpecifier = entry.format;
+            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);            
         }
         if (entry.type === 'numerical' && !entry.domain) {
             entry.domain = this._minMaxProperty(property);
