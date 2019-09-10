@@ -18,23 +18,23 @@ export default {
         },
         formation_energy: {
             label: "Formation energy",
-            filterAble: true,
+            filterable: true,
             format: '.3f',
             suffix: ` eV/atom`
         },
         synthesis_probability: {
             label: "Synthesis probability",
-            filterAble: true,
+            filterable: true,
             format: '.1%',
             domain: [0, 1]
         },
         eigen_cent: {
             label: 'Eigenvector centrality',
-            filterAble: true,
+            filterable: true,
         },
         deg_cent: {
             label: 'Degree centrality',
-            filterAble: true,
+            filterable: true,
         },
         shortest_path: {
             label: 'Shortest path'

@@ -10,8 +10,7 @@ import { scaleLinear } from 'd3-scale';
 export function propertyColorFactory(prop) {
     return (store) => {
         const meta = store.getPropertyMetaData(prop);
-        const domain = store.getFilteredDomain(prop);
-        const scale = store.colorScale.copy().domain(domain);
+        const scale = store.colorScale.copy().domain(meta.domain);
 
         return {
             legend: () => <>
@@ -62,8 +61,7 @@ export function propertySizeFactory(prop, createScale = createDefaultScale) {
             };
         }
         const meta = store.getPropertyMetaData(prop);
-        const domain = store.getFilteredDomain(prop);
-        const scale = createScale(domain).range(store.sizeScaleRange).clamp(true);
+        const scale = createScale(meta.domain).range(store.sizeScaleRange).clamp(true);
 
         return {
             legend: (factor) => <SizeLegend scale={scale} factor={factor} format={meta.format}/>,
