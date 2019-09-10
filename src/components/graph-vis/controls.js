@@ -56,7 +56,7 @@ class Controls extends React.Component {
         />
 
         <div>
-          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<RotatedPin/>} label={node.name} onDelete={() => store.removePinned(node)} />))}
+          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<RotatedPin />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />))}
         </div>
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>

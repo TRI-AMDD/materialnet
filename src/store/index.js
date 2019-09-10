@@ -427,13 +427,24 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(node) {
+    selectNode(node, asPinned) {
         const currentName = this.selected ? this.selected.name : '';
-        // toggle if click on selected
-        if (node.name === currentName) {
-            node = null;
+        const isSelected = node.name === currentName;
+        const isPinned = this.isPinned(node);
+
+        if (asPinned) {
+            if (isPinned) {
+                this.removePinned(node);
+                if (isSelected) {
+                    this.selected = null;
+                }
+            } else {
+                this.pushPinned(node);
+                this.selected = node;
+            }
+            return;
         }
-        this.selected = node;
+        this.selected = isSelected ? null : node;        
     }
 
     @computed
