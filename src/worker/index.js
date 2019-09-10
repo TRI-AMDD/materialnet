@@ -1,4 +1,5 @@
 import { forceSimulation, forceManyBody, forceLink, forceCollide } from 'd3-force';
+import { throttle } from 'lodash-es';
 
 // eslint-disable-next-line no-restricted-globals
 const root = self;
@@ -68,11 +69,11 @@ function layout(params, replyer, key) {
         return r;
     }
     
-    simulation.on('tick', () => {
+    simulation.on('tick', throttle(() => {
         replyer('tick', {
             nodes: toNodePos(nodes)
         });
-    });
+    }, 200));
     simulation.on('end', () => {
         replyer('end', {
             nodes: toNodePos(nodes)
