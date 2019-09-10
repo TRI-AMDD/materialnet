@@ -215,8 +215,8 @@ export class GeoJSSceneManager {
       });
     }
 
-    this.points.modified();
-    this.lines.modified();
+    this.points.dataTime().modified();
+    this.lines.dataTime().modified();
     this.map.draw();
   }
 
