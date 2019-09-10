@@ -2,7 +2,6 @@ import geo from 'geojs';
 
 const FOCUS_OPACITY = 0.8;
 const DEFOCUS_OPACITY = 0.05;
-const DEFOCUS_EDGE_OPACITY = 0;
 const SELECTION_STROKE_WIDTH = 4;
 const FOCUS_STROKE_WIDTH = 3;
 const DEFAULT_STROKE_WIDTH = 1;
@@ -22,7 +21,9 @@ export class GeoJSSceneManager {
     this.expansion = 1;
     this.selected = null;
     this.focus = new Set();
+    this.highlightNodes = new Set();
     this.linkOpacity = 0.01;
+    this.linesVisible = false;
   }
 
   initScene(zoomRange) {
@@ -73,9 +74,19 @@ export class GeoJSSceneManager {
         position: this._position.bind(this),
         width: 1,
         strokeColor: 'black',
-        strokeOpacity: () => this.linkOpacity,
+        strokeOpacity: this.linkOpacity,
       })
-      .visible(false); // disable by default
+      .visible(this.linesVisible); // disable by default
+    
+    this.highlightLines = layer.createFeature('line')
+      .data([])
+      .style({
+        position: this._position.bind(this),
+        width: 1,
+        strokeColor: 'black',
+        strokeOpacity: this.linkOpacity,
+      })
+      .visible(this.linesVisible && this._isHighlighted()); // disable by default
 
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
@@ -168,15 +179,6 @@ export class GeoJSSceneManager {
     return DEFAULT_STROKE_WIDTH;
   }
 
-  _strokeSelectedEdgeColor(nodes) {
-    return (_node, _idx, edge) => {
-      if (nodes.has(edge[0]) && nodes.has(edge[1])) {
-        return this.linkOpacity;
-      }
-      return DEFOCUS_EDGE_OPACITY;
-    };
-  }
-
   _handleNodeSpacing() {
     let deltaDirection = null;
     let position = null;
@@ -212,6 +214,9 @@ export class GeoJSSceneManager {
     }
     this.points.data(nodes);
     this.lines.data(edges);
+    if (this._isHighlighted()) {
+      this._updateEdgeHighlights();
+    }
     this.map.draw();
   }
 
@@ -250,15 +255,17 @@ export class GeoJSSceneManager {
 
     this.points.dataTime().modified();
     this.lines.dataTime().modified();
+    this.highlightLines.dataTime().modified();
     this.map.draw();
   }
 
   setLinkOpacity (value) {
     this.linkOpacity = value;
-    if (!this._isHighlighted()) { // in the highlight case, the function handles the update
-      this.lines.style('strokeOpacity', this.linkOpacity);
-    }
+    this.lines.style('strokeOpacity', this.linkOpacity);
+    this.highlightLines.style('strokeOpacity', this.linkOpacity);
+
     this.lines.modified();
+    this.highlightLines.modified();
     this.map.draw();
   }
 
@@ -287,15 +294,32 @@ export class GeoJSSceneManager {
   }
 
   _focusNodes(nodes) {
+    this.highlightNodes = nodes;
     // Set opacity of all nodes in accordance with membership in the
     // neighborhood.
     this.points.style('fillOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
     this.points.style('strokeOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
 
-    // Same for edges.
-    this.lines.style('strokeOpacity', this._strokeSelectedEdgeColor(nodes));
+    this._updateEdgeHighlights();
 
     this.map.draw();
+  }
+
+  _updateEdgeHighlights() {
+    const isHighlighted = this._isHighlighted();
+
+    this.lines.visible(this.linesVisible && !isHighlighted);
+
+    if (!isHighlighted || !this.linesVisible) {
+      // no highlight lines
+      this.highlightLines.visible(false);
+      this.highlightLines.data([]);
+      return;
+    }
+    
+    const toHighlight = this.lines.data().filter(([a, b]) => this.highlightNodes.has(a) && this.highlightNodes.has(b));
+    this.highlightLines.data(toHighlight);
+    this.highlightLines.visible(true);
   }
 
   displayFocus(pinned, selected) {
@@ -317,18 +341,20 @@ export class GeoJSSceneManager {
   undisplay() {
     this.selected = null;
     this.focus = new Set();
+    this.highlightNodes = new Set();
 
     if (!this.map) {
       return;
     }
     this.points.style('fillOpacity', FOCUS_OPACITY);
     this.points.style('strokeOpacity', FOCUS_OPACITY);
-    this.lines.style('strokeOpacity', this.linkOpacity);
+    this._updateEdgeHighlights();
     this.map.draw();
   }
 
-  linksVisible (show) {
-    this.lines.visible(show);
+  linksVisible(show) {
+    this.linesVisible = show;
+    this._updateEdgeHighlights();
     this.map.draw();
   }
 
@@ -339,6 +365,7 @@ export class GeoJSSceneManager {
 
     this.parent.style.backgroundColor = bgColor;
     this.lines.style('strokeColor', linkColor);
+    this.highlightLines.style('strokeColor', linkColor);
     this.map.draw();
   }
 
