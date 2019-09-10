@@ -326,7 +326,7 @@ export class ApplicationStore {
     _createProperty(property, info = {}) {
         const entry = {
             property,
-            isFilterAble: false,
+            isfilterable: false,
             type: 'numerical',
             label: camelCase(property),
             format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
