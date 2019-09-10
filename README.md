@@ -4,6 +4,13 @@ MaterialNet
 MaterialNet is a visual exploration tool to explore large networks in the context of material science.
 
 
+Interactions
+------------
+
+* Use the `mouse wheel` to zoom into the map
+* Use `ctrl + mouse wheel` to change the node spacing factor
+* `Clicking` on a node will select it, clicking on the same node again will deselect it
+
 
 
 Internal Notes
