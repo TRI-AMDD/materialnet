@@ -543,7 +543,17 @@ export class ApplicationStore {
 
     @action
     computeSubGraphLayout() {
-        const nodes = toJS(this.subGraphNodes);
+        const nodes = toJS(this.subGraphNodes).map((name) => {
+            const node = this.nodes[name];
+            const layoutNode = {
+                name,
+                x: node.x,
+                y: node.y,
+                radius: this.nodeSizer.scale(node)
+            };
+            return layoutNode;
+        });
+
         if (nodes.length === 0) {
             return;
         }

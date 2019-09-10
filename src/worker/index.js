@@ -1,4 +1,4 @@
-import { forceSimulation, forceManyBody, forceLink, forceCenter } from 'd3-force';
+import { forceSimulation, forceManyBody, forceLink, forceCollide } from 'd3-force';
 
 // eslint-disable-next-line no-restricted-globals
 const root = self;
@@ -22,17 +22,16 @@ function layout(params, replyer, key) {
 
     }, params);
 
-    // nodes format as input: string[]
+    // nodes format as input: {name: string, x: number, y: number, radius: number}[]
     // edge format as inptu: [string, string];
 
     // position output format: {[node string]: {x, y}};
 
     const lookup = new Map();
-    const nodes = params.nodes.map((name) => {
-        const obj = { name };
-        lookup.set(name, obj);
-        return obj;
-    });
+    const nodes = params.nodes;
+    for (const node of nodes) {
+        lookup.set(node.name, node);
+    };
     const edges = params.edges.map(([a, b]) => {
         return {
             source: lookup.get(a),
@@ -44,8 +43,8 @@ function layout(params, replyer, key) {
         .nodes(nodes)
         .alpha(params.alpha)
         .force('charge', forceManyBody())
-        .force('link', forceLink(edges))
-        .force('center', forceCenter());
+        .force('collide', forceCollide().radius((node) => node.radius))
+        .force('link', forceLink(edges));
     
     const stopper = onMessage((msg) => {
         if (msg.key !== key) {
@@ -84,7 +83,7 @@ function layout(params, replyer, key) {
 }
 
 
-onMessage((data, msg) => {
+onMessage((data) => {
     const type = data.type;
     const key = data.key;
     const params = data.params;
