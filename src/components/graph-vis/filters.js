@@ -3,27 +3,13 @@ import React from 'react';
 import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
+import { TagsSelect } from 'react-select-material-ui';
 import RangeSliderControlComponent from '../controls/rangeslider';
-import { Chip, FormControl, Input, InputLabel } from '@material-ui/core';
 
 @observer
 class Filters extends React.Component {
   static contextType = Store;
 
-  onKeyPress = (evt) => {
-    const target = evt.target;
-    const value = target.value.trim();
-    const filterElements = this.context.filterElements;
-    const key = evt.key;
-    if (!(key === ' ' || key === 'Enter')) {
-      return;
-    }
-    if (!value || filterElements.some((d) => d === value)) {
-      return;
-    }
-    filterElements.push(value);
-    target.value = '';
-  }
   
   render() {
     const store = this.context;
@@ -44,18 +30,12 @@ class Filters extends React.Component {
           }
         }}
       />)}
-      <FormControl fullWidth>
-        <InputLabel>
-          Elements
-        </InputLabel>
-        <Input placeholder="Press Space or Enter to add" inputProps={{ onKeyPress: this.onKeyPress, onBlur: this.onKeyPress, list: 'elementList' }}/>
-        <datalist id="elementList">
-          {store.knownElements.map((d) => <option key={d} value={d} />)}
-        </datalist>
-        <div>
-          {store.filterElements.map((elem) => <Chip key={elem} label={elem} onDelete={() => { store.filterElements = store.filterElements.filter((d) => d !== elem); }} />)}
-        </div>
-      </FormControl>
+      <TagsSelect
+        label="Elements"
+        values={store.filterElements}
+        options={store.knownElements} onChange={(values) => store.filterElements = values}
+        SelectProps={{ isClearable: true, }}
+      />
     </Grid>
     );
   }
