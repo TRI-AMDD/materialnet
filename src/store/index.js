@@ -117,6 +117,9 @@ export class ApplicationStore {
     drawerVisible = true;
 
     @observable
+    showTable = false;
+
+    @observable
     drawerExpanded = {
             options: true,
             filter: false,
@@ -512,6 +515,11 @@ export class ApplicationStore {
             return this.filteredNodeNames;
         }
         return Array.from(neighborsOf(this.pinnedNodes.length > 0 ? this.pinnedNodes.map((d) => d.name) : this.selected.name, this.filteredEdges));
+    }
+
+    @computed
+    get subGraphNodeObjects() {
+        return this.subGraphNodes.map((name) => this.nodes[name]);
     }
 
     @computed
