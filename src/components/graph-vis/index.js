@@ -14,12 +14,12 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
+    picked: (node, asPinned) => {
+      this.context.selectNode(node, asPinned);
+    },
     onNodeSpacingChanged: (delta) => {
       const next = this.context.spacing + (delta > 0 ? -0.1 : 0.1);
       this.context.spacing = Math.max(next, Math.min(this.context.spacingRange[1], this.context.spacingRange[0]));
-    },
-    picked: (node, position) => {
-      this.context.selectNode(node, position);
     },
     hovered: (node, position, radius) => {
       this.context.hovered = { node, position, radius };
@@ -73,12 +73,17 @@ class GraphVisComponent extends Component {
       }
       const obj = this.scene.pickName(store.search);
       if (obj) {
-        this.scene.display(store.search, true);
+        this.scene.display(store.search);
       } else {
         store.selected = null;
       }
     });
     setAndObserve(() => {
+      if (store.pinnedNodes.length > 0) {
+        this.scene.displayFocus(store.pinnedNodes.map((d) => d.name), store.selected ? store.selected.name : null);
+        return;
+      }
+      // no pinned nodes, default behavior
       if (store.selected == null) {
         this.scene.undisplay();
       } else {

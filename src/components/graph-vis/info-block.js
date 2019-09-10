@@ -19,9 +19,9 @@ export default class InfoBlock extends React.Component {
         const formatValue = typeof format === 'function' ? format : (format ? d3Format(format): defaultFormatter);
 
         return value != null && <>
-            <Typography gutterBottom variant="subheading" color="textSecondary">
+            <Typography gutterBottom variant="caption" color="textSecondary">
                 {label}
-                </Typography>
+            </Typography>
             <Typography paragraph>
                 {formatValue(value)}
                 {children}

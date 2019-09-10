@@ -1,5 +1,11 @@
 import geo from 'geojs';
 
+const FOCUS_OPACITY = 0.8;
+const DEFOCUS_OPACITY = 0.05;
+const SELECTION_STROKE_WIDTH = 4;
+const FOCUS_STROKE_WIDTH = 3;
+const DEFAULT_STROKE_WIDTH = 1;
+
 export class GeoJSSceneManager {
   constructor({ onZoomChanged, picked, hovered, hoveredLine, onNodeSpacingChanged }) {
     this.dp = null;
@@ -13,6 +19,8 @@ export class GeoJSSceneManager {
     this.expansion = 1;
     this.nextExpansionFocus = null;
     this.map = null;
+    this.selected = null;
+    this.focus = new Set();
   }
 
   initScene(zoomRange) {
@@ -57,21 +65,10 @@ export class GeoJSSceneManager {
       ],
     });
 
-    const position = (name) => {
-      const pos = dp.nodePosition(name);
-      if (this.expansion === 1) {
-        return pos;
-      }
-      return {
-        x: pos.x * this.expansion,
-        y: pos.y * this.expansion
-      };
-    };
-
     this.lines = layer.createFeature('line')
       .data(dp.edges)
       .style({
-        position,
+        position: this._position.bind(this),
         width: 1,
         strokeColor: 'black',
         strokeOpacity: 0.1,
@@ -82,12 +79,13 @@ export class GeoJSSceneManager {
       // primitiveShape: 'triangle',
       style: {
         strokeColor: 'black',
+        strokeWidth: this._strokeWidth.bind(this),
         fillColor: 'gray',
-        strokeOpacity: 0.8,
-        fillOpacity: 0.8,
+        strokeOpacity: FOCUS_OPACITY,
+        fillOpacity: FOCUS_OPACITY,
         radius: 10,
       },
-      position,
+      position: this._position.bind(this),
     })
       .data(dp.nodeNames());
 
@@ -108,7 +106,7 @@ export class GeoJSSceneManager {
     });
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        this.picked(this.dp.nodes[evt.data], evt.mouse.geo);
+        this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers.ctrl);
       }
     });
 
@@ -142,6 +140,26 @@ export class GeoJSSceneManager {
     map.draw();
 
     return true;
+  }
+
+  _position(name) {
+    const pos = this.dp.nodePosition(name);
+    if (this.expansion === 1) {
+      return pos;
+    }
+    return {
+      x: pos.x * this.expansion,
+      y: pos.y * this.expansion
+    };
+  }
+
+  _strokeWidth(name) {
+    if (name === this.selected) {
+      return SELECTION_STROKE_WIDTH;
+    } else if (this.focus.has(name)) {
+      return FOCUS_STROKE_WIDTH;
+    }
+    return DEFAULT_STROKE_WIDTH;
   }
 
   _handleNodeSpacing() {
@@ -254,30 +272,24 @@ export class GeoJSSceneManager {
 
   display (name) {
     this.selected = name;
+    this.focus = new Set();
 
-    // Collect neighborhood of selected node.
-    let onehop = new Set([]);
-    for(let i = 0; i < this.dp.edgeCount(); i++) {
-      const edge = this.dp.edgeNodes(i);
+    const onehop = this.dp.neighborsOf(name);
 
-      if (name === edge[0] || name === edge[1]) {
-        onehop.add(edge[0]);
-        onehop.add(edge[1]);
-      }
-    }
+    this._focusNodes(onehop);
+  }
 
+  _focusNodes(nodes) {
     // Set opacity of all nodes in accordance with membership in the
     // neighborhood.
-    let focus = 0.8;
-    let defocus = 0.05;
-    this.points.style('fillOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
-    this.points.style('strokeOpacity', (nodeId) => onehop.has(nodeId) ? focus : defocus);
+    this.points.style('fillOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
+    this.points.style('strokeOpacity', (nodeId) => nodes.has(nodeId) ? FOCUS_OPACITY : DEFOCUS_OPACITY);
 
     // Same for edges.
     const lineFocus = this.linkOpacity;
     const lineDefocus = 0;
     this.lines.style('strokeOpacity', (node, idx, edge) => {
-      if (onehop.has(edge[0]) && onehop.has(edge[1])) {
+      if (nodes.has(edge[0]) && nodes.has(edge[1])) {
         this.lineSelected.add(edge[0]);
         this.lineSelected.add(edge[1]);
 
@@ -293,12 +305,31 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
+  displayFocus(pinned, selected) {
+    this.focus = new Set(pinned);
+    this.selected = selected;
+
+    if (this.focus.size === 0 && !selected) {
+      this.undisplay();
+      return;
+    }
+
+    const onehop = this.dp.neighborsOf(this.focus);
+    if (selected) {
+      onehop.add(selected); // at least highlight it
+    }
+    this._focusNodes(onehop);
+  }
+
   undisplay() {
+    this.selected = null;
+    this.focus = new Set();
+
     if (!this.map) {
       return;
     }
-    this.points.style('fillOpacity', 0.8);
-    this.points.style('strokeOpacity', 0.8);
+    this.points.style('fillOpacity', FOCUS_OPACITY);
+    this.points.style('strokeOpacity', FOCUS_OPACITY);
     this.setLinkOpacity(this.linkOpacity);
 
     this.map.draw();

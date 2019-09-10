@@ -3,7 +3,8 @@ import Store from '../../store';
 import { withStyles, Paper, IconButton } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
-import CloseIcon from '@material-ui/icons/Close';
+import { Close } from '@material-ui/icons';
+import RotatedPin from './RotatedPin';
 
 
 const visStyles = theme => ({
@@ -26,6 +27,21 @@ class InfoPanel extends React.Component {
 
   onClear = () => this.context.selected = null;
 
+  togglePinned = () => {
+    const store = this.context;
+    const node = store.selected;
+
+    if (!node) {
+      return;
+    }
+
+    if (store.isPinned(node)) {
+      store.removePinned(node);
+    } else {
+      store.pushPinned(node);
+    }
+  }
+
   render() {
     const store = this.context;
     const { classes } = this.props;
@@ -35,7 +51,11 @@ class InfoPanel extends React.Component {
       return null;
     }
     return <Paper className={classes.root}>
-      <IconButton style={{ float: 'right' }} onClick={this.onClear}><CloseIcon /></IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
+        <RotatedPin />
+      </IconButton>
+      
 
       {store.template && store.template.render(node, store)}
     </Paper>;
