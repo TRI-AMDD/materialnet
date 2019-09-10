@@ -220,9 +220,11 @@ export class ApplicationStore {
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
             const selected = url.searchParams.get('s');
+            const pinned = (url.searchParams.get('p') || '').split(',');
             integrateState({
                 dataset,
-                selected
+                selected,
+                pinned
             });
         }
         
@@ -252,6 +254,11 @@ export class ApplicationStore {
                 url.searchParams.set('s', this.selected.name);
             } else {
                 url.searchParams.delete('s');
+            }
+            if (this.pinnedNodes.length > 0) { 
+                url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('p');
             }
             const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
