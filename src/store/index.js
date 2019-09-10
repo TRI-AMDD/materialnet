@@ -266,7 +266,7 @@ export class ApplicationStore {
 
     @computed
     get filterFunc() {
-        const filters = Object.entries(this.filters);
+        const filters = Object.entries(toJS(this.filters));
         if (filters.length === 0) {
             return null;
         }
