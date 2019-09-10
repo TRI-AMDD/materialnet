@@ -1,4 +1,5 @@
 import geo from 'geojs';
+import { neighborsOf } from '../data-provider/graph';
 
 const FOCUS_OPACITY = 0.8;
 const DEFOCUS_OPACITY = 0.05;
@@ -24,6 +25,7 @@ export class GeoJSSceneManager {
     this.subGraphNodes = new Set();
     this.linkOpacity = 0.01;
     this.linesVisible = false;
+    this.positionOverrides = {};
   }
 
   initScene(zoomRange) {
@@ -160,7 +162,7 @@ export class GeoJSSceneManager {
   }
 
   _position = (name) => {
-    const pos = this.dp.nodePosition(name);
+    const pos = this.positionOverrides[name] || this.dp.nodePosition(name);
     if (this.expansion === 1) {
       return pos;
     }
@@ -168,6 +170,15 @@ export class GeoJSSceneManager {
       x: pos.x * this.expansion,
       y: pos.y * this.expansion
     };
+  }
+
+  setPositions(overrides) {
+    this.positionOverrides = overrides;
+
+    this.points.dataTime().modified();
+    this.lines.dataTime().modified();
+    this.highlightLines.dataTime().modified();
+    this.map.draw();
   }
 
   _strokeWidth = (name) => {
@@ -213,16 +224,7 @@ export class GeoJSSceneManager {
   }
 
   _neighborsOf(nodeNameOrSet) {
-    const lookup = typeof nodeNameOrSet === 'string' ? new Set([nodeNameOrSet]) : nodeNameOrSet;
-    // Collect neighborhood of selected node.
-    const nodes = new Set(lookup);
-    for (const edge of this.lines.data()) {
-      if (lookup.has(edge[0]) || lookup.has(edge[1])) {
-        nodes.add(edge[0]);
-        nodes.add(edge[1]);
-      }
-    }
-    return nodes;
+    return neighborsOf(nodeNameOrSet, this.lines.data());
   }
 
   setData(nodes, edges) {
