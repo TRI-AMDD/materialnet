@@ -314,7 +314,6 @@ export class GeoJSSceneManager {
       return;
     }
 
-    console.log('focus', pinned, selected);
     const onehop = this.dp.neighborsOf(this.focus);
     if (selected) {
       onehop.add(selected); // at least highlight it

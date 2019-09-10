@@ -3,7 +3,8 @@ import Store from '../../store';
 import { withStyles, Paper, IconButton } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
-import {Close, Room} from '@material-ui/icons';
+import { Close } from '@material-ui/icons';
+import RotatedPin from './RotatedPin';
 
 
 const visStyles = theme => ({
@@ -51,7 +52,9 @@ class InfoPanel extends React.Component {
     }
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}><Room /></IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
+        <RotatedPin />
+      </IconButton>
       
 
       {store.template && store.template.render(node, store)}

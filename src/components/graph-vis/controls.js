@@ -9,7 +9,7 @@ import {
   Typography, Chip
 } from '@material-ui/core';
 
-import { PlayArrow, Pause, ExpandMore, Room} from '@material-ui/icons';
+import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
 
 import Grid from '../controls/grid';
 import SearchControl from '../controls/search';
@@ -20,6 +20,7 @@ import Filters from './filters';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
+import RotatedPin from './RotatedPin';
 
 function simplify(label) {
   // simplify the label for better values
@@ -55,7 +56,7 @@ class Controls extends React.Component {
         />
 
         <div>
-          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<Room color="primary" />} label={node.name} onDelete={() => store.removePinned(node)} />))}
+          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<RotatedPin/>} label={node.name} onDelete={() => store.removePinned(node)} />))}
         </div>
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
