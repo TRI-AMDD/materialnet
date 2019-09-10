@@ -63,7 +63,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
-    });
+    }, { delay: 250 }); // debounce
     setAndObserve(() => {
       this.scene.setData(store.filteredNodeNames, store.filteredEdges);
     }, { delay: 250 }); // debounce
