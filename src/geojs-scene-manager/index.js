@@ -1,4 +1,5 @@
 import geo from 'geojs';
+import { debounce } from 'lodash-es';
 
 const FOCUS_OPACITY = 0.8;
 const DEFOCUS_OPACITY = 0.05;
@@ -104,11 +105,21 @@ export class GeoJSSceneManager {
       onNode = null;
       this.hovered(null, null, null);
     });
+
+    let lastPointEvent = null;
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
         this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers.ctrl);
       }
+      lastPointEvent = evt.mouse;
     });
+    this.map.geoOn(geo.event.mouseclick, debounce((evt) => {
+      if (lastPointEvent && lastPointEvent.time === evt.time) {
+        return;
+      }
+      // seems like we have a click that didn't hit something
+      this.picked(null, false);
+    }, 100));
 
     // NOTE: disable line hovering for now till figured out where to show
     // let onLine = null;
