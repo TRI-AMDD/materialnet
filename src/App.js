@@ -174,11 +174,12 @@ class App extends React.Component {
         </Drawer>
 
         <div className={clsx(classes.contentContainer, {
-          [classes.contentShift]: store.drawerVisible,
-          [classes.contentNightMode]: store.nightMode
+          [classes.contentShift]: store.drawerVisible
         })}>
           <div className={classes.drawerHeader} />
-          <div className={classes.content}>
+          <div className={clsx(classes.content, {
+            [classes.contentNightMode]: store.nightMode
+          })}>
             <GraphVisComponent />
             {store.showLegend && <div className={classes.legend}>
               <NodeColorLegend />
