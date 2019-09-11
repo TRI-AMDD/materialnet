@@ -82,6 +82,9 @@ class GraphVisComponent extends Component {
       this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.name));
     });
     setAndObserve(() => {
+      this.scene.setPositions(store.subGraphLayout);
+    }, { delay: 300 });
+    setAndObserve(() => {
       this.scene.linksVisible(store.showLinks);
     });
     setAndObserve(() => {

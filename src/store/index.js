@@ -6,8 +6,12 @@ import { DiskDataProvider } from "../data-provider";
 import { sortStringsLength } from "../components/graph-vis/sort";
 import { fetchStructure } from "../rest";
 import datasets from '../datasets';
-import { isEqual, camelCase } from "lodash-es";
+import { isEqual, camelCase, uniqueId } from "lodash-es";
 import { createFormatter } from './format';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import Worker from 'worker-loader!../worker';
+import { neighborsOf } from '../data-provider/graph';
 
 export class ApplicationStore {
     static INVALID_VALUE_COLOR = '#ff0000';
@@ -97,15 +101,15 @@ export class ApplicationStore {
 
     @observable
     hovered = {
-            node: null,
-            position: null,
-            radius: null
+        node: null,
+        position: null,
+        radius: null
     };
     @observable
     hoveredLine = {
-            node1: null,
-            node2: null,
-            position: null
+        node1: null,
+        node2: null,
+        position: null
     };
 
     
@@ -115,7 +119,8 @@ export class ApplicationStore {
     @observable
     drawerExpanded = {
             options: true,
-            filter: false
+            filter: false,
+            layouts: false
     };
 
     @observable
@@ -134,6 +139,14 @@ export class ApplicationStore {
     };
 
     @observable
+    subGraphLayout = {
+        // [name]: {x,y}
+    };
+    @observable
+    subGraphLayouting = null; // function to abort the current layout
+
+
+    worker = new Worker();
     filterElements = [];
 
     constructor() {
@@ -175,7 +188,6 @@ export class ApplicationStore {
                 return node.structure = cjson;
             });
         });
-
     }
 
     initState() {
@@ -260,7 +272,7 @@ export class ApplicationStore {
             } else {
                 url.searchParams.delete('s');
             }
-            if (this.pinnedNodes.length > 0) { 
+            if (this.pinnedNodes.length > 0) {
                 url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
             } else {
                 url.searchParams.delete('p');
@@ -349,7 +361,7 @@ export class ApplicationStore {
         if (!filter) {
             return this.data.edges;
         }
-        return this.data.edges.filter(([a , b]) => filter(this.data.nodes[a]) && filter(this.data.nodes[b]));
+        return this.data.edges.filter(([a, b]) => filter(this.data.nodes[a]) && filter(this.data.nodes[b]));
     }
 
     @computed
@@ -475,7 +487,7 @@ export class ApplicationStore {
             }
             return;
         }
-        this.selected = isSelected ? null : node; 
+        this.selected = isSelected ? null : node;
     }
 
     @computed
@@ -514,6 +526,87 @@ export class ApplicationStore {
     @action
     removePinned(node) {
         this.pinnedNodes = this.pinnedNodes.filter((n) => n.name !== node.name);
+    }
+
+    @computed
+    get subGraphNodes() {
+        if (!this.selected && this.pinnedNodes.length === 0) {
+            return this.filteredNodeNames;
+        }
+        return Array.from(neighborsOf(this.pinnedNodes.length > 0 ? this.pinnedNodes.map((d) => d.name) : this.selected.name, this.filteredEdges));
+    }
+
+    @computed
+    get subGraphEdges() {
+        const nodes = new Set(this.subGraphNodes);
+        if (nodes.size === 0) {
+            return [];
+        }
+        return this.filteredEdges.filter((d) => nodes.has(d[0]) && nodes.has(d[1]));
+    }
+
+    _postMessage(type, params, onMessage) {
+        const key = uniqueId();
+        const replyer = (type, params) => this.worker.postMessage({ type, params, key });
+
+        const listener = (msg) => {
+            if (msg.data.key !== key) {
+                return;
+            }
+            const done = onMessage(msg.data, replyer);
+            if (done) {
+                this.worker.removeEventListener('message', listener);
+            }
+        }
+        this.worker.addEventListener('message', listener);
+        this.worker.postMessage({ type, params, key });
+        return replyer;
+    }
+
+    @action
+    computeSubGraphLayout() {
+        const nodes = toJS(this.subGraphNodes).map((name) => {
+            const node = this.nodes[name];
+            const layoutNode = {
+                name,
+                x: node.x,
+                y: node.y,
+                radius: this.nodeSizer.scale(node)
+            };
+            return layoutNode;
+        });
+
+        if (nodes.length === 0) {
+            return;
+        }
+        this.subGraphLayouting = true;
+
+        const edges = toJS(this.subGraphEdges);        
+
+        this.subGraphLayouting = this._postMessage('layout', { nodes, edges }, (msg) => {
+            const nodes = msg.params.nodes;
+            this.subGraphLayout = nodes;
+
+            if (msg.type === 'end') {
+                this.subGraphLayouting = null;
+                return true;
+            }
+            // just a tick
+            return false;
+        });
+    }
+
+    @action
+    abortSubGraphLayout() {
+        if (this.subGraphLayouting) {
+            this.subGraphLayouting('abort', {});
+            this.subGraphLayouting = null;
+        }
+    }
+
+    @action
+    resetSubGraphLayout() {
+        this.subGraphLayout = {};
     }
 }
 
