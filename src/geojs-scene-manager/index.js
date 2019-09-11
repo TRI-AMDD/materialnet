@@ -343,10 +343,10 @@ export class GeoJSSceneManager {
   setNightMode (night) {
     const bgColor = night ? 'black' : 'white';
     const strokeColor = night ? 'white' : 'black';
-    const linkColor = strokeColor;
 
     this.parent.style.backgroundColor = bgColor;
-    this.lines.style('strokeColor', linkColor);
+    this.points.style('strokeColor', strokeColor);
+    this.lines.style('strokeColor', strokeColor);
     this.map.draw();
   }
 
