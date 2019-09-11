@@ -15,16 +15,16 @@ class Layouts extends React.Component {
       {!store.subGraphLayouting && <Button
         disabled={store.selected == null && store.pinnedNodes.length === 0}
         onClick={() => store.computeSubGraphLayout()}>
-        Relayout SubGraph
+        start layout
       </Button>}
       {store.subGraphLayouting && <Button
         onClick={() => store.abortSubGraphLayout()}>
-        <CircularProgress /> <span>Abort</span>
+        <CircularProgress />&nbsp;abort
       </Button>}
       {!store.subGraphLayouting && <Button
         disabled={Object.keys(store.subGraphLayout).length === 0}
         onClick={() => store.resetSubGraphLayout()}>
-        Reset Layout
+        reset layout
       </Button>}      
     </Grid>
     );

@@ -1,5 +1,6 @@
 import geo from 'geojs';
 import { neighborsOf } from '../data-provider/graph';
+import { debounce } from 'lodash-es';
 
 const FOCUS_OPACITY = 0.8;
 const DEFOCUS_OPACITY = 0.05;
@@ -26,6 +27,7 @@ export class GeoJSSceneManager {
     this.linkOpacity = 0.01;
     this.linesVisible = false;
     this.positionOverrides = {};
+    this.linesNeedsToBeModified = false;
   }
 
   initScene(zoomRange) {
@@ -119,11 +121,21 @@ export class GeoJSSceneManager {
       onNode = null;
       this.hovered(null, null, null);
     });
+
+    let lastPointEvent = null;
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
         this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers.ctrl);
       }
+      lastPointEvent = evt.mouse;
     });
+    this.map.geoOn(geo.event.mouseclick, debounce((evt) => {
+      if (lastPointEvent && lastPointEvent.time === evt.time) {
+        return;
+      }
+      // seems like we have a click that didn't hit something
+      this.picked(null, false);
+    }, 100));
 
     // NOTE: disable line hovering for now till figured out where to show
     // let onLine = null;
@@ -176,8 +188,13 @@ export class GeoJSSceneManager {
     this.positionOverrides = overrides;
 
     this.points.dataTime().modified();
-    this.lines.dataTime().modified();
-    this.highlightLines.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
     this.map.draw();
   }
 
@@ -276,8 +293,13 @@ export class GeoJSSceneManager {
     }
 
     this.points.dataTime().modified();
-    this.lines.dataTime().modified();
-    this.highlightLines.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
     this.map.draw();
   }
 
@@ -286,8 +308,13 @@ export class GeoJSSceneManager {
     this.lines.style('strokeOpacity', this.linkOpacity);
     this.highlightLines.style('strokeOpacity', this.linkOpacity);
 
-    this.lines.modified();
-    this.highlightLines.modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.modified();
+    }
     this.map.draw();
   }
 
@@ -295,7 +322,9 @@ export class GeoJSSceneManager {
 
   setNodeSize(scale, factor) {
     this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
-    this.map.draw();
+    if (this.map) {
+      this.map.draw();
+    }
   }
 
   pickName (name) {
@@ -321,7 +350,12 @@ export class GeoJSSceneManager {
   _updateEdgeHighlights() {
     const isHighlighted = this._isHighlighted();
 
-    this.lines.visible(this.linesVisible && !isHighlighted);
+    const allLinesVisible = this.linesVisible && !isHighlighted;
+    this.lines.visible(allLinesVisible);
+    if (allLinesVisible && this.linesNeedsToBeModified) {
+      this.lines.dataTime().modified();
+      this.linesNeedsToBeModified = false;
+    }
 
     if (!isHighlighted || !this.linesVisible) {
       // no highlight lines
