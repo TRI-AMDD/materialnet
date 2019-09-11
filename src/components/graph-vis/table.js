@@ -15,7 +15,7 @@ class Table extends React.Component {
   
   render() {
     const store = this.context;
-    const selected = store.selectedIndex;
+    const selected = store.selected ? this.filteredNodes.findIndex((d) => d.name === this.selected.name) : -1;
 
     return (<LineUp data={store.filteredNodes}
       singleSelection defaultRanking
