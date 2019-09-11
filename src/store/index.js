@@ -93,7 +93,7 @@ export class ApplicationStore {
     selected = null;
 
     @observable
-    selectedPosition = null;
+    pinnedNodes = [];
 
     @observable
     hovered = {
@@ -142,6 +142,8 @@ export class ApplicationStore {
             this.hovered = { node: null, position: null, radius: null };
             this.hoveredLine = { node1: null, node2: null, position: null };
             this.filters = {};
+            this.selected = null;
+            this.pinnedNodes = [];
 
             // set the defaults from the dataset
             Object.assign(this, this.dataset.defaults || {});
@@ -187,16 +189,21 @@ export class ApplicationStore {
                     this[attr] = found;
                 }
             });
-            if (state.selected) {
+            if (state.selected || state.pinned) {
                 // selected by name when data is 
                 const toSelect = state.selected;
+                const toPin = state.pinned;
                 delete state.selected;
+                delete state.pinned;
+
                 autorun((reaction) => {
                     if (!this.data) {
                         return;
                     }
                     // lookup by name
                     this.selected = this.data.nodes[toSelect];
+                    this.pinnedNodes = toPin.map((d) => this.data.nodes[d]).filter((d) => d != null);
+
                     reaction.dispose(); // stop updating
                 });
             }
@@ -213,9 +220,11 @@ export class ApplicationStore {
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
             const selected = url.searchParams.get('s');
+            const pinned = (url.searchParams.get('p') || '').split(',');
             integrateState({
                 dataset,
-                selected
+                selected,
+                pinned
             });
         }
         
@@ -230,7 +239,8 @@ export class ApplicationStore {
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
                 filters: toJS(this.filters),
-                selected: this.selected ? this.selected.name : null
+                selected: this.selected ? this.selected.name : null,
+                pinned: this.pinnedNodes.map((d) => d.name)
             };
 
             if (isEqual(state, window.history.state)) {
@@ -244,6 +254,11 @@ export class ApplicationStore {
                 url.searchParams.set('s', this.selected.name);
             } else {
                 url.searchParams.delete('s');
+            }
+            if (this.pinnedNodes.length > 0) { 
+                url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('p');
             }
             const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
@@ -419,14 +434,24 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(node, position) {
+    selectNode(node, asPinned) {
         const currentName = this.selected ? this.selected.name : '';
-        // toggle if click on selected
-        if (node.name === currentName) {
-            node = null;
+        const isSelected = node.name === currentName;
+        const isPinned = this.isPinned(node);
+
+        if (asPinned) {
+            if (isPinned) {
+                this.removePinned(node);
+                if (isSelected) {
+                    this.selected = null;
+                }
+            } else {
+                this.pushPinned(node);
+                this.selected = node;
+            }
+            return;
         }
-        this.selected = node;
-        this.selectedPosition = position;
+        this.selected = isSelected ? null : node;        
     }
 
     @computed
@@ -449,6 +474,22 @@ export class ApplicationStore {
             };
         }
         return this.size.factory(this);
+    }
+
+    @action
+    pushPinned(node) {
+        if (this.pinnedNodes.every((d) => d.name !== node.name)) {
+            this.pinnedNodes.push(node);
+        }
+    }
+
+    isPinned(node) {
+        return this.pinnedNodes.some((d) => d.name === node.name);
+    }
+
+    @action
+    removePinned(node) {
+        this.pinnedNodes = this.pinnedNodes.filter((n) => n.name !== node.name);
     }
 }
 

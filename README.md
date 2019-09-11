@@ -10,6 +10,7 @@ Interactions
 * Use the `mouse wheel` to zoom into the map
 * Use `ctrl + mouse wheel` to change the node spacing factor
 * `Clicking` on a node will select it, clicking on the same node again will deselect it
+* `ctrl + click` on a node to select and pin it
 
 
 
