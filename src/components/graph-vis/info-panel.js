@@ -1,7 +1,6 @@
 import React from 'react';
 import Store from '../../store';
 import { withStyles, Paper, IconButton } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
 import { observer } from 'mobx-react';
 import { Close } from '@material-ui/icons';
 import RotatedPin from './RotatedPin';
@@ -16,8 +15,7 @@ const visStyles = theme => ({
     maxHeight: '100%',
     padding: '1rem',
     minWidth: '15rem',
-    zIndex: 9999,
-    background: grey[100]
+    zIndex: theme.zIndex.modal
   }
 });
 
