@@ -10,7 +10,7 @@ const templates = [
         render: (node, store) => {
             return <>
                 <Typography gutterBottom variant="h4">{node.name}</Typography>
-                <Typography gutterBottom variant="title" component="div">Properties</Typography>
+                <Typography gutterBottom variant="subtitle1" component="div">Properties</Typography>
 
                 {store.propertyList.map((prop) => {
                     const value = node[prop.property];

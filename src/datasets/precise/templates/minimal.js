@@ -12,7 +12,7 @@ export default {
         return <>
             <Typography gutterBottom variant="h4">{`${node.name} (${hypothetical ? 'undiscovered' : node.discovery})`}</Typography>
 
-            <Typography gutterBottom variant="title" component="div">
+            <Typography gutterBottom variant="subtitle1" component="div">
                 Material Properties
             </Typography>
 

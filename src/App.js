@@ -150,7 +150,7 @@ class App extends React.Component {
               <img className='logo' src={logo} alt="logo" />
             </Button>
             <Typography variant="h5" color="inherit" noWrap>
-              MaterialNet - {store.dataset.label}
+              MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
               </Typography>
             <div style={{ flex: 1 }}>
             </div>

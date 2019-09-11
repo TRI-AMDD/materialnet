@@ -6,10 +6,10 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Typography
+  Typography, Chip
 } from '@material-ui/core';
 
-import { PlayArrow, Pause, ExpandMore } from '@material-ui/icons';
+import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
 
 import Grid from '../controls/grid';
 import SearchControl from '../controls/search';
@@ -20,6 +20,7 @@ import Filters from './filters';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
+import RotatedPin from './RotatedPin';
 
 function simplify(label) {
   // simplify the label for better values
@@ -35,7 +36,7 @@ function toOption(v) {
 @observer
 class Controls extends React.Component {
   static contextType = Store;
-  
+
   render() {
     const store = this.context;
     return (
@@ -53,6 +54,11 @@ class Controls extends React.Component {
           maxItems={20}
           onChange={(_e, val) => { store.search = val.newValue; }}
         />
+
+        <div>
+          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<RotatedPin />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />))}
+        </div>
+
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
             <Typography>Options</Typography>

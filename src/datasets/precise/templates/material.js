@@ -12,13 +12,13 @@ export default {
         return <>
             <Typography gutterBottom variant="h4">{`${node.name} (${hypothetical ? 'undiscovered' : node.discovery})`}</Typography>
 
-            <Typography gutterBottom variant="title" component="div">Material Properties</Typography>
+            <Typography gutterBottom variant="subtitle1" component="div">Material Properties</Typography>
 
             {node.degree != null && <InfoBlock value={node.degree} {...store.getPropertyMetaData('degree')} />}
             {node.formation_energy != null && <InfoBlock value={node.formation_energy} {...store.getPropertyMetaData('formation_energy')} />}
             {node.synthesis_probability != null && <InfoBlock value={node.synthesis_probability} {...store.getPropertyMetaData('synthesis_probability')} />}
 
-            <Typography gutterBottom variant="title" component="div">Network Properties</Typography>
+            <Typography gutterBottom variant="subtitle1" component="div">Network Properties</Typography>
 
             {node.eigen_cent != null && <InfoBlock value={node.eigen_cent} {...store.getPropertyMetaData('eigen_cent')} />}
             {node.deg_cent != null && <InfoBlock value={node.deg_cent} {...store.getPropertyMetaData('deg_cent')} />}
