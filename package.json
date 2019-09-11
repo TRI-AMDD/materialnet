@@ -137,6 +137,7 @@
   "homepage": "https://arclamp.github.io/materialnet",
   "devDependencies": {
     "babel-preset-mobx": "^2.0.0",
-    "gh-pages": "^2.0.1"
+    "gh-pages": "^2.0.1",
+    "worker-loader": "^2.0.0"
   }
 }

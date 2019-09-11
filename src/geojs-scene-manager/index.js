@@ -1,4 +1,5 @@
 import geo from 'geojs';
+import { neighborsOf } from '../data-provider/graph';
 import { debounce } from 'lodash-es';
 
 const FOCUS_OPACITY = 0.8;
@@ -25,6 +26,8 @@ export class GeoJSSceneManager {
     this.subGraphNodes = new Set();
     this.linkOpacity = 0.01;
     this.linesVisible = false;
+    this.positionOverrides = {};
+    this.linesNeedsToBeModified = false;
   }
 
   initScene(zoomRange) {
@@ -171,7 +174,7 @@ export class GeoJSSceneManager {
   }
 
   _position = (name) => {
-    const pos = this.dp.nodePosition(name);
+    const pos = this.positionOverrides[name] || this.dp.nodePosition(name);
     if (this.expansion === 1) {
       return pos;
     }
@@ -179,6 +182,20 @@ export class GeoJSSceneManager {
       x: pos.x * this.expansion,
       y: pos.y * this.expansion
     };
+  }
+
+  setPositions(overrides) {
+    this.positionOverrides = overrides;
+
+    this.points.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
+    this.map.draw();
   }
 
   _strokeWidth = (name) => {
@@ -224,16 +241,7 @@ export class GeoJSSceneManager {
   }
 
   _neighborsOf(nodeNameOrSet) {
-    const lookup = typeof nodeNameOrSet === 'string' ? new Set([nodeNameOrSet]) : nodeNameOrSet;
-    // Collect neighborhood of selected node.
-    const nodes = new Set(lookup);
-    for (const edge of this.lines.data()) {
-      if (lookup.has(edge[0]) || lookup.has(edge[1])) {
-        nodes.add(edge[0]);
-        nodes.add(edge[1]);
-      }
-    }
-    return nodes;
+    return neighborsOf(nodeNameOrSet, this.lines.data());
   }
 
   setData(nodes, edges) {
@@ -285,8 +293,13 @@ export class GeoJSSceneManager {
     }
 
     this.points.dataTime().modified();
-    this.lines.dataTime().modified();
-    this.highlightLines.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
     this.map.draw();
   }
 
@@ -295,8 +308,13 @@ export class GeoJSSceneManager {
     this.lines.style('strokeOpacity', this.linkOpacity);
     this.highlightLines.style('strokeOpacity', this.linkOpacity);
 
-    this.lines.modified();
-    this.highlightLines.modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.modified();
+    }
     this.map.draw();
   }
 
@@ -304,7 +322,9 @@ export class GeoJSSceneManager {
 
   setNodeSize(scale, factor) {
     this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
-    this.map.draw();
+    if (this.map) {
+      this.map.draw();
+    }
   }
 
   pickName (name) {
@@ -330,7 +350,12 @@ export class GeoJSSceneManager {
   _updateEdgeHighlights() {
     const isHighlighted = this._isHighlighted();
 
-    this.lines.visible(this.linesVisible && !isHighlighted);
+    const allLinesVisible = this.linesVisible && !isHighlighted;
+    this.lines.visible(allLinesVisible);
+    if (allLinesVisible && this.linesNeedsToBeModified) {
+      this.lines.dataTime().modified();
+      this.linesNeedsToBeModified = false;
+    }
 
     if (!isHighlighted || !this.linesVisible) {
       // no highlight lines

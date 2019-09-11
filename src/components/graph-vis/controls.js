@@ -21,6 +21,7 @@ import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
 import RotatedPin from './RotatedPin';
+import Layouts from './layouts';
 
 function simplify(label) {
   // simplify the label for better values
@@ -164,6 +165,15 @@ class Controls extends React.Component {
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Filters />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel expanded={store.drawerExpanded.layouts} onChange={(_, isExpanded) => { store.drawerExpanded.layouts = isExpanded }}>
+          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+            <Typography>Layout</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Layouts />
           </ExpansionPanelDetails>
         </ExpansionPanel>
       </Grid>
