@@ -27,6 +27,7 @@ export class GeoJSSceneManager {
     this.linkOpacity = 0.01;
     this.linesVisible = false;
     this.positionOverrides = {};
+    this.linesNeedsToBeModified = false;
   }
 
   initScene(zoomRange) {
@@ -187,8 +188,13 @@ export class GeoJSSceneManager {
     this.positionOverrides = overrides;
 
     this.points.dataTime().modified();
-    this.lines.dataTime().modified();
-    this.highlightLines.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
     this.map.draw();
   }
 
@@ -287,8 +293,13 @@ export class GeoJSSceneManager {
     }
 
     this.points.dataTime().modified();
-    this.lines.dataTime().modified();
-    this.highlightLines.dataTime().modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.dataTime().modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.dataTime().modified();
+    }
     this.map.draw();
   }
 
@@ -297,8 +308,13 @@ export class GeoJSSceneManager {
     this.lines.style('strokeOpacity', this.linkOpacity);
     this.highlightLines.style('strokeOpacity', this.linkOpacity);
 
-    this.lines.modified();
-    this.highlightLines.modified();
+    if (this.lines.visible()) {
+      this.linesNeedsToBeModified = true;
+      this.lines.modified();
+    }
+    if (this.highlightLines.visible()) {
+      this.highlightLines.modified();
+    }
     this.map.draw();
   }
 
@@ -306,7 +322,9 @@ export class GeoJSSceneManager {
 
   setNodeSize(scale, factor) {
     this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
-    this.map.draw();
+    if (this.map) {
+      this.map.draw();
+    }
   }
 
   pickName (name) {
@@ -332,7 +350,12 @@ export class GeoJSSceneManager {
   _updateEdgeHighlights() {
     const isHighlighted = this._isHighlighted();
 
-    this.lines.visible(this.linesVisible && !isHighlighted);
+    const allLinesVisible = this.linesVisible && !isHighlighted;
+    this.lines.visible(allLinesVisible);
+    if (allLinesVisible && this.linesNeedsToBeModified) {
+      this.lines.dataTime().modified();
+      this.linesNeedsToBeModified = false;
+    }
 
     if (!isHighlighted || !this.linesVisible) {
       // no highlight lines
