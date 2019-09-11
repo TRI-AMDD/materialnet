@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography, CircularProgress } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Controls from './components/graph-vis/controls';
@@ -10,6 +9,8 @@ import GraphVisComponent from './components/graph-vis';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import logo from './components/header/logo.svg';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 import clsx from 'clsx';
 import Store from './store';
 import { observer } from 'mobx-react';
@@ -17,9 +18,25 @@ import './App.css';
 import NodeSizeLegend from './components/graph-vis/node-size-legend';
 import NodeColorLegend from './components/graph-vis/node-color-legend';
 import Tooltip from './components/graph-vis/tooltip';
+import { grey } from '@material-ui/core/colors';
 
 // based on https://material-ui.com/components/drawers/
 const drawerWidth = 360;
+
+const theme = createMuiTheme({
+  palette: {
+    background: {
+      paper: grey[100],
+      default: grey[100]
+    }
+  }
+});
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark'
+  }
+});
 
 const appStyles = theme => ({
   root: {
@@ -60,7 +77,6 @@ const appStyles = theme => ({
     left: 0,
     right: 0,
     overflow: 'auto',
-    backgroundColor: grey['100'],
     padding: theme.spacing(2),
     paddingTop: 0,
     overflowX: 'hidden'
@@ -104,7 +120,7 @@ const appStyles = theme => ({
     alignItems: 'flex-end'
   },
   loaderWrapper: {
-    zIndex: 200,
+    zIndex: theme.zIndex.tooltip,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -129,66 +145,68 @@ class App extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar color="default" position="fixed"
-          className={clsx(classes.appBar, {
-            [classes.appBarShift]: store.drawerVisible,
-          })}
-        >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={() => { store.drawerVisible = true; }}
-              edge="start"
-              className={clsx(classes.menuButton, store.drawerVisible && classes.hide)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }}>
-              <img className='logo' src={logo} alt="logo" />
-            </Button>
-            <Typography variant="h5" color="inherit" noWrap>
-              MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
-              </Typography>
-            <div style={{ flex: 1 }}>
+      <ThemeProvider theme={store.nightMode ? darkTheme : theme}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar color="default" position="fixed"
+            className={clsx(classes.appBar, {
+              [classes.appBarShift]: store.drawerVisible,
+            })}
+          >
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={() => { store.drawerVisible = true; }}
+                edge="start"
+                className={clsx(classes.menuButton, store.drawerVisible && classes.hide)}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }}>
+                <img className='logo' src={logo} alt="logo" />
+              </Button>
+              <Typography variant="h5" color="inherit" noWrap>
+                MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
+                </Typography>
+              <div style={{ flex: 1 }}>
+              </div>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            className={classes.drawer}
+            variant='persistent'
+            open={store.drawerVisible}
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+          >
+            <div className={classes.drawerHeader}>
+              <IconButton onClick={() => { store.drawerVisible = false; }}>
+                <ChevronLeftIcon />
+              </IconButton>
             </div>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          className={classes.drawer}
-          variant='persistent'
-          open={store.drawerVisible}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-          <div className={classes.drawerHeader}>
-            <IconButton onClick={() => { store.drawerVisible = false; }}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Controls />
-        </Drawer>
+            <Controls />
+          </Drawer>
 
-        <div className={clsx(classes.contentContainer, {
-          [classes.contentShift]: store.drawerVisible,
-          [classes.contentNightMode]: store.nightMode
-        })}>
-          <div className={classes.drawerHeader} />
-          <div className={classes.content}>
-            <GraphVisComponent />
-            {store.showLegend && <div className={classes.legend}>
-              <NodeColorLegend />
-              <NodeSizeLegend />
-            </div>}
-            <InfoPanel />
-            <Tooltip />
-            {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
+          <div className={clsx(classes.contentContainer, {
+            [classes.contentShift]: store.drawerVisible,
+            [classes.contentNightMode]: store.nightMode
+          })}>
+            <div className={classes.drawerHeader} />
+            <div className={classes.content}>
+              <GraphVisComponent />
+              {store.showLegend && <div className={classes.legend}>
+                <NodeColorLegend />
+                <NodeSizeLegend />
+              </div>}
+              <InfoPanel />
+              <Tooltip />
+              {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
+            </div>
           </div>
         </div>
-      </div>
+      </ThemeProvider>
     );
   }
 }
