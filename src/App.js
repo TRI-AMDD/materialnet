@@ -140,6 +140,10 @@ const appStyles = theme => ({
 class App extends React.Component {
   static contextType = Store;
 
+  onLogoClick = () => {
+    window.location.replace(window.location.pathname);
+  };
+
   render() {
     const store = this.context;
     const { classes } = this.props;
@@ -163,8 +167,8 @@ class App extends React.Component {
               >
                 <MenuIcon />
               </IconButton>
-              <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }}>
-                <img className='logo' src={logo} alt="logo" />
+              <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }} onClick={this.onLogoClick}>
+                <img className='logo' src={logo} alt="logo" style={{ filter: store.nightMode ? `invert(100%)` : null }}/>
               </Button>
               <Typography variant="h5" color="inherit" noWrap>
                 MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
