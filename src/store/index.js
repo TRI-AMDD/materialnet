@@ -133,6 +133,9 @@ export class ApplicationStore {
         // [property]: value ... filter object
     };
 
+    @observable
+    filterElements = [];
+
     constructor() {
         // load data and update on dataset change        
         autorun(() => {
@@ -142,6 +145,7 @@ export class ApplicationStore {
             this.hovered = { node: null, position: null, radius: null };
             this.hoveredLine = { node1: null, node2: null, position: null };
             this.filters = {};
+            this.filterElements = [];
             this.selected = null;
             this.pinnedNodes = [];
 
@@ -220,9 +224,11 @@ export class ApplicationStore {
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
             const selected = url.searchParams.get('s');
+            const pinned = (url.searchParams.get('p') || '').split(',');
             integrateState({
                 dataset,
-                selected
+                selected,
+                pinned
             });
         }
         
@@ -237,6 +243,7 @@ export class ApplicationStore {
                 colorYear: this.colorYear,
                 drawerVisible: this.drawerVisible,
                 filters: toJS(this.filters),
+                filterElements: toJS(this.filterElements),
                 selected: this.selected ? this.selected.name : null,
                 pinned: this.pinnedNodes.map((d) => d.name)
             };
@@ -252,6 +259,11 @@ export class ApplicationStore {
                 url.searchParams.set('s', this.selected.name);
             } else {
                 url.searchParams.delete('s');
+            }
+            if (this.pinnedNodes.length > 0) { 
+                url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('p');
             }
             const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
@@ -275,10 +287,14 @@ export class ApplicationStore {
     @computed
     get filterFunc() {
         const filters = Object.entries(toJS(this.filters));
-        if (filters.length === 0) {
+        const elements = new Set(this.filterElements);
+        if (filters.length === 0 && elements.length === 0) {
             return null;
         }
         return (node) => {
+            if (elements.size > 0 && node._elements.some((e) => !elements.has(e))) {
+                return false;
+            }
             return filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
@@ -294,6 +310,21 @@ export class ApplicationStore {
     @computed
     get edges() {
         return this.data.edges;
+    }
+
+    @computed
+    get knownElements() {
+        if (!this.data) {
+            return [];
+        }
+        const s = new Set();
+        for (const name of this.data.nodeNames()) {
+            const elements = this.data.nodes[name]._elements;
+            for (const elem of elements) {
+                s.add(elem)
+            }
+        }
+        return Array.from(s).sort();
     }
 
     @computed
