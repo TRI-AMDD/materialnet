@@ -190,6 +190,13 @@ export class GeoJSSceneManager {
     return DEFAULT_STROKE_WIDTH;
   }
 
+  _darkStrokePointColor = (name) => {
+    if (name === this.selected || this.focus.has(name)) {
+      return 'white';
+    }
+    return 'black';
+  }
+
   _nodeOpacity = (name) => {
     return this.subGraphNodes.has(name) || name === this.selected ? FOCUS_OPACITY : DEFOCUS_OPACITY;
   }
@@ -380,9 +387,10 @@ export class GeoJSSceneManager {
   setNightMode (night) {
     const bgColor = night ? 'black' : 'white';
     const strokeColor = night ? 'white' : 'black';
+    const pointStrokeColor = night ? this._darkStrokePointColor : 'black';
 
     this.parent.style.backgroundColor = bgColor;
-    this.points.style('strokeColor', strokeColor);
+    this.points.style('strokeColor', pointStrokeColor);
     this.lines.style('strokeColor', strokeColor); 
     this.highlightLines.style('strokeColor', strokeColor);
     this.map.draw();
