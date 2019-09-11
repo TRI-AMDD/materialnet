@@ -3,11 +3,13 @@ import React from 'react';
 import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
+import { TagsSelect } from 'react-select-material-ui';
 import RangeSliderControlComponent from '../controls/rangeslider';
 
 @observer
 class Filters extends React.Component {
   static contextType = Store;
+
   
   render() {
     const store = this.context;
@@ -28,6 +30,12 @@ class Filters extends React.Component {
           }
         }}
       />)}
+      <TagsSelect
+        label="Elements"
+        values={store.filterElements}
+        options={store.knownElements} onChange={(values) => store.filterElements = values}
+        SelectProps={{ isClearable: true, }}
+      />
     </Grid>
     );
   }
