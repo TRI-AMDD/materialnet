@@ -176,6 +176,16 @@ export class ApplicationStore {
             });
         });
 
+        autorun(() => {
+            if (!this.data) {
+                return;
+            }
+            const node = this.data.nodes[this.search];
+            if (node) {
+                this.selected = node;
+            }
+        })
+
     }
 
     initState() {
@@ -360,9 +370,9 @@ export class ApplicationStore {
     @computed
     get searchOptions() {
         if (!this.data) {
-            return null;
+            return [];
         }
-        return this.filteredNodeNames.slice().sort(sortStringsLength).map(val => ({ label: val }));
+        return this.filteredNodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value }));
     }
 
     _createProperty(property, info = {}) {
