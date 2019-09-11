@@ -63,7 +63,7 @@ class GraphVisComponent extends Component {
     });
     setAndObserve(() => {
       this.scene.setLinkOpacity(store.opacity);
-    });
+    }, { delay: 250 }); // debounce
     setAndObserve(() => {
       this.scene.setData(store.filteredNodeNames, store.filteredEdges);
     }, { delay: 250 }); // debounce
@@ -79,16 +79,7 @@ class GraphVisComponent extends Component {
       }
     });
     setAndObserve(() => {
-      if (store.pinnedNodes.length > 0) {
-        this.scene.displayFocus(store.pinnedNodes.map((d) => d.name), store.selected ? store.selected.name : null);
-        return;
-      }
-      // no pinned nodes, default behavior
-      if (store.selected == null) {
-        this.scene.undisplay();
-      } else {
-        this.scene.display(store.selected.name);
-      }
+      this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.name));
     });
     setAndObserve(() => {
       this.scene.linksVisible(store.showLinks);
