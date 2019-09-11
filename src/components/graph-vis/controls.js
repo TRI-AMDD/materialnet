@@ -62,6 +62,7 @@ class Controls extends React.Component {
           options={store.searchOptions}
           value={store.search ? {label: store.search, value: store.search} : null}
           isSearchable
+          placeholder="Search (e.g. NaCl)"
           isClearable
           maxItems={20}
           onChange={(val) => store.search = val ? val.value : null}

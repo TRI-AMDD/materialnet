@@ -242,14 +242,14 @@ export function ReactSelectSearchWrapper({ label, maxItems, options, ...rest }) 
     };
 
     const loadOptions = (inputValue) => {
-        inputValue = deburr(inputValue.trim());
+        inputValue = deburr(inputValue.trim()).toLowerCase();
 
         if (!inputValue) {
             return maxItems ? options.slice(0, maxItems) : [];
         }
 
         const data = options.reduce((r, d) => {
-            if ((!maxItems || r.length < maxItems) && d.label.includes(inputValue)) {
+            if ((!maxItems || r.length < maxItems) && d.label.toLowerCase().includes(inputValue)) {
                 r.push(d);
             }
             return r;
