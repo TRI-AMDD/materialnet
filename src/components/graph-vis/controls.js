@@ -158,7 +158,7 @@ class Controls extends React.Component {
 
         <ExpansionPanel expanded={store.drawerExpanded.layouts} onChange={(_, isExpanded) => { store.drawerExpanded.layouts = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Layouting</Typography>
+            <Typography>Layout</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Layouts />
