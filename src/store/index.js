@@ -145,12 +145,14 @@ export class ApplicationStore {
     subGraphLayout = {
         // [name]: {x,y}
     };
+
     @observable
     subGraphLayouting = null; // function to abort the current layout
 
+    @observable
+    filterElements = [];
 
     worker = new Worker();
-    filterElements = [];
 
     constructor() {
         // load data and update on dataset change        
