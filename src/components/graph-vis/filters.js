@@ -3,7 +3,7 @@ import React from 'react';
 import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
-import { TagsSelect } from 'react-select-material-ui';
+import ReactSelectWrapper from '../controls/reactselect';
 import RangeSliderControlComponent from '../controls/rangeslider';
 
 @observer
@@ -30,11 +30,14 @@ class Filters extends React.Component {
           }
         }}
       />)}
-      <TagsSelect
+      <ReactSelectWrapper
         label="Elements"
-        values={store.filterElements}
-        options={store.knownElements} onChange={(values) => store.filterElements = values}
-        SelectProps={{ isClearable: true, }}
+        value={store.filterElements.map((value) => ({ label: value, value }))}
+        isMulti
+        options={store.knownElements.map((value) => ({ label: value, value }))}
+        onChange={(values) => {
+          store.filterElements = values.map((d) => d.value);
+        }}
       />
     </Grid>
     );

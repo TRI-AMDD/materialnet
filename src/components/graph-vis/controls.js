@@ -12,7 +12,7 @@ import {
 import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
 
 import Grid from '../controls/grid';
-import SearchControl from '../controls/search';
+import { ReactSelectSearchWrapper} from '../controls/reactselect';
 import SliderControl from '../controls/slider';
 import SelectControl from '../controls/select';
 import CheckboxControl from '../controls/checkbox';
@@ -38,6 +38,15 @@ function toOption(v) {
 class Controls extends React.Component {
   static contextType = Store;
 
+  filterSearchOption = ({ value }, rawInput) => {
+    rawInput = rawInput.trim();
+    value = value.trim();
+    if (!rawInput) {
+      return false;
+    }
+    return value.includes(rawInput);
+  }
+
   render() {
     const store = this.context;
     return (
@@ -48,12 +57,15 @@ class Controls extends React.Component {
           label={'Dataset'}
           onChange={(val) => { store.dataset = store.datasets.find((d) => toOption(d).value === val); }}
         />}
-        <SearchControl
+        <ReactSelectSearchWrapper
           label={'Search'}
           options={store.searchOptions}
-          value={store.search}
+          value={store.search ? {label: store.search, value: store.search} : null}
+          isSearchable
+          placeholder="Search (e.g. NaCl)"
+          isClearable
           maxItems={20}
-          onChange={(_e, val) => { store.search = val.newValue; }}
+          onChange={(val) => store.search = val ? val.value : null}
         />
 
         <div>
