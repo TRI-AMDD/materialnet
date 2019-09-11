@@ -1,3 +1,5 @@
+import { extractElements } from "./parse";
+
 export class DataProvider {
 }
 
@@ -36,7 +38,10 @@ export class DiskDataProvider extends DataProvider {
     this.edgeIndex = graph.edgeIndex;
 
     // inject the name of the node into the object
-    Object.entries(nodes).forEach(([k, v]) => v.name = k);
+    Object.entries(nodes).forEach(([k, v]) => {
+      v.name = k;
+      v._elements = extractElements(k);
+    });
 
     this._names = Object.keys(this.nodes);
     const bad = this._names.indexOf('value');
