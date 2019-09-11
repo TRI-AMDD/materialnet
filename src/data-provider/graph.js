@@ -1,5 +1,12 @@
 export function neighborsOf(nodeNameOrSet, edges) {
-    const lookup = typeof nodeNameOrSet === 'string' ? new Set([nodeNameOrSet]) : nodeNameOrSet;
+    const lookup = (() => {
+      if (typeof nodeNameOrSet === 'string') {
+        nodeNameOrSet = [nodeNameOrSet];
+      }
+
+      return Array.isArray(nodeNameOrSet) ? new Set(nodeNameOrSet) : nodeNameOrSet;
+    })();
+
     // Collect neighborhood of selected node.
     const nodes = new Set(lookup);
     for (const edge of edges) {
