@@ -460,8 +460,8 @@ export class ApplicationStore {
     @action
     selectNode(node, asPinned) {
         const currentName = this.selected ? this.selected.name : '';
-        const isSelected = node.name === currentName;
-        const isPinned = this.isPinned(node);
+        const isSelected = node && node.name === currentName;
+        const isPinned = node && this.isPinned(node);
 
         if (asPinned) {
             if (isPinned) {
@@ -475,7 +475,7 @@ export class ApplicationStore {
             }
             return;
         }
-        this.selected = isSelected ? null : node;        
+        this.selected = isSelected ? null : node; 
     }
 
     @computed
