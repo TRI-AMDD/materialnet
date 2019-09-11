@@ -48,7 +48,6 @@ class Controls extends React.Component {
 
   render() {
     const store = this.context;
-    console.log(store.search);
     return (
       <Grid>
         {store.datasets.length > 1 && <SelectControl

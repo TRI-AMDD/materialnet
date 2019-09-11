@@ -36,7 +36,6 @@ class Filters extends React.Component {
         isMulti
         options={store.knownElements.map((value) => ({ label: value, value }))}
         onChange={(values) => {
-          console.log(values);
           store.filterElements = values.map((d) => d.value);
         }}
       />
