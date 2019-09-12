@@ -227,7 +227,9 @@ export class GeoJSSceneManager {
       if (deltaDirection == null || position == null) {
         return;
       }
-      this.nextExpansionFocus = position;
+      if (!this.nextExpansionFocus) {
+        this.nextExpansionFocus = position;
+      }
       this.onNodeSpacingChanged(deltaDirection);
       deltaDirection = null;
       position = null;
@@ -244,6 +246,10 @@ export class GeoJSSceneManager {
       }
       position = evt.mouse.geo;
       handle();
+    });
+
+    this.map.geoOn(geo.event.mousemove, () => {
+      this.nextExpansionFocus = null;
     });
   }
 
@@ -291,7 +297,9 @@ export class GeoJSSceneManager {
         x: factor * this.nextExpansionFocus.x - offCenter.x,
         y: factor * this.nextExpansionFocus.y - offCenter.y
       });
-      this.nextExpansionFocus = null;
+      // this.nextExpansionFocus = null;
+      this.nextExpansionFocus.x *= factor;
+      this.nextExpansionFocus.y *= factor;
     } else {
       this.map.center({
         x: factor * center.x,
