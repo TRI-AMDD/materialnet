@@ -220,19 +220,14 @@ export class GeoJSSceneManager {
 
   _handleNodeSpacing() {
     let deltaDirection = null;
-    let position = null;
 
     const handle = () => {
       // run when we have both
-      if (deltaDirection == null || position == null) {
+      if (deltaDirection == null || this.nextExpansionFocus == null) {
         return;
-      }
-      if (!this.nextExpansionFocus) {
-        this.nextExpansionFocus = position;
       }
       this.onNodeSpacingChanged(deltaDirection);
       deltaDirection = null;
-      position = null;
     };
 
     // since not provided by geojs
@@ -240,14 +235,19 @@ export class GeoJSSceneManager {
       deltaDirection = evt.deltaY;
       handle();
     };
+
+    // Capture the mouse coordinates on a first mousewheel event in a sequence.
     this.map.geoOn(geo.event.actionwheel, (evt) => {
       if (!evt.mouse.modifiers.ctrl) {
         return;
       }
-      position = evt.mouse.geo;
+      if (!this.nextExpansionFocus) {
+        this.nextExpansionFocus = evt.mouse.geo;
+      }
       handle();
     });
 
+    // Clear the mouse coordinates as soon as the mouse moves.
     this.map.geoOn(geo.event.mousemove, () => {
       this.nextExpansionFocus = null;
     });
