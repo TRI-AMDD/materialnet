@@ -297,7 +297,8 @@ export class GeoJSSceneManager {
         x: factor * this.nextExpansionFocus.x - offCenter.x,
         y: factor * this.nextExpansionFocus.y - offCenter.y
       });
-      // this.nextExpansionFocus = null;
+
+      // Expand the click position in order to work around a bug in GeoJS.
       this.nextExpansionFocus.x *= factor;
       this.nextExpansionFocus.y *= factor;
     } else {
