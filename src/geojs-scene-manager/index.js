@@ -1,4 +1,4 @@
-import geo from 'geojs';
+import geo from 'geojs/geo.min.js';
 import { neighborsOf } from '../data-provider/graph';
 import { debounce } from 'lodash-es';
 
