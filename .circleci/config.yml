@@ -23,14 +23,8 @@ jobs:
             - node_modules
           key: v1-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Run tests
-          command: npm test
-      - run:
           name: Create build
           command: npm run build
-      - add_ssh_keys:
-          fingerprints:
-            - "52:83:4d:e5:df:bf:f5:82:ba:2e:35:66:40:98:e0:8f"
       - deploy:
           name: Deploy
           command: |
