@@ -117,6 +117,9 @@ export class ApplicationStore {
     drawerVisible = true;
 
     @observable
+    showTable = false;
+
+    @observable
     drawerExpanded = {
             options: true,
             filter: false,
@@ -142,6 +145,7 @@ export class ApplicationStore {
     subGraphLayout = {
         // [name]: {x,y}
     };
+
     @observable
     subGraphLayouting = null; // function to abort the current layout
 
@@ -362,6 +366,11 @@ export class ApplicationStore {
         return this.data.nodeNames().filter((name) => filter(this.data.nodes[name]));
     }
 
+    @computed
+    get filteredNodes() {
+        return this.filteredNodeNames.map((d) => this.data.nodes[d]);
+    }
+
 
     @computed
     get filteredEdges() {
@@ -394,12 +403,14 @@ export class ApplicationStore {
             isfilterable: false,
             type: 'numerical',
             label: camelCase(property),
+            formatSpecifier: '.3f',
             format: (v) => typeof v === 'number' ? v.toFixed(3) : v,
             ...info
         };
         if (typeof entry.format === 'string') {
             // create a formatter out of the spec
-            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);
+            entry.formatSpecifier = entry.format;
+            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);            
         }
         if (entry.type === 'numerical' && !entry.domain) {
             entry.domain = this._minMaxProperty(property);
@@ -545,6 +556,11 @@ export class ApplicationStore {
             return this.filteredNodeNames;
         }
         return Array.from(neighborsOf(this.pinnedNodes.length > 0 ? this.pinnedNodes.map((d) => d.name) : this.selected.name, this.filteredEdges));
+    }
+
+    @computed
+    get subGraphNodeObjects() {
+        return this.subGraphNodes.map((name) => this.nodes[name]);
     }
 
     @computed

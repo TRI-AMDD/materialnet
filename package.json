@@ -43,6 +43,7 @@
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
+    "lineupjsx": "^1.0.7",
     "lodash-es": "^4.17.11",
     "mini-css-extract-plugin": "0.4.3",
     "mobx": "^5.13.0",

@@ -18,6 +18,7 @@ import './App.css';
 import NodeSizeLegend from './components/graph-vis/node-size-legend';
 import NodeColorLegend from './components/graph-vis/node-color-legend';
 import Tooltip from './components/graph-vis/tooltip';
+import Table from './components/graph-vis/table';
 import { grey } from '@material-ui/core/colors';
 
 // based on https://material-ui.com/components/drawers/
@@ -192,7 +193,6 @@ class App extends React.Component {
             </div>
             <Controls />
           </Drawer>
-
           <div className={clsx(classes.contentContainer, {
             [classes.contentShift]: store.drawerVisible,
             [classes.contentNightMode]: store.nightMode
@@ -208,6 +208,7 @@ class App extends React.Component {
               <Tooltip />
               {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
             </div>
+            {store.showTable && <Table />}
           </div>
         </div>
       </ThemeProvider>
