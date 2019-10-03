@@ -9,7 +9,8 @@ const Structure = ({cjson}) => (
       {},
       // Props
       {
-        cjson
+        cjson,
+        moleculeRenderer: 'vtkjs',
       }
     )}
   />
