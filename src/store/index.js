@@ -314,7 +314,7 @@ export class ApplicationStore {
     @computed
     get filterFunc() {
         const filters = Object.entries(toJS(this.filters));
-        const subSpaceBaseElements = new Set([].concat(this.defineSubspaceNodes.map(d => d._elements)));
+        const subSpaceBaseElements = new Set([].concat(...this.defineSubspaceNodes.map(d => d._elements)));
         const neighborElements = this.data ? neighborsOf(this.incluceNeighborsNodes, this.data.edges) : new Set();
         const mustInclude = new Set(this.pinnedNodes.map((d) => d.node));
         if (this.selected) {
@@ -362,14 +362,7 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        const s = new Set();
-        for (const name of this.nodeNames) {
-            const elements = this.data.nodes[name]._elements;
-            for (const elem of elements) {
-                s.add(elem)
-            }
-        }
-        return Array.from(s).sort();
+        return this.nodeNames.filter((d) => this.data.nodes[d]._elements.length === 1).sort(sortStringsLength);
     }
 
     @computed
@@ -508,20 +501,23 @@ export class ApplicationStore {
     }
 
     @action
-    selectNode(node, asPinned) {
+    selectNode(node, modifiers) {
         const currentName = this.selected ? this.selected.name : '';
         const isSelected = node && node.name === currentName;
-        const isPinned = node && this.isPinned(node);
 
-        if (asPinned) {
-            if (isPinned) {
-                this.removePinned(node);
-                if (isSelected) {
-                    this.selected = null;
-                }
-            } else {
-                this.pushPinned(node);
+        if (modifiers.ctrl && node) {
+            if (this.toggleIncludeNeighbors(node)) {
                 this.selected = node;
+            } else if (isSelected) {
+                this.selected = null;
+            }
+            return;
+        }
+        if (modifiers.alt && node) {
+            if (this.toggleDefineSubspace(node)) {
+                this.selected = node;
+            } else if (isSelected) {
+                this.selected = null;
             }
             return;
         }
@@ -580,9 +576,10 @@ export class ApplicationStore {
                 // remove completly
                 this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
             }
-        } else {
-            this.pinnedNodes.push({ node, includeNeighbors: true, defineSubspace: false });
+            return false;
         }
+        this.pinnedNodes.push({ node, includeNeighbors: true, defineSubspace: false });
+        return true;
     }
 
     @action
@@ -594,9 +591,10 @@ export class ApplicationStore {
                 // remove completly
                 this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
             }
-        } else {
-            this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: true });
+            return false;
         }
+        this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: true });
+        return true;
     }
 
     isIncludeNeighborsPinned(node) {
@@ -607,9 +605,18 @@ export class ApplicationStore {
         return this.pinnedNodes.some((d) => d.node.name === node.name && d.defineSubspace);
     }
 
+    isPinned(node) {
+        return this.pinnedNodes.find((d) => d.node === node) != null;
+    }
+
     @action
     removePinned(node) {
         this.pinnedNodes = this.pinnedNodes.filter((d) => d.node !== node);
+    }
+
+    @action
+    pushPinned(node) {
+        this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: false });
     }
 
 

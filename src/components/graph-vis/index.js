@@ -14,8 +14,8 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
-    picked: (node, asPinned) => {
-      this.context.selectNode(node, asPinned);
+    picked: (node, modifiers) => {
+      this.context.selectNode(node, modifiers);
     },
     onNodeSpacingChanged: (delta) => {
       const next = this.context.spacing + (delta > 0 ? -0.1 : 0.1);

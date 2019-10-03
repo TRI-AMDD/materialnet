@@ -81,7 +81,7 @@ export class GeoJSSceneManager {
         strokeOpacity: this.linkOpacity,
       })
       .visible(this.linesVisible); // disable by default
-    
+
     this.highlightLines = layer.createFeature('line')
       .data([])
       .style({
@@ -125,7 +125,7 @@ export class GeoJSSceneManager {
     let lastPointEvent = null;
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers.ctrl);
+        this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers);
       }
       lastPointEvent = evt.mouse;
     });
@@ -134,7 +134,7 @@ export class GeoJSSceneManager {
         return;
       }
       // seems like we have a click that didn't hit something
-      this.picked(null, false);
+      this.picked(null, {});
     }, 100));
 
     // NOTE: disable line hovering for now till figured out where to show
@@ -425,7 +425,7 @@ export class GeoJSSceneManager {
 
     this.parent.style.backgroundColor = bgColor;
     this.points.style('strokeColor', pointStrokeColor);
-    this.lines.style('strokeColor', strokeColor); 
+    this.lines.style('strokeColor', strokeColor);
     this.highlightLines.style('strokeColor', strokeColor);
     this.map.draw();
   }
