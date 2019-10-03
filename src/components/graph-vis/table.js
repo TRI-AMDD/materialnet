@@ -3,6 +3,7 @@ import Store from '../../store';
 import { observer } from 'mobx-react';
 import LineUp, { LineUpStringColumnDesc, LineUpNumberColumnDesc } from 'lineupjsx';
 import 'lineupjsx/build/LineUpJSx.css';
+import './lineup.css';
 
 @observer
 class Table extends React.Component {
