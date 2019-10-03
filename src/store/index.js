@@ -112,7 +112,7 @@ export class ApplicationStore {
         position: null
     };
 
-    
+
     @observable
     drawerVisible = true;
 
@@ -155,7 +155,7 @@ export class ApplicationStore {
     worker = new Worker();
 
     constructor() {
-        // load data and update on dataset change        
+        // load data and update on dataset change
         autorun(() => {
             const toLoad = this.dataset.fileName;
 
@@ -221,7 +221,7 @@ export class ApplicationStore {
                 }
             });
             if (state.selected || state.pinned) {
-                // selected by name when data is 
+                // selected by name when data is
                 const toSelect = state.selected;
                 const toPin = state.pinned;
                 delete state.selected;
@@ -258,7 +258,7 @@ export class ApplicationStore {
                 pinned
             });
         }
-        
+
         let firstRun = true;
         // track state and update the url automatically
         autorun(() => {
@@ -300,7 +300,7 @@ export class ApplicationStore {
                 window.history.pushState(state, title, url.href);
             }
         }, { delay: 300 }); // debounce 300ms
-        
+
         // track history changes by the user (e.g. go back)
         window.addEventListener('popstate', (evt) => {
             const state = evt.state;
@@ -308,7 +308,7 @@ export class ApplicationStore {
                 integrateState(state);
             }
         });
-        
+
     }
 
     @computed
@@ -388,7 +388,7 @@ export class ApplicationStore {
     get zoomNodeSizeFactor() {
         return Math.pow(2, this.zoom);
     }
-    
+
     @computed
     get searchOptions() {
         if (!this.data) {
@@ -410,7 +410,7 @@ export class ApplicationStore {
         if (typeof entry.format === 'string') {
             // create a formatter out of the spec
             entry.formatSpecifier = entry.format;
-            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);            
+            entry.format = createFormatter(entry.format, entry.prefix, entry.suffix);
         }
         if (entry.type === 'numerical' && !entry.domain) {
             entry.domain = this._minMaxProperty(property);
@@ -559,6 +559,11 @@ export class ApplicationStore {
     }
 
     @computed
+    get doesShowSubgraph() {
+        return this.selected || this.pinnedNodes.length > 0 || this.filterFunc != null;
+    }
+
+    @computed
     get subGraphNodeObjects() {
         return this.subGraphNodes.map((name) => this.nodes[name]);
     }
@@ -608,7 +613,7 @@ export class ApplicationStore {
         }
         this.subGraphLayouting = true;
 
-        const edges = toJS(this.subGraphEdges);        
+        const edges = toJS(this.subGraphEdges);
 
         this.subGraphLayouting = this._postMessage('layout', { nodes, edges }, (msg) => {
             const nodes = msg.params.nodes;

@@ -8,12 +8,12 @@ import { Button, CircularProgress } from '@material-ui/core';
 @observer
 class Layouts extends React.Component {
   static contextType = Store;
-  
+
   render() {
     const store = this.context;
     return (<Grid>
       {!store.subGraphLayouting && <Button
-        disabled={store.selected == null && store.pinnedNodes.length === 0}
+        disabled={!store.doesShowSubgraph}
         onClick={() => store.computeSubGraphLayout()}>
         start layout
       </Button>}
@@ -25,7 +25,7 @@ class Layouts extends React.Component {
         disabled={Object.keys(store.subGraphLayout).length === 0}
         onClick={() => store.resetSubGraphLayout()}>
         reset layout
-      </Button>}      
+      </Button>}
     </Grid>
     );
   }
