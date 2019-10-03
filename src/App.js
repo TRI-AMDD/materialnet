@@ -8,7 +8,7 @@ import InfoPanel from './components/graph-vis/info-panel';
 import GraphVisComponent from './components/graph-vis';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import logo from './components/header/logo.svg';
+import logo from './components/header/logo.png';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import clsx from 'clsx';
