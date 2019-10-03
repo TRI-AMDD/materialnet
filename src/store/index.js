@@ -96,8 +96,6 @@ export class ApplicationStore {
     @observable
     selected = null;
 
-    @observable
-    pinnedNodes = [];
 
     @observable
     hovered = {
@@ -121,9 +119,9 @@ export class ApplicationStore {
 
     @observable
     drawerExpanded = {
-            options: true,
-            filter: false,
-            layouts: false
+        options: true,
+        filter: false,
+        layouts: false
     };
 
     @observable
@@ -135,6 +133,12 @@ export class ApplicationStore {
 
     @observable
     showLegend = true;
+
+    @observable
+    showSubGraphOnly = true;
+
+    @observable
+    pinnedNodes = []; // {node: INode, includeNeighbors: boolean, defineSubspace: boolean}
 
     @observable
     filters = {
@@ -149,9 +153,6 @@ export class ApplicationStore {
     @observable
     subGraphLayouting = null; // function to abort the current layout
 
-    @observable
-    filterElements = [];
-
     worker = new Worker();
 
     constructor() {
@@ -163,7 +164,6 @@ export class ApplicationStore {
             this.hovered = { node: null, position: null, radius: null };
             this.hoveredLine = { node1: null, node2: null, position: null };
             this.filters = {};
-            this.filterElements = [];
             this.selected = null;
             this.pinnedNodes = [];
 
@@ -223,7 +223,7 @@ export class ApplicationStore {
             if (state.selected || state.pinned) {
                 // selected by name when data is
                 const toSelect = state.selected;
-                const toPin = state.pinned;
+                // const toPin = state.pinned;
                 delete state.selected;
                 delete state.pinned;
 
@@ -233,7 +233,8 @@ export class ApplicationStore {
                     }
                     // lookup by name
                     this.selected = this.data.nodes[toSelect];
-                    this.pinnedNodes = toPin.map((d) => this.data.nodes[d]).filter((d) => d != null);
+                    // TODO
+                    // this.pinnedNodes = toPin.map((d) => this.data.nodes[d]).filter((d) => d != null);
 
                     reaction.dispose(); // stop updating
                 });
@@ -251,11 +252,10 @@ export class ApplicationStore {
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
             const selected = url.searchParams.get('s');
-            const pinned = (url.searchParams.get('p') || '').split(',');
+            // TODO const pinned = (url.searchParams.get('p') || '').split(',');
             integrateState({
                 dataset,
                 selected,
-                pinned
             });
         }
 
@@ -272,7 +272,7 @@ export class ApplicationStore {
                 filters: toJS(this.filters),
                 filterElements: toJS(this.filterElements),
                 selected: this.selected ? this.selected.name : null,
-                pinned: this.pinnedNodes.map((d) => d.name)
+                // TODO pinned: this.pinnedNodes.map((d) => d.name)
             };
 
             if (isEqual(state, window.history.state)) {
@@ -287,11 +287,11 @@ export class ApplicationStore {
             } else {
                 url.searchParams.delete('s');
             }
-            if (this.pinnedNodes.length > 0) {
-                url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
-            } else {
-                url.searchParams.delete('p');
-            }
+            // if (this.pinnedNodes.length > 0) {
+            //     url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
+            // } else {
+            //     url.searchParams.delete('p');
+            // }
             const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
                 firstRun = false;
@@ -314,24 +314,42 @@ export class ApplicationStore {
     @computed
     get filterFunc() {
         const filters = Object.entries(toJS(this.filters));
-        const elements = new Set(this.filterElements);
-        if (filters.length === 0 && elements.length === 0) {
+        const subSpaceBaseElements = new Set([].concat(this.defineSubspaceNodes.map(d => d._elements)));
+        const neighborElements = this.data ? neighborsOf(this.incluceNeighborsNodes, this.data.edges) : new Set();
+        const mustInclude = new Set(this.pinnedNodes.map((d) => d.node));
+        if (this.selected) {
+            mustInclude.add(this.selected);
+        }
+
+        if (filters.length === 0 && mustInclude.size === 0 && subSpaceBaseElements.size === 0 && neighborElements.size === 0) {
             return null;
         }
+
         return (node) => {
-            if (elements.size > 0 && node._elements.some((e) => !elements.has(e))) {
-                return false;
+            if (mustInclude.has(node)) {
+                return true;
             }
-            return filters.every(([prop, [min, max]]) => {
+            if (!filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
-            });
+            })) {
+                return false; // filtered out by property
+            }
+            if (neighborElements.has(node)) {
+                return true;
+            }
+            return subSpaceBaseElements.size === 0 || node._elements.every(base => subSpaceBaseElements.has(base));
         };
     }
 
     @computed
     get nodes() {
         return this.data.nodes;
+    }
+
+    @computed
+    get nodeNames() {
+        return this.data ? this.data.nodeNames() : [];
     }
 
     @computed
@@ -345,7 +363,7 @@ export class ApplicationStore {
             return [];
         }
         const s = new Set();
-        for (const name of this.data.nodeNames()) {
+        for (const name of this.nodeNames) {
             const elements = this.data.nodes[name]._elements;
             for (const elem of elements) {
                 s.add(elem)
@@ -355,33 +373,31 @@ export class ApplicationStore {
     }
 
     @computed
-    get filteredNodeNames() {
-        if (!this.data) {
-            return [];
-        }
+    get subGraphNodeNames() {
         const filter = this.filterFunc;
         if (!filter) {
-            return this.data.nodeNames();
+            return this.nodeNames;
         }
-        return this.data.nodeNames().filter((name) => filter(this.data.nodes[name]));
+        return this.nodeNames.filter((name) => filter(this.data.nodes[name]));
     }
 
     @computed
-    get filteredNodes() {
-        return this.filteredNodeNames.map((d) => this.data.nodes[d]);
+    get doesShowSubgraph() {
+        return this.filterFunc != null;
     }
 
+    @computed
+    get subGraphNodes() {
+        return this.subGraphNodeNames.map((name) => this.nodes[name]);
+    }
 
     @computed
-    get filteredEdges() {
-        if (!this.data) {
+    get subGraphEdges() {
+        const nodes = new Set(this.subGraphNodeNames);
+        if (nodes.size === 0) {
             return [];
         }
-        const filter = this.filterFunc;
-        if (!filter) {
-            return this.data.edges;
-        }
-        return this.data.edges.filter(([a, b]) => filter(this.data.nodes[a]) && filter(this.data.nodes[b]));
+        return this.data.edges.filter((d) => nodes.has(d[0]) && nodes.has(d[1]));
     }
 
     @computed
@@ -394,7 +410,7 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        return this.filteredNodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value }));
+        return this.nodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value }));
     }
 
     _createProperty(property, info = {}) {
@@ -534,48 +550,68 @@ export class ApplicationStore {
         return this.size.factory(this);
     }
 
+
+
+    @computed
+    get defineSubspaceNodes() {
+        return this.pinnedNodes.filter((d) => d.defineSubspace).map((d) => d.node);
+    }
+
+    setDefineSubspaceNodes(names) {
+        const old = new Set(this.defineSubspaceNodes.map((d) => d.name));
+        names.forEach((name) => {
+            if (!old.has(name)) {
+                this.toggleDefineSubspace(this.data.nodes[name]);
+            }
+        });
+    }
+
+    @computed
+    get incluceNeighborsNodes() {
+        return this.pinnedNodes.filter((d) => d.includeNeighbors).map((d) => d.node);
+    }
+
     @action
-    pushPinned(node) {
-        if (this.pinnedNodes.every((d) => d.name !== node.name)) {
-            this.pinnedNodes.push(node);
+    toggleIncludeNeighbors(node) {
+        const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
+        if (existing) {
+            existing.includeNeighbors = false;
+            if (!existing.defineSubspace) {
+                // remove completly
+                this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
+            }
+        } else {
+            this.pinnedNodes.push({ node, includeNeighbors: true, defineSubspace: false });
         }
     }
 
-    isPinned(node) {
-        return this.pinnedNodes.some((d) => d.name === node.name);
+    @action
+    toggleDefineSubspace(node) {
+        const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
+        if (existing) {
+            existing.defineSubspace = false;
+            if (!existing.includeNeighbors) {
+                // remove completly
+                this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
+            }
+        } else {
+            this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: true });
+        }
+    }
+
+    isIncludeNeighborsPinned(node) {
+        return this.pinnedNodes.some((d) => d.node.name === node.name && d.includeNeighbors);
+    }
+
+    isDefineSubspacePinned(node) {
+        return this.pinnedNodes.some((d) => d.node.name === node.name && d.defineSubspace);
     }
 
     @action
     removePinned(node) {
-        this.pinnedNodes = this.pinnedNodes.filter((n) => n.name !== node.name);
+        this.pinnedNodes = this.pinnedNodes.filter((d) => d.node !== node);
     }
 
-    @computed
-    get subGraphNodes() {
-        if (!this.selected && this.pinnedNodes.length === 0) {
-            return this.filteredNodeNames;
-        }
-        return Array.from(neighborsOf(this.pinnedNodes.length > 0 ? this.pinnedNodes.map((d) => d.name) : this.selected.name, this.filteredEdges));
-    }
-
-    @computed
-    get doesShowSubgraph() {
-        return this.selected || this.pinnedNodes.length > 0 || this.filterFunc != null;
-    }
-
-    @computed
-    get subGraphNodeObjects() {
-        return this.subGraphNodes.map((name) => this.nodes[name]);
-    }
-
-    @computed
-    get subGraphEdges() {
-        const nodes = new Set(this.subGraphNodes);
-        if (nodes.size === 0) {
-            return [];
-        }
-        return this.filteredEdges.filter((d) => nodes.has(d[0]) && nodes.has(d[1]));
-    }
 
     _postMessage(type, params, onMessage) {
         const key = uniqueId();

@@ -10,14 +10,14 @@ class Table extends React.Component {
 
   onSelectionChanged = (selection) => {
     const store = this.context;
-    store.selected = selection.length > 0 ? store.filteredNodes[selection[0]] : null;
+    store.selected = selection.length > 0 ? store.subGraphNodes[selection[0]] : null;
   };
-  
+
   render() {
     const store = this.context;
-    const selected = store.selected ? store.filteredNodes.findIndex((d) => d.name === store.selected.name) : -1;
+    const selected = store.selected ? store.subGraphNodes.findIndex((d) => d.name === store.selected.name) : -1;
 
-    return (<LineUp data={store.filteredNodes}
+    return (<LineUp data={store.subGraphNodes}
       singleSelection defaultRanking
       deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal' }}
       selection={selected >= 0 ? [selected] : undefined} onSelectionChanged={this.onSelectionChanged}

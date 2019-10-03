@@ -10,7 +10,7 @@ import RangeSliderControlComponent from '../controls/rangeslider';
 class Filters extends React.Component {
   static contextType = Store;
 
-  
+
   render() {
     const store = this.context;
     return (<Grid>
@@ -32,11 +32,11 @@ class Filters extends React.Component {
       />)}
       <ReactSelectWrapper
         label="Elements"
-        value={store.filterElements.map((value) => ({ label: value, value }))}
+        value={store.defineSubspaceNodes.map((value) => ({ label: value.name, value: value.name }))}
         isMulti
         options={store.knownElements.map((value) => ({ label: value, value }))}
         onChange={(values) => {
-          store.filterElements = values.map((d) => d.value);
+          store.setDefineSubspaceNodes(values.map((d) => d.value));
         }}
       />
     </Grid>

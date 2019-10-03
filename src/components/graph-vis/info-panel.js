@@ -25,7 +25,7 @@ class InfoPanel extends React.Component {
 
   onClear = () => this.context.selected = null;
 
-  togglePinned = () => {
+  toggleIncludeNeighbors = () => {
     const store = this.context;
     const node = store.selected;
 
@@ -33,11 +33,18 @@ class InfoPanel extends React.Component {
       return;
     }
 
-    if (store.isPinned(node)) {
-      store.removePinned(node);
-    } else {
-      store.pushPinned(node);
+    store.toggleIncludeNeighbors(node);
+  }
+
+  toggleDefineSubspace = () => {
+    const store = this.context;
+    const node = store.selected;
+
+    if (!node) {
+      return;
     }
+
+    store.toggleDefineSubspace(node);
   }
 
   render() {
@@ -50,10 +57,13 @@ class InfoPanel extends React.Component {
     }
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
+      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'inherit'}>
         <RotatedPin />
       </IconButton>
-      
+      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
+        <RotatedPin />
+      </IconButton>
+
 
       {store.template && store.template.render(node, store)}
     </Paper>;

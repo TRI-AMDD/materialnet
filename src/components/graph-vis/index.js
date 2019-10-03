@@ -65,10 +65,14 @@ class GraphVisComponent extends Component {
       this.scene.setLinkOpacity(store.opacity);
     }, { delay: 250 }); // debounce
     setAndObserve(() => {
-      this.scene.setData(store.filteredNodeNames, store.filteredEdges);
+      if (store.showSubGraphOnly) {
+        this.scene.setData(store.subGraphNodeNames, store.subGraphEdges);
+      } else {
+        this.scene.setData(store.nodeNames, store.edges);
+      }
     }, { delay: 250 }); // debounce
     setAndObserve(() => {
-      this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.name));
+      this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.node.name));
     });
     setAndObserve(() => {
       this.scene.setPositions(store.subGraphLayout);
