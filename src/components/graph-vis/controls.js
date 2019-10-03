@@ -6,7 +6,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Typography, Chip
+  Typography
 } from '@material-ui/core';
 
 import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
@@ -20,10 +20,8 @@ import Filters from './filters';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
-import RotatedPin from './RotatedPin';
 import Layouts from './layouts';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import PinnedNode from './PinnedNode';
 
 function simplify(label) {
   // simplify the label for better values
@@ -71,9 +69,7 @@ class Controls extends React.Component {
         />
 
         <div>
-          {store.pinnedNodes.map(({defineSubspace, includeNeighbors, node }) => (<Chip key={node.name} icon={
-            (includeNeighbors ? <RotatedPin /> : (defineSubspace ? <FontAwesomeIcon icon={faFilter} /> : null))}
-            label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />))}
+          {store.pinnedNodes.map((node) => (<PinnedNode key={node.node.name} {...node} />))}
         </div>
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>

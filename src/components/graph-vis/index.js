@@ -72,6 +72,11 @@ class GraphVisComponent extends Component {
       }
     }, { delay: 250 }); // debounce
     setAndObserve(() => {
+      if (!store.showSubGraphOnly) {
+        this.scene.showSubGraph(store.showSubGraph ? store.subGraphNodeNames : []);
+      }
+    }, { delay: 250 }); // debounce
+    setAndObserve(() => {
       this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.node.name));
     });
     setAndObserve(() => {
