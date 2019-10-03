@@ -485,7 +485,7 @@ export class ApplicationStore {
                     nextYear = this.yearRange[0];
                 }
                 this.year = nextYear;
-            }, 1000);
+            }, 10);
         }
 
         this.setPlayState(play, interval);
