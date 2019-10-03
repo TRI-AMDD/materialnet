@@ -493,7 +493,7 @@ export class ApplicationStore {
                     nextYear = this.yearRange[0];
                 }
                 this.year = nextYear;
-            }, 10);
+            }, 300);
         }
 
         this.setPlayState(play, interval);
