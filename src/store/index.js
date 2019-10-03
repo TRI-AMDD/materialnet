@@ -142,6 +142,14 @@ export class ApplicationStore {
     };
 
     @observable
+    discoveryYearFilter = (node) => {
+        const cutoff = this.year;
+        const year = node.discovery;
+
+        return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+    };
+
+    @observable
     subGraphLayout = {
         // [name]: {x,y}
     };
@@ -322,7 +330,7 @@ export class ApplicationStore {
             if (elements.size > 0 && node._elements.some((e) => !elements.has(e))) {
                 return false;
             }
-            return filters.every(([prop, [min, max]]) => {
+            return this.discoveryYearFilter(node) && filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
             });
