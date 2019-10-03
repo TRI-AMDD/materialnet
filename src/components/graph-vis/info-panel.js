@@ -4,6 +4,8 @@ import { withStyles, Paper, IconButton } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { Close } from '@material-ui/icons';
 import RotatedPin from './RotatedPin';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
 
 
 const visStyles = theme => ({
@@ -57,11 +59,11 @@ class InfoPanel extends React.Component {
     }
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'inherit'}>
+      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'inherit'}>
         <RotatedPin />
       </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
-        <RotatedPin />
+      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
+        <FontAwesomeIcon icon={faFilter} />
       </IconButton>
 
 

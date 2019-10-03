@@ -135,7 +135,7 @@ export class ApplicationStore {
     showLegend = true;
 
     @observable
-    showSubGraphOnly = true;
+    showSubGraphOnly = false;
 
     @observable
     pinnedNodes = []; // {node: INode, includeNeighbors: boolean, defineSubspace: boolean}
@@ -571,9 +571,9 @@ export class ApplicationStore {
     toggleIncludeNeighbors(node) {
         const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
         if (existing) {
-            existing.includeNeighbors = false;
-            if (!existing.defineSubspace) {
-                // remove completly
+            existing.includeNeighbors = !existing.includeNeighbors;
+            if (!existing.defineSubspace && !existing.includeNeighbors) {
+                // remove completely
                 this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
             }
             return false;
@@ -586,9 +586,9 @@ export class ApplicationStore {
     toggleDefineSubspace(node) {
         const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
         if (existing) {
-            existing.defineSubspace = false;
-            if (!existing.includeNeighbors) {
-                // remove completly
+            existing.defineSubspace = !existing.defineSubspace;
+            if (!existing.defineSubspace && !existing.includeNeighbors) {
+                // remove completely
                 this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
             }
             return false;
