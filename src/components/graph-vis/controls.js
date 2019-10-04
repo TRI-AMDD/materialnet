@@ -6,7 +6,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Typography, Chip
+  Typography
 } from '@material-ui/core';
 
 import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
@@ -20,8 +20,11 @@ import Filters from './filters';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
-import RotatedPin from './RotatedPin';
 import Layouts from './layouts';
+import PinnedNode from './PinnedNode';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RotatedPin from './RotatedPin';
+import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
 
 function simplify(label) {
   // simplify the label for better values
@@ -47,6 +50,21 @@ class Controls extends React.Component {
     return value.includes(rawInput);
   }
 
+  renderOptionButtons = ({ node }) => {
+    const store = this.context;
+    return <>
+      <IconButton onClick={() => store.togglePinned(node)} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'default'}>
+        <RotatedPin />
+      </IconButton>
+      <IconButton onClick={() => store.toggleIncludeNeighbors(node)} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faProjectDiagram} />
+      </IconButton>
+      <IconButton onClick={() => store.toggleDefineSubspace(node)} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faFlask} />
+      </IconButton>
+    </>;
+  }
+
   render() {
     const store = this.context;
     return (
@@ -60,6 +78,7 @@ class Controls extends React.Component {
         <ReactSelectSearchWrapper
           label={'Search'}
           options={store.searchOptions}
+          optionButtons={this.renderOptionButtons}
           value={store.search ? {label: store.search, value: store.search} : null}
           isSearchable
           placeholder="Search (e.g. NaCl)"
@@ -69,7 +88,7 @@ class Controls extends React.Component {
         />
 
         <div>
-          {store.pinnedNodes.map((node) => (<Chip key={node.name} icon={<RotatedPin />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />))}
+          {store.pinnedNodes.map((node) => (<PinnedNode key={node.node.name} {...node} />))}
         </div>
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
@@ -146,6 +165,16 @@ class Controls extends React.Component {
                 disabled={!store.color || store.color.label !== 'Discovered/Undiscovered'}
                 onChange={(val) => { store.colorYear = val; }}
               />}
+              <CheckboxControl
+                label="Show Sub Graph Only"
+                value={store.showSubGraphOnly}
+                onChange={(val) => { store.showSubGraphOnly = val; }}
+              />
+              <CheckboxControl
+                label="Auto Include Neigbhors of Selected"
+                value={store.autoIncludeNeighorsForSelection}
+                onChange={(val) => { store.autoIncludeNeighorsForSelection = val; }}
+              />
               <CheckboxControl
                 label="Show Legend"
                 value={store.showLegend}

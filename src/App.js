@@ -174,7 +174,7 @@ class App extends React.Component {
                 <img className='logo' src={logo} alt="logo" style={{ filter: store.nightMode ? `invert(100%)` : null }}/>
               </Button>
               <Typography variant="h5" color="inherit" noWrap>
-                MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
+                MaterialNet - {store.dataset.label}{store.selected ? ` - ${store.selected.name}` : ''}
                 </Typography>
               <div style={{ flex: 1 }}>
               </div>
