@@ -47,8 +47,8 @@ self.__precacheManifest = [
     "url": "/materialnet/static/media/ccda38f2ae7b5f07875dc4bba68b9586.ccda38f2.svg"
   },
   {
-    "revision": "86c168acf6a07692766a",
-    "url": "/materialnet/static/js/main.86c168ac.chunk.js"
+    "revision": "6e9438fa77c39a22f080",
+    "url": "/materialnet/static/js/main.6e9438fa.chunk.js"
   },
   {
     "revision": "c872de5d64b05c2c625f",
@@ -157,11 +157,7 @@ self.__precacheManifest = [
     "url": "/materialnet/static/media/29334f20971b9251d88c2b7c1a082917.29334f20.eot"
   },
   {
-    "revision": "89378f991ae92ccd3b1db472afe91d7f",
-    "url": "/materialnet/static/media/logo.89378f99.svg"
-  },
-  {
-    "revision": "86c168acf6a07692766a",
+    "revision": "6e9438fa77c39a22f080",
     "url": "/materialnet/static/css/main.591bfc97.chunk.css"
   },
   {
@@ -169,7 +165,7 @@ self.__precacheManifest = [
     "url": "/materialnet/static/css/35.3079e493.chunk.css"
   },
   {
-    "revision": "7bda236fb5e902f143801502f9ad72e0",
+    "revision": "b533e9c30e10af462b2e32f632e5fa8e",
     "url": "/materialnet/index.html"
   },
   {
