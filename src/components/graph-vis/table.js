@@ -13,14 +13,14 @@ class Table extends React.Component {
     const store = this.context;
     store.selected = selection.length > 0 ? store.filteredNodes[selection[0]] : null;
   };
-  
+
   render() {
     const store = this.context;
     const selected = store.selected ? store.filteredNodes.findIndex((d) => d.name === store.selected.name) : -1;
 
     return (<LineUp data={store.filteredNodes}
       singleSelection defaultRanking
-      deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal' }}
+      deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal', ...(this.props.style || {}) }}
       selection={selected >= 0 ? [selected] : undefined} onSelectionChanged={this.onSelectionChanged}
     >
       <LineUpStringColumnDesc column="name" />
