@@ -352,10 +352,10 @@ export class ApplicationStore {
             neighborsOf(this.selected.name, this.data.edges).forEach((n) => neighborElementNames.add(n));
         }
 
-        if (filters.length === 0 && subSpaceBaseElements.size === 0 && neighborElementNames.size === 0) {
+        const mustInclude = new Set(this.pinnedNodes.map((d) => d.node.name));
+        if (filters.length === 0 && subSpaceBaseElements.size === 0 && neighborElementNames.size === 0 && mustInclude.size === 0) {
             return null;
         }
-        const mustInclude = new Set(this.pinnedNodes.map((d) => d.node.name));
 
         if (this.selected) {
             mustInclude.add(this.selected.name);
@@ -378,7 +378,7 @@ export class ApplicationStore {
                 return true;
             }
             // only visible if no subspace filter is set
-            return neighborElementNames.size === 0 && subSpaceBaseElements.size === 0;
+            return neighborElementNames.size === 0 && subSpaceBaseElements.size === 0 && mustInclude.size === 0;
         };
     }
 

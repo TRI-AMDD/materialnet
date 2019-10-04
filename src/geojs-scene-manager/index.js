@@ -4,7 +4,7 @@ import { debounce } from 'lodash-es';
 const FOCUS_OPACITY = 0.8; // selection or pinned
 const NOFOCUS_OPACITY = 0.8; // in case of no focus
 
-const DEFOCUS_OPACITY = 0.3; // not in focus if focus is present
+const DEFOCUS_OPACITY = 0.8; // not in focus if focus is present
 
 const CONTEXT_OPACITY = 0.03; // background if subgraph is present
 
