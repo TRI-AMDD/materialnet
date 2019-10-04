@@ -402,14 +402,7 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        const s = new Set();
-        for (const name of this.data.nodeNames()) {
-            const elements = this.data.nodes[name]._elements;
-            for (const elem of elements) {
-                s.add(elem)
-            }
-        }
-        return Array.from(s).sort(sortStringsLength);
+        return this.nodeNames.filter((d) => this.data.nodes[d]._elements.length === 1).sort(sortStringsLength);
     }
 
     @computed
