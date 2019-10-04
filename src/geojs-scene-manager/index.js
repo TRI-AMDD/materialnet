@@ -1,11 +1,16 @@
 import geo from 'geojs/geo.min.js';
-import { neighborsOf } from '../data-provider/graph';
 import { debounce } from 'lodash-es';
 
-const FOCUS_OPACITY = 0.8;
-const DEFOCUS_OPACITY = 0.05;
+const FOCUS_OPACITY = 0.8; // selection or pinned
+const NOFOCUS_OPACITY = 0.8; // in case of no focus
+
+const DEFOCUS_OPACITY = 0.3; // not in focus if focus is present
+
+const CONTEXT_OPACITY = 0.03; // background if subgraph is present
+
+
 const SELECTION_STROKE_WIDTH = 4;
-const FOCUS_STROKE_WIDTH = 3;
+const PINNED_STROKE_WIDTH = 2;
 const DEFAULT_STROKE_WIDTH = 1;
 
 export class GeoJSSceneManager {
@@ -21,8 +26,11 @@ export class GeoJSSceneManager {
     this.map = null;
 
     this.expansion = 1;
+
     this.selected = null;
+    this.pinned = new Set();
     this.subGraphNodes = new Set();
+
     this.linkOpacity = 0.01;
     this.linesVisible = false;
     this.positionOverrides = {};
@@ -97,8 +105,8 @@ export class GeoJSSceneManager {
         strokeColor: 'black',
         strokeWidth: this._strokeWidth,
         fillColor: 'gray',
-        strokeOpacity: FOCUS_OPACITY,
-        fillOpacity: FOCUS_OPACITY,
+        strokeOpacity: this._nodeOpacity,
+        fillOpacity: this._nodeOpacity,
         radius: 10,
       },
       position: this._position,
@@ -169,7 +177,7 @@ export class GeoJSSceneManager {
   }
 
   _isHighlighted() {
-    return this.selected != null;
+    return this.subGraphNodes.size > 0;
   }
 
   _position = (name) => {
@@ -201,6 +209,9 @@ export class GeoJSSceneManager {
     if (name === this.selected) {
       return SELECTION_STROKE_WIDTH;
     }
+    if (this.pinned.has(name)) {
+      return PINNED_STROKE_WIDTH;
+    }
     return DEFAULT_STROKE_WIDTH;
   }
 
@@ -212,10 +223,16 @@ export class GeoJSSceneManager {
   }
 
   _nodeOpacity = (name) => {
-    if (this.subGraphNodes.size === 0) {
-      return name === this.selected ? FOCUS_OPACITY : DEFOCUS_OPACITY;
+    const hasFocus = this.selected || this.pinned.size > 0;
+    if (name === this.selected || this.pinned.has(name)) {
+      return FOCUS_OPACITY;
     }
-    return this.subGraphNodes.has(name) || name === this.selected ? FOCUS_OPACITY : DEFOCUS_OPACITY;
+    if (this.subGraphNodes.size === 0 || this.subGraphNodes.has(name)) {
+      // full graph no sub graph
+      return hasFocus ? DEFOCUS_OPACITY : NOFOCUS_OPACITY;
+    }
+
+    return CONTEXT_OPACITY;
   }
 
   _handleNodeSpacing() {
@@ -259,11 +276,8 @@ export class GeoJSSceneManager {
     }
     this.points.data(nodes);
     this.lines.data(edges);
-
-    // // recompute subgraph can shrink or grow
-    // this.showSubGraph(subGraphNodes);
-
-    this.map.draw();
+    // recompute subgraph can shrink or grow
+    this.showSubGraph([]);
   }
 
   expand(m) {
@@ -348,16 +362,6 @@ export class GeoJSSceneManager {
   showSubGraph(subGraphNodes) {
     this.subGraphNodes = new Set(subGraphNodes);
 
-    if (this.subGraphNodes.size === 0) {
-      this.points.style('fillOpacity', FOCUS_OPACITY);
-      this.points.style('strokeOpacity', FOCUS_OPACITY);
-    } else {
-      // Set opacity of all nodes in accordance with membership in the
-      // neighborhood.
-      this.points.style('fillOpacity', this._nodeOpacity);
-      this.points.style('strokeOpacity', this._nodeOpacity);
-    }
-
     this._updateEdgeHighlights();
 
     this.map.draw();
@@ -384,10 +388,11 @@ export class GeoJSSceneManager {
     this.highlightLines.visible(true);
   }
 
-  display(selected) {
+  setSelected(selected, pinned) {
     this.selected = selected;
+    this.pinned = new Set(pinned);
+    this.points.modified();
 
-    this._updateEdgeHighlights();
     this.map.draw();
   }
 
