@@ -223,7 +223,7 @@ export class ApplicationStore {
             if (state.selected || state.pinned) {
                 // selected by name when data is
                 const toSelect = state.selected;
-                // const toPin = state.pinned;
+                const toPin = state.pinned;
                 delete state.selected;
                 delete state.pinned;
 
@@ -233,8 +233,7 @@ export class ApplicationStore {
                     }
                     // lookup by name
                     this.selected = this.data.nodes[toSelect];
-                    // TODO
-                    // this.pinnedNodes = toPin.map((d) => this.data.nodes[d]).filter((d) => d != null);
+                    this.pinnedNodes = toPin.map((d) => ({ ...d, node: this.data.nodes[d.node] })).filter((d) => d.node != null);
 
                     reaction.dispose(); // stop updating
                 });
@@ -252,10 +251,29 @@ export class ApplicationStore {
             const url = new URL(window.location.href);
             const dataset = url.searchParams.get('ds');
             const selected = url.searchParams.get('s');
-            // TODO const pinned = (url.searchParams.get('p') || '').split(',');
+            const pinnedOnly = (url.searchParams.get('p') || '').split(',');
+            const defineSubspace = (url.searchParams.get('e') || '').split(',');
+            const incudeNeighbors = (url.searchParams.get('n') || '').split(',');
+            const pinned = new Map();
+            pinnedOnly.forEach((p) => pinned.set(p, { node: p, includeNeighbors: false, defineSubspace: false }));
+            defineSubspace.forEach((p) => {
+                if (pinned.has(p)) {
+                    pinned.get(p).defineSubspace = true;
+                } else {
+                    pinned.set(p, { node: p, includeNeighbors: false, defineSubspace: true })
+                }
+            });
+            incudeNeighbors.forEach((p) => {
+                if (pinned.has(p)) {
+                    pinned.get(p).includeNeighbors = true;
+                } else {
+                    pinned.set(p, { node: p, includeNeighbors: true, defineSubspace: false })
+                }
+            });
             integrateState({
                 dataset,
                 selected,
+                pinned: Array.from(pinned.values()).sort((a, b) => sortStringsLength(a.name, b.name))
             });
         }
 
@@ -272,7 +290,7 @@ export class ApplicationStore {
                 filters: toJS(this.filters),
                 filterElements: toJS(this.filterElements),
                 selected: this.selected ? this.selected.name : null,
-                // TODO pinned: this.pinnedNodes.map((d) => d.name)
+                pinned: this.pinnedNodes.map((d) => ({ ...d, node: d.node.name }))
             };
 
             if (isEqual(state, window.history.state)) {
@@ -287,11 +305,21 @@ export class ApplicationStore {
             } else {
                 url.searchParams.delete('s');
             }
-            // if (this.pinnedNodes.length > 0) {
-            //     url.searchParams.set('p', this.pinnedNodes.map((d) => d.name).join(','));
-            // } else {
-            //     url.searchParams.delete('p');
-            // }
+            if (this.pinnedOnlyNodes.length > 0) {
+                url.searchParams.set('p', this.pinnedOnlyNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('p');
+            }
+            if (this.incluceNeighborsNodes.length > 0) {
+                url.searchParams.set('n', this.incluceNeighborsNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('n');
+            }
+            if (this.defineSubspaceNodes.length > 0) {
+                url.searchParams.set('e', this.defineSubspaceNodes.map((d) => d.name).join(','));
+            } else {
+                url.searchParams.delete('e');
+            }
             const title = document.title = `MaterialNet - ${this.dataset.label}${this.selected ? ` - ${this.selected.name}` : ''}`;
             if (firstRun) {
                 firstRun = false;
@@ -572,6 +600,11 @@ export class ApplicationStore {
         return this.pinnedNodes.filter((d) => d.includeNeighbors).map((d) => d.node);
     }
 
+    @computed
+    get pinnedOnlyNodes() {
+        return this.pinnedNodes.filter((d) => !d.includeNeighbors && !d.defineSubspace).map((d) => d.node);
+    }
+
     @action
     toggleIncludeNeighbors(node) {
         const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
@@ -611,7 +644,7 @@ export class ApplicationStore {
     }
 
     isPinned(node) {
-        return this.pinnedNodes.find((d) => d.name === node.name) != null;
+        return this.pinnedNodes.find((d) => d.node.name === node.name) != null;
     }
 
     @action
