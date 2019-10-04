@@ -8,8 +8,13 @@ const DEFOCUS_OPACITY = 0.8; // not in focus if focus is present
 
 const CONTEXT_OPACITY = 0.03; // background if subgraph is present
 
+const SELECTION_STROKE_COLOR = 'orange';
+const PINNED_STROKE_COLOR = 'black';
+const PINNED_NIGHT_STROKE_COLOR = 'black';
+const DEFAULT_STROKE_COLOR = 'black';
+const DEFAULT_NIGHT_STROKE_COLOR = 'black';
 
-const SELECTION_STROKE_WIDTH = 4;
+const SELECTION_STROKE_WIDTH = 3;
 const PINNED_STROKE_WIDTH = 2;
 const DEFAULT_STROKE_WIDTH = 1;
 
@@ -102,7 +107,7 @@ export class GeoJSSceneManager {
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
       style: {
-        strokeColor: 'black',
+        strokeColor: this._strokeColor,
         strokeWidth: this._strokeWidth,
         fillColor: 'gray',
         strokeOpacity: this._nodeOpacity,
@@ -215,11 +220,24 @@ export class GeoJSSceneManager {
     return DEFAULT_STROKE_WIDTH;
   }
 
+  _strokeColor = (name) => {
+    if (name === this.selected) {
+      return SELECTION_STROKE_COLOR;
+    }
+    if (this.pinned.has(name)) {
+      return PINNED_STROKE_COLOR;
+    }
+    return DEFAULT_STROKE_COLOR;
+  }
+
   _darkStrokePointColor = (name) => {
     if (name === this.selected) {
-      return 'white';
+      return SELECTION_STROKE_COLOR;
     }
-    return 'black';
+    if (this.pinned.has(name)) {
+      return PINNED_NIGHT_STROKE_COLOR;
+    }
+    return DEFAULT_NIGHT_STROKE_COLOR;
   }
 
   _nodeOpacity = (name) => {
@@ -406,7 +424,7 @@ export class GeoJSSceneManager {
   setNightMode (night) {
     const bgColor = night ? 'black' : 'white';
     const strokeColor = night ? 'white' : 'black';
-    const pointStrokeColor = night ? this._darkStrokePointColor : 'black';
+    const pointStrokeColor = night ? this._darkStrokePointColor : this._strokeColor;
 
     this.parent.style.backgroundColor = bgColor;
     this.points.style('strokeColor', pointStrokeColor);
