@@ -697,7 +697,7 @@ export class ApplicationStore {
 
     @action
     computeSubGraphLayout() {
-        const nodes = toJS(this.subGraphNodes).map((name) => {
+        const nodes = toJS(this.subGraphNodeNames).map((name) => {
             const node = this.nodes[name];
             const layoutNode = {
                 name,
