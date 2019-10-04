@@ -22,6 +22,9 @@ import { observer } from 'mobx-react';
 import { deburr } from 'lodash-es';
 import Layouts from './layouts';
 import PinnedNode from './PinnedNode';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RotatedPin from './RotatedPin';
+import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
 
 function simplify(label) {
   // simplify the label for better values
@@ -47,6 +50,21 @@ class Controls extends React.Component {
     return value.includes(rawInput);
   }
 
+  renderOptionButtons = ({ node }) => {
+    const store = this.context;
+    return <>
+      <IconButton onClick={() => store.togglePinned(node)} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'default'}>
+        <RotatedPin />
+      </IconButton>
+      <IconButton onClick={() => store.toggleIncludeNeighbors(node)} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faProjectDiagram} />
+      </IconButton>
+      <IconButton onClick={() => store.toggleDefineSubspace(node)} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faFlask} />
+      </IconButton>
+    </>;
+  }
+
   render() {
     const store = this.context;
     return (
@@ -60,6 +78,7 @@ class Controls extends React.Component {
         <ReactSelectSearchWrapper
           label={'Search'}
           options={store.searchOptions}
+          optionButtons={this.renderOptionButtons}
           value={store.search ? {label: store.search, value: store.search} : null}
           isSearchable
           placeholder="Search (e.g. NaCl)"

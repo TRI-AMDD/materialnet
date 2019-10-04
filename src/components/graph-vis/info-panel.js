@@ -71,13 +71,13 @@ class InfoPanel extends React.Component {
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
 
-      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
+      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}>
         <FontAwesomeIcon icon={faFlask} />
       </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'inherit'}>
+      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}>
         <FontAwesomeIcon icon={faProjectDiagram} />
       </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'default'}>
         <RotatedPin />
       </IconButton>
 

@@ -436,7 +436,7 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        return this.nodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value }));
+        return this.nodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value, node: this.nodes[value] }));
     }
 
     _createProperty(property, info = {}) {

@@ -34,7 +34,7 @@ class Filters extends React.Component {
       />)}
       <ReactSelectWrapper
         label={<><FontAwesomeIcon icon={faFlask} /> Elements</>}
-        value={store.defineSubspaceNodes.map((value) => ({ label: value.name, value: value.name }))}
+        value={store.defineSubspaceNodes.map((value) => ({ label: value.name, value: value.name, icon: <FontAwesomeIcon icon={faFlask} />}))}
         isMulti
         options={store.knownElements.map((value) => ({ label: value, value }))}
         onChange={(values) => {
