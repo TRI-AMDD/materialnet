@@ -171,6 +171,11 @@ class Controls extends React.Component {
                 onChange={(val) => { store.showSubGraphOnly = val; }}
               />
               <CheckboxControl
+                label="Auto Include Neigbhors of Selected"
+                value={store.autoIncludeNeighorsForSelection}
+                onChange={(val) => { store.autoIncludeNeighorsForSelection = val; }}
+              />
+              <CheckboxControl
                 label="Show Legend"
                 value={store.showLegend}
                 onChange={(val) => { store.showLegend = val; }}

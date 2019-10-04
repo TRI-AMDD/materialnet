@@ -138,6 +138,9 @@ export class ApplicationStore {
     showSubGraphOnly = true;
 
     @observable
+    autoIncludeNeighorsForSelection = true;
+
+    @observable
     pinnedNodes = []; // {node: INode, includeNeighbors: boolean, defineSubspace: boolean}
 
     @observable
@@ -344,6 +347,10 @@ export class ApplicationStore {
         const filters = Object.entries(toJS(this.filters));
         const subSpaceBaseElements = new Set([].concat(...this.defineSubspaceNodes.map(d => d._elements)));
         const neighborElementNames = this.data ? neighborsOf(this.incluceNeighborsNodes.map((d) => d.name), this.data.edges) : new Set();
+
+        if (this.autoIncludeNeighorsForSelection && this.selected) {
+            neighborsOf(this.selected.name, this.data.edges).forEach((n) => neighborElementNames.add(n));
+        }
 
         if (filters.length === 0 && subSpaceBaseElements.size === 0 && neighborElementNames.size === 0) {
             return null;
