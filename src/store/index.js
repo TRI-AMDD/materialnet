@@ -151,6 +151,15 @@ export class ApplicationStore {
         // [property]: value ... filter object
     };
 
+    @computed
+    get filterDiscoveryYear() {
+        const cutoff = this.year;
+        return (node) => {
+            const year = node.discovery;
+            return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+        };
+    };
+
     @observable
     subGraphLayout = {
         // [name]: {x,y}
@@ -357,7 +366,7 @@ export class ApplicationStore {
 
         const mustInclude = new Set(this.pinnedNodes.map((d) => d.node.name));
         if (filters.length === 0 && subSpaceBaseElements.size === 0 && neighborElementNames.size === 0 && mustInclude.size === 0) {
-            return null;
+            return this.filterDiscoveryYear;
         }
 
         if (this.selected) {
@@ -368,7 +377,7 @@ export class ApplicationStore {
             if (mustInclude.has(node.name)) {
                 return true;
             }
-            if (!filters.every(([prop, [min, max]]) => {
+            if (!this.filterDiscoveryYear(node) || !filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
             })) {
@@ -537,7 +546,7 @@ export class ApplicationStore {
                     nextYear = this.yearRange[0];
                 }
                 this.year = nextYear;
-            }, 1000);
+            }, 300);
         }
 
         this.setPlayState(play, interval);
