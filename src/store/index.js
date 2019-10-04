@@ -545,23 +545,31 @@ export class ApplicationStore {
         const currentName = this.selected ? this.selected.name : '';
         const isSelected = node && node.name === currentName;
 
-        if (modifiers.ctrl && node) {
-            if (this.toggleIncludeNeighbors(node)) {
-                this.selected = node;
-            } else if (isSelected) {
-                this.selected = null;
-            }
+        if (!node || (!modifiers.shift && !modifiers.alt && !modifiers.ctrl)) {
+            // plain selection
+            this.selected = isSelected ? null : node;
             return;
         }
-        if (modifiers.alt && node) {
-            if (this.toggleDefineSubspace(node)) {
-                this.selected = node;
-            } else if (isSelected) {
+        const old = this.pinnedNodes.find((d) => d.node.name === node.name);
+        if (old) {
+            if (modifiers.ctrl) {
+                // delete as a whole
+                this.togglePinned(node);
                 this.selected = null;
+                return;
             }
+            if (modifiers.alt) {
+                old.defineSubspace = !old.defineSubspace;
+            }
+            if (modifiers.shift) {
+                old.includeNeighbors = !old.includeNeighbors;
+            }
+            this.selected = old.defineSubspace || old.includeNeighbors ? node : null;
             return;
         }
-        this.selected = isSelected ? null : node;
+
+        this.pinnedNodes.push({ node, defineSubspace: modifiers.alt, includeNeighbors: modifiers.shift });
+        this.selected = node;
     }
 
     @computed
