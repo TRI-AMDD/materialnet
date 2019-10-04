@@ -8,14 +8,13 @@ import InfoPanel from './components/graph-vis/info-panel';
 import GraphVisComponent from './components/graph-vis';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import logo from './components/header/logo.svg';
+import logo from './components/header/logo.png';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import clsx from 'clsx';
 import Store from './store';
 import { observer } from 'mobx-react';
 import './App.css';
-import NodeSizeLegend from './components/graph-vis/node-size-legend';
 import NodeColorLegend from './components/graph-vis/node-color-legend';
 import Tooltip from './components/graph-vis/tooltip';
 import Table from './components/graph-vis/table';
@@ -172,7 +171,7 @@ class App extends React.Component {
                 <img className='logo' src={logo} alt="logo" style={{ filter: store.nightMode ? `invert(100%)` : null }}/>
               </Button>
               <Typography variant="h5" color="inherit" noWrap>
-                MaterialNet - {store.dataset.label}{store.pinnedNodes.length > 0 ? ` - ${store.pinnedNodes.map((d) => d.name).join(', ')}` : ''}
+                MaterialNet - {store.dataset.label}{store.selected ? ` - ${store.selected.name}` : ''}
                 </Typography>
               <div style={{ flex: 1 }}>
               </div>
@@ -202,7 +201,6 @@ class App extends React.Component {
               <GraphVisComponent />
               {store.showLegend && <div className={classes.legend}>
                 <NodeColorLegend />
-                <NodeSizeLegend />
               </div>}
               <InfoPanel />
               <Tooltip />
