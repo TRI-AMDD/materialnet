@@ -138,7 +138,7 @@ export class ApplicationStore {
     showSubGraphOnly = true;
 
     @observable
-    autoIncludeNeighorsForSelection = true;
+    autoIncludeNeighorsForSelection = false;
 
     @observable
     pinnedNodes = []; // {node: INode, includeNeighbors: boolean, defineSubspace: boolean}
@@ -596,10 +596,13 @@ export class ApplicationStore {
     setDefineSubspaceNodes(names) {
         const old = new Set(this.defineSubspaceNodes.map((d) => d.name));
         names.forEach((name) => {
-            if (!old.has(name)) {
+            if (!old.delete(name)) {
+                // toggle on
                 this.toggleDefineSubspace(this.data.nodes[name]);
             }
         });
+        // toggle off
+        old.forEach((name) => this.toggleDefineSubspace(this.data.nodes[name]))
     }
 
     @computed
@@ -617,10 +620,6 @@ export class ApplicationStore {
         const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
         if (existing) {
             existing.includeNeighbors = !existing.includeNeighbors;
-            if (!existing.defineSubspace && !existing.includeNeighbors) {
-                // remove completely
-                this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
-            }
             return false;
         }
         this.pinnedNodes.push({ node, includeNeighbors: true, defineSubspace: false });
@@ -632,10 +631,6 @@ export class ApplicationStore {
         const existing = this.pinnedNodes.find((d) => d.node.name === node.name);
         if (existing) {
             existing.defineSubspace = !existing.defineSubspace;
-            if (!existing.defineSubspace && !existing.includeNeighbors) {
-                // remove completely
-                this.pinnedNodes = this.pinnedNodes.filter((d) => d !== existing);
-            }
             return false;
         }
         this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: true });
