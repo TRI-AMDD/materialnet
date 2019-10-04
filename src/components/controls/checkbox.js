@@ -11,11 +11,12 @@ class CheckboxControlComponent extends Component {
     const {
       label,
       value,
-      onChange
+      onChange,
+      className
     } = this.props;
 
     return (
-      <FormControl fullWidth>
+      <FormControl fullWidth className={className}>
         <FormControlLabel
           control={
             <Checkbox
