@@ -702,6 +702,7 @@ export class ApplicationStore {
             return;
         }
         this.subGraphLayouting = true;
+        this.showSubGraphOnly = true; // doesn't make sense since moving
 
         const edges = toJS(this.subGraphEdges);
 
