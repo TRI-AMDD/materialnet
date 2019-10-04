@@ -9,6 +9,7 @@ import Chip from '@material-ui/core/Chip';
 import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { deburr } from 'lodash-es';
+import { ListItemText, ListItemSecondaryAction } from '@material-ui/core';
 
 // BASED on https://material-ui.com/components/autocomplete/
 
@@ -121,7 +122,12 @@ function Option(props) {
             }}
             {...props.innerProps}
         >
-            {props.children}
+            {props.selectProps.optionButtons ? <>
+                <ListItemText primary={props.children} />
+                <ListItemSecondaryAction>
+                    {props.selectProps.optionButtons(props.data)}
+                </ListItemSecondaryAction>
+            </> : props.children}
         </MenuItem>
     );
 }
@@ -151,6 +157,7 @@ function MultiValue(props) {
     return (
         <Chip
             tabIndex={-1}
+            icon={props.data ? props.data.icon : null}
             label={props.children}
             className={clsx(props.selectProps.classes.chip, {
                 [props.selectProps.classes.chipFocused]: props.isFocused,

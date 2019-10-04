@@ -1,11 +1,21 @@
 import geo from 'geojs/geo.min.js';
-import { neighborsOf } from '../data-provider/graph';
 import { debounce } from 'lodash-es';
 
-const FOCUS_OPACITY = 0.8;
-const DEFOCUS_OPACITY = 0.05;
-const SELECTION_STROKE_WIDTH = 4;
-const FOCUS_STROKE_WIDTH = 3;
+const FOCUS_OPACITY = 0.8; // selection or pinned
+const NOFOCUS_OPACITY = 0.8; // in case of no focus
+
+const DEFOCUS_OPACITY = 0.8; // not in focus if focus is present
+
+const CONTEXT_OPACITY = 0.03; // background if subgraph is present
+
+const SELECTION_STROKE_COLOR = 'orange';
+const PINNED_STROKE_COLOR = 'black';
+const PINNED_NIGHT_STROKE_COLOR = 'black';
+const DEFAULT_STROKE_COLOR = 'black';
+const DEFAULT_NIGHT_STROKE_COLOR = 'black';
+
+const SELECTION_STROKE_WIDTH = 3;
+const PINNED_STROKE_WIDTH = 2;
 const DEFAULT_STROKE_WIDTH = 1;
 
 export class GeoJSSceneManager {
@@ -21,9 +31,11 @@ export class GeoJSSceneManager {
     this.map = null;
 
     this.expansion = 1;
+
     this.selected = null;
-    this.focus = new Set();
+    this.pinned = new Set();
     this.subGraphNodes = new Set();
+
     this.linkOpacity = 0.01;
     this.linesVisible = false;
     this.positionOverrides = {};
@@ -81,7 +93,7 @@ export class GeoJSSceneManager {
         strokeOpacity: this.linkOpacity,
       })
       .visible(this.linesVisible); // disable by default
-    
+
     this.highlightLines = layer.createFeature('line')
       .data([])
       .style({
@@ -95,11 +107,11 @@ export class GeoJSSceneManager {
     const points = this.points = layer.createFeature('point', {
       // primitiveShape: 'triangle',
       style: {
-        strokeColor: 'black',
+        strokeColor: this._strokeColor,
         strokeWidth: this._strokeWidth,
         fillColor: 'gray',
-        strokeOpacity: FOCUS_OPACITY,
-        fillOpacity: FOCUS_OPACITY,
+        strokeOpacity: this._nodeOpacity,
+        fillOpacity: this._nodeOpacity,
         radius: 10,
       },
       position: this._position,
@@ -125,7 +137,7 @@ export class GeoJSSceneManager {
     let lastPointEvent = null;
     points.geoOn(geo.event.feature.mouseclick, evt => {
       if (evt.top) {
-        this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers.ctrl);
+        this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers);
       }
       lastPointEvent = evt.mouse;
     });
@@ -134,7 +146,7 @@ export class GeoJSSceneManager {
         return;
       }
       // seems like we have a click that didn't hit something
-      this.picked(null, false);
+      this.picked(null, {});
     }, 100));
 
     // NOTE: disable line hovering for now till figured out where to show
@@ -170,7 +182,7 @@ export class GeoJSSceneManager {
   }
 
   _isHighlighted() {
-    return this.selected != null || this.focus.size > 0;
+    return this.subGraphNodes.size > 0;
   }
 
   _position = (name) => {
@@ -201,21 +213,44 @@ export class GeoJSSceneManager {
   _strokeWidth = (name) => {
     if (name === this.selected) {
       return SELECTION_STROKE_WIDTH;
-    } else if (this.focus.has(name)) {
-      return FOCUS_STROKE_WIDTH;
+    }
+    if (this.pinned.has(name)) {
+      return PINNED_STROKE_WIDTH;
     }
     return DEFAULT_STROKE_WIDTH;
   }
 
-  _darkStrokePointColor = (name) => {
-    if (name === this.selected || this.focus.has(name)) {
-      return 'white';
+  _strokeColor = (name) => {
+    if (name === this.selected) {
+      return SELECTION_STROKE_COLOR;
     }
-    return 'black';
+    if (this.pinned.has(name)) {
+      return PINNED_STROKE_COLOR;
+    }
+    return DEFAULT_STROKE_COLOR;
+  }
+
+  _darkStrokePointColor = (name) => {
+    if (name === this.selected) {
+      return SELECTION_STROKE_COLOR;
+    }
+    if (this.pinned.has(name)) {
+      return PINNED_NIGHT_STROKE_COLOR;
+    }
+    return DEFAULT_NIGHT_STROKE_COLOR;
   }
 
   _nodeOpacity = (name) => {
-    return this.subGraphNodes.has(name) || name === this.selected ? FOCUS_OPACITY : DEFOCUS_OPACITY;
+    const hasFocus = this.selected || this.pinned.size > 0;
+    if (name === this.selected || this.pinned.has(name)) {
+      return FOCUS_OPACITY;
+    }
+    if (this.subGraphNodes.size === 0 || this.subGraphNodes.has(name)) {
+      // full graph no sub graph
+      return hasFocus ? DEFOCUS_OPACITY : NOFOCUS_OPACITY;
+    }
+
+    return CONTEXT_OPACITY;
   }
 
   _handleNodeSpacing() {
@@ -253,23 +288,14 @@ export class GeoJSSceneManager {
     });
   }
 
-  _neighborsOf(nodeNameOrSet) {
-    return neighborsOf(nodeNameOrSet, this.lines.data());
-  }
-
   setData(nodes, edges) {
     if (!this.map) {
       return;
     }
     this.points.data(nodes);
     this.lines.data(edges);
-
-    if (this._isHighlighted()) {
-      // recompute subgraph can shrink or grow
-      this.subGraphNodes = this._neighborsOf(this.focus.size > 0 ? this.focus : this.selected);
-      this._updateEdgeHighlights();
-    }
-    this.map.draw();
+    // recompute subgraph can shrink or grow
+    this.showSubGraph([]);
   }
 
   expand(m) {
@@ -351,15 +377,12 @@ export class GeoJSSceneManager {
     return this.dp.nodes[name];
   }
 
-  _showSubGraph(subGraphNodes) {
-    this.subGraphNodes = subGraphNodes;
-    // Set opacity of all nodes in accordance with membership in the
-    // neighborhood.
-    this.points.style('fillOpacity', this._nodeOpacity);
-    this.points.style('strokeOpacity', this._nodeOpacity);
+  showSubGraph(subGraphNodes) {
+    this.subGraphNodes = new Set(subGraphNodes);
 
     this._updateEdgeHighlights();
 
+    this.points.modified();
     this.map.draw();
   }
 
@@ -384,31 +407,11 @@ export class GeoJSSceneManager {
     this.highlightLines.visible(true);
   }
 
-  display(selected, pinned = []) {
-    this.focus = new Set(pinned);
+  setSelected(selected, pinned) {
     this.selected = selected;
+    this.pinned = new Set(pinned);
+    this.points.modified();
 
-    if (this.focus.size === 0 && !selected) {
-      this.undisplay();
-      return;
-    }
-
-    const nodes = this._neighborsOf(this.focus.size > 0 ? this.focus : this.selected);
-    this._showSubGraph(nodes);
-  }
-
-
-  undisplay() {
-    this.selected = null;
-    this.focus = new Set();
-    this.subGraphNodes = new Set();
-
-    if (!this.map) {
-      return;
-    }
-    this.points.style('fillOpacity', FOCUS_OPACITY);
-    this.points.style('strokeOpacity', FOCUS_OPACITY);
-    this._updateEdgeHighlights();
     this.map.draw();
   }
 
@@ -421,11 +424,11 @@ export class GeoJSSceneManager {
   setNightMode (night) {
     const bgColor = night ? 'black' : 'white';
     const strokeColor = night ? 'white' : 'black';
-    const pointStrokeColor = night ? this._darkStrokePointColor : 'black';
+    const pointStrokeColor = night ? this._darkStrokePointColor : this._strokeColor;
 
     this.parent.style.backgroundColor = bgColor;
     this.points.style('strokeColor', pointStrokeColor);
-    this.lines.style('strokeColor', strokeColor); 
+    this.lines.style('strokeColor', strokeColor);
     this.highlightLines.style('strokeColor', strokeColor);
     this.map.draw();
   }
