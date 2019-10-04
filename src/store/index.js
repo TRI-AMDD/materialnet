@@ -118,6 +118,9 @@ export class ApplicationStore {
     showTable = false;
 
     @observable
+    graphRatio = 50;
+
+    @observable
     drawerExpanded = {
         options: true,
         filter: false,

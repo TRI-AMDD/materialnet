@@ -20,7 +20,7 @@ class Table extends React.Component {
 
     return (<LineUp data={store.subGraphNodes}
       singleSelection
-      deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal' }}
+      deriveColors sidePanel={false} style={{ flexGrow: 1, lineHeight: 'normal', ...(this.props.style || {})  }}
       selection={selected >= 0 ? [selected] : undefined} onSelectionChanged={this.onSelectionChanged}
     >
       <LineUpStringColumnDesc column="name" />

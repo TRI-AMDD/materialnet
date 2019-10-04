@@ -19,6 +19,7 @@ import NodeColorLegend from './components/graph-vis/node-color-legend';
 import Tooltip from './components/graph-vis/tooltip';
 import Table from './components/graph-vis/table';
 import { grey } from '@material-ui/core/colors';
+import SplitContainer from './components/graph-vis/SplitContainer';
 
 // based on https://material-ui.com/components/drawers/
 const drawerWidth = 360;
@@ -105,8 +106,10 @@ const appStyles = theme => ({
     marginLeft: 0,
   },
   content: {
-    position: 'relative',
     flexGrow: 1
+  },
+  graph: {
+    position: 'relative'
   },
   contentNightMode: {
     color: 'white'
@@ -197,16 +200,17 @@ class App extends React.Component {
             [classes.contentNightMode]: store.nightMode
           })}>
             <div className={classes.drawerHeader} />
-            <div className={classes.content}>
-              <GraphVisComponent />
-              {store.showLegend && <div className={classes.legend}>
-                <NodeColorLegend />
+            <SplitContainer className={classes.content} value={store.graphRatio} onValueChanged={(value) => store.graphRatio = value}
+              top={(value) => <div className={classes.graph} style={{ flexGrow: value }}>
+                <GraphVisComponent />
+                {store.showLegend && <div className={classes.legend}>
+                  <NodeColorLegend />
+                </div>}
+                <InfoPanel />
+                <Tooltip />
+                {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100} /></div>}
               </div>}
-              <InfoPanel />
-              <Tooltip />
-              {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100}/></div>}
-            </div>
-            {store.showTable && <Table />}
+              bottom={store.showTable ? (value) => <Table style={{ flexGrow: value }} /> : null} />
           </div>
         </div>
       </ThemeProvider>
