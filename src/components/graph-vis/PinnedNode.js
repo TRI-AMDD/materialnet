@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Chip } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RotatedPin from './RotatedPin';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faFlask, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 @observer
 class PinnedNode extends React.Component {
@@ -12,10 +12,18 @@ class PinnedNode extends React.Component {
     render() {
         const store = this.context;
         const { node, includeNeighbors, defineSubspace } = this.props;
-        const label = node.label;
-        // icon = {
-        //     (includeNeighbors ? <RotatedPin /> : (defineSubspace ? <FontAwesomeIcon icon={faFilter} /> : null));
-        return <Chip label={label} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />;
+
+        const neighbors = <Chip icon={<FontAwesomeIcon icon={faProjectDiagram} />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.toggleIncludeNeighbors(node)} />;
+        const subspace = <Chip icon={<FontAwesomeIcon icon={faFlask} />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.toggleDefineSubspace(node)} />;
+
+        if (includeNeighbors && defineSubspace) {
+            return <>{neighbors} {subspace}</>;
+        } else if (includeNeighbors) {
+            return neighbors;
+        } else if (defineSubspace) {
+            return subspace;
+        }
+        return <Chip icon={<RotatedPin />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />;
     }
 }
 

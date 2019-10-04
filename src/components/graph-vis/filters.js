@@ -5,6 +5,8 @@ import Store from '../../store';
 import { observer } from 'mobx-react';
 import ReactSelectWrapper from '../controls/reactselect';
 import RangeSliderControlComponent from '../controls/rangeslider';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlask } from '@fortawesome/free-solid-svg-icons';
 
 @observer
 class Filters extends React.Component {
@@ -31,7 +33,7 @@ class Filters extends React.Component {
         }}
       />)}
       <ReactSelectWrapper
-        label="Elements"
+        label={<><FontAwesomeIcon icon={faFlask} /> Elements</>}
         value={store.defineSubspaceNodes.map((value) => ({ label: value.name, value: value.name }))}
         isMulti
         options={store.knownElements.map((value) => ({ label: value, value }))}

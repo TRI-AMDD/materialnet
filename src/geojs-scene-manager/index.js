@@ -364,6 +364,7 @@ export class GeoJSSceneManager {
 
     this._updateEdgeHighlights();
 
+    this.points.modified();
     this.map.draw();
   }
 

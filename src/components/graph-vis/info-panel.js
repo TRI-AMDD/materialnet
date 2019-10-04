@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Close } from '@material-ui/icons';
 import RotatedPin from './RotatedPin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faFlask, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 
 const visStyles = theme => ({
@@ -49,6 +49,17 @@ class InfoPanel extends React.Component {
     store.toggleDefineSubspace(node);
   }
 
+  togglePinned = () => {
+    const store = this.context;
+    const node = store.selected;
+
+    if (!node) {
+      return;
+    }
+
+    store.togglePinned(node);
+  }
+
   render() {
     const store = this.context;
     const { classes } = this.props;
@@ -59,13 +70,16 @@ class InfoPanel extends React.Component {
     }
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
+
+      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
+        <FontAwesomeIcon icon={faFlask} />
+      </IconButton>
       <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'inherit'}>
+        <FontAwesomeIcon icon={faProjectDiagram} />
+      </IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
         <RotatedPin />
       </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'inherit'}>
-        <FontAwesomeIcon icon={faFilter} />
-      </IconButton>
-
 
       {store.template && store.template.render(node, store)}
     </Paper>;

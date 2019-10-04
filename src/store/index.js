@@ -135,7 +135,7 @@ export class ApplicationStore {
     showLegend = true;
 
     @observable
-    showSubGraphOnly = false;
+    showSubGraphOnly = true;
 
     @observable
     pinnedNodes = []; // {node: INode, includeNeighbors: boolean, defineSubspace: boolean}
@@ -315,30 +315,35 @@ export class ApplicationStore {
     get filterFunc() {
         const filters = Object.entries(toJS(this.filters));
         const subSpaceBaseElements = new Set([].concat(...this.defineSubspaceNodes.map(d => d._elements)));
-        const neighborElements = this.data ? neighborsOf(this.incluceNeighborsNodes, this.data.edges) : new Set();
-        const mustInclude = new Set(this.pinnedNodes.map((d) => d.node));
-        if (this.selected) {
-            mustInclude.add(this.selected);
-        }
+        const neighborElementNames = this.data ? neighborsOf(this.incluceNeighborsNodes.map((d) => d.name), this.data.edges) : new Set();
 
-        if (filters.length === 0 && mustInclude.size === 0 && subSpaceBaseElements.size === 0 && neighborElements.size === 0) {
+        if (filters.length === 0 && subSpaceBaseElements.size === 0 && neighborElementNames.size === 0) {
             return null;
+        }
+        const mustInclude = new Set(this.pinnedNodes.map((d) => d.node.name));
+
+        if (this.selected) {
+            mustInclude.add(this.selected.name);
         }
 
         return (node) => {
-            if (mustInclude.has(node)) {
+            if (mustInclude.has(node.name)) {
                 return true;
             }
             if (!filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
             })) {
-                return false; // filtered out by property
+                return false;
             }
-            if (neighborElements.has(node)) {
+            if (neighborElementNames.has(node.name)) {
                 return true;
             }
-            return subSpaceBaseElements.size === 0 || node._elements.every(base => subSpaceBaseElements.has(base));
+            if (subSpaceBaseElements.size > 0 && node._elements.every(base => subSpaceBaseElements.has(base))) {
+                return true;
+            }
+            // only visible if no subspace filter is set
+            return neighborElementNames.size === 0 && subSpaceBaseElements.size === 0;
         };
     }
 
@@ -606,12 +611,12 @@ export class ApplicationStore {
     }
 
     isPinned(node) {
-        return this.pinnedNodes.find((d) => d.node === node) != null;
+        return this.pinnedNodes.find((d) => d.name === node.name) != null;
     }
 
     @action
     removePinned(node) {
-        this.pinnedNodes = this.pinnedNodes.filter((d) => d.node !== node);
+        this.pinnedNodes = this.pinnedNodes.filter((d) => d.node.name !== node.name);
     }
 
     @action
@@ -619,6 +624,15 @@ export class ApplicationStore {
         this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: false });
     }
 
+    @action
+    togglePinned(node) {
+        const index = this.pinnedNodes.findIndex((d) => d.node.name === node.name);
+        if (index >= 0) {
+            this.pinnedNodes.splice(index, 1);
+        } else {
+            this.pinnedNodes.push({ node, includeNeighbors: false, defineSubspace: false });
+        }
+    }
 
     _postMessage(type, params, onMessage) {
         const key = uniqueId();
