@@ -141,12 +141,13 @@ export class ApplicationStore {
         // [property]: value ... filter object
     };
 
-    @observable
-    discoveryYearFilter = (node) => {
+    @computed
+    get filterDiscoveryYear() {
         const cutoff = this.year;
-        const year = node.discovery;
-
-        return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+        return (node) => {
+            const year = node.discovery;
+            return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+        };
     };
 
     @observable
@@ -324,13 +325,13 @@ export class ApplicationStore {
         const filters = Object.entries(toJS(this.filters));
         const elements = new Set(this.filterElements);
         if (filters.length === 0 && elements.length === 0) {
-            return null;
+            return this.filterDiscoveryYear;
         }
         return (node) => {
             if (elements.size > 0 && node._elements.some((e) => !elements.has(e))) {
                 return false;
             }
-            return this.discoveryYearFilter(node) && filters.every(([prop, [min, max]]) => {
+            return this.filterDiscoveryYear(node) && filters.every(([prop, [min, max]]) => {
                 const value = node[prop];
                 return value != null && value >= min && value <= max;
             });
