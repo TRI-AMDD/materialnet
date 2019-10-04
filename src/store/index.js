@@ -414,7 +414,7 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        return this.nodeNames.filter((d) => this.data.nodes[d]._elements.length === 1).sort(sortStringsLength);
+        return this.nodeNames.filter((d) => (this.data.nodes[d]._elements || []).length === 1).sort(sortStringsLength);
     }
 
     @computed
