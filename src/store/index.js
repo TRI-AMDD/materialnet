@@ -351,7 +351,7 @@ export class ApplicationStore {
                 s.add(elem)
             }
         }
-        return Array.from(s).sort();
+        return Array.from(s).sort(sortStringsLength);
     }
 
     @computed

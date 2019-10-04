@@ -5,7 +5,6 @@ import Store from '../../store';
 import { observer } from 'mobx-react';
 import ReactSelectWrapper from '../controls/reactselect';
 import RangeSliderControlComponent from '../controls/rangeslider';
-import { sortStringsLength } from "./sort";
 
 @observer
 class Filters extends React.Component {
@@ -35,7 +34,7 @@ class Filters extends React.Component {
         label="Elements"
         value={store.filterElements.map((value) => ({ label: value, value }))}
         isMulti
-        options={store.knownElements.slice().sort(sortStringsLength).map((value) => ({ label: value, value }))}
+        options={store.knownElements.map((value) => ({ label: value, value }))}
         onChange={(values) => {
           store.filterElements = values.map((d) => d.value);
         }}
