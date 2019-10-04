@@ -4,6 +4,8 @@ import { withStyles, Paper, IconButton } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { Close } from '@material-ui/icons';
 import RotatedPin from './RotatedPin';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlask, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 
 const visStyles = theme => ({
@@ -25,6 +27,28 @@ class InfoPanel extends React.Component {
 
   onClear = () => this.context.selected = null;
 
+  toggleIncludeNeighbors = () => {
+    const store = this.context;
+    const node = store.selected;
+
+    if (!node) {
+      return;
+    }
+
+    store.toggleIncludeNeighbors(node);
+  }
+
+  toggleDefineSubspace = () => {
+    const store = this.context;
+    const node = store.selected;
+
+    if (!node) {
+      return;
+    }
+
+    store.toggleDefineSubspace(node);
+  }
+
   togglePinned = () => {
     const store = this.context;
     const node = store.selected;
@@ -33,11 +57,7 @@ class InfoPanel extends React.Component {
       return;
     }
 
-    if (store.isPinned(node)) {
-      store.removePinned(node);
-    } else {
-      store.pushPinned(node);
-    }
+    store.togglePinned(node);
   }
 
   render() {
@@ -50,10 +70,16 @@ class InfoPanel extends React.Component {
     }
     return <Paper className={classes.root}>
       <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'Unpin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'inherit'}>
+
+      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faFlask} />
+      </IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}>
+        <FontAwesomeIcon icon={faProjectDiagram} />
+      </IconButton>
+      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'default'}>
         <RotatedPin />
       </IconButton>
-      
 
       {store.template && store.template.render(node, store)}
     </Paper>;

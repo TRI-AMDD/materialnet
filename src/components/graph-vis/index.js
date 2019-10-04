@@ -14,8 +14,8 @@ class GraphVisComponent extends Component {
   visElement;
   scene = new GeoJSSceneManager({
     onZoomChanged: (val) => this.context.zoom = val,
-    picked: (node, asPinned) => {
-      this.context.selectNode(node, asPinned);
+    picked: (node, modifiers) => {
+      this.context.selectNode(node, modifiers);
     },
     onNodeSpacingChanged: (delta) => {
       const next = this.context.spacing + (delta > 0 ? -0.1 : 0.1);
@@ -65,10 +65,19 @@ class GraphVisComponent extends Component {
       this.scene.setLinkOpacity(store.opacity);
     }, { delay: 250 }); // debounce
     setAndObserve(() => {
-      this.scene.setData(store.filteredNodeNames, store.filteredEdges);
+      if (store.showSubGraphOnly) {
+        this.scene.setData(store.subGraphNodeNames, store.subGraphEdges);
+      } else {
+        this.scene.setData(store.nodeNames, store.edges);
+      }
     }, { delay: 250 }); // debounce
     setAndObserve(() => {
-      this.scene.display(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.name));
+      if (!store.showSubGraphOnly) {
+        this.scene.showSubGraph(store.doesShowSubgraph ? store.subGraphNodeNames : []);
+      }
+    }, { delay: 250 }); // debounce
+    setAndObserve(() => {
+      this.scene.setSelected(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.node.name));
     });
     setAndObserve(() => {
       this.scene.setPositions(store.subGraphLayout);
