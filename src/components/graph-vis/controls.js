@@ -6,7 +6,8 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Typography
+  Typography,
+  withStyles
 } from '@material-ui/core';
 
 import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
@@ -36,6 +37,15 @@ function toOption(v) {
   const value = v.value || simplify(label);
   return { label, value };
 }
+
+const visStyles = theme => ({
+  denseCheckbox: {
+    padding: 0,
+    '& .MuiCheckbox-root': {
+      padding: '0 9px'
+    }
+  }
+});
 
 @observer
 class Controls extends React.Component {
@@ -67,6 +77,7 @@ class Controls extends React.Component {
 
   render() {
     const store = this.context;
+    const { classes } = this.props;
     return (
       <Grid>
         {store.datasets.length > 1 && <SelectControl
@@ -166,26 +177,31 @@ class Controls extends React.Component {
                 onChange={(val) => { store.colorYear = val; }}
               />}
               <CheckboxControl
+                className={classes.denseCheckbox}
                 label="Show Sub Graph Only"
                 value={store.showSubGraphOnly}
                 onChange={(val) => { store.showSubGraphOnly = val; }}
               />
               <CheckboxControl
+                className={classes.denseCheckbox}
                 label="Auto Include Neigbhors of Selected"
                 value={store.autoIncludeNeighorsForSelection}
                 onChange={(val) => { store.autoIncludeNeighorsForSelection = val; }}
               />
               <CheckboxControl
+                className={classes.denseCheckbox}
                 label="Show Legend"
                 value={store.showLegend}
                 onChange={(val) => { store.showLegend = val; }}
               />
               <CheckboxControl
+                className={classes.denseCheckbox}
                 label="Show Table"
                 value={store.showTable}
                 onChange={(val) => { store.showTable = val; }}
               />
               <CheckboxControl
+                className={classes.denseCheckbox}
                 label="Night mode"
                 value={store.nightMode}
                 onChange={(val) => { store.nightMode = val; }}
@@ -215,4 +231,4 @@ class Controls extends React.Component {
   }
 }
 
-export default Controls;
+export default withStyles(visStyles)(Controls);
