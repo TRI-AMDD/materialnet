@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Paper } from '@material-ui/core';
+import { observer } from 'mobx-react';
 import clsx from 'clsx';
 
 // based on https://github.com/phovea/phovea_ui/tree/master/src/layout
@@ -23,6 +24,7 @@ const visStyles = theme => ({
   }
 });
 
+@observer
 class SplitContainer extends React.Component {
 
   state = {
