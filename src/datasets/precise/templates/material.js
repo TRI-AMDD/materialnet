@@ -8,6 +8,7 @@ export default {
     label: 'Material',
     render: (node, store) => {
         const hypothetical = node.discovery == null;
+        const structureFile = `/sample-data/structures/${node.name}.cjson`;
 
         return <>
             <Typography gutterBottom variant="h4">{`${node.name} (${hypothetical ? 'undiscovered' : node.discovery})`}</Typography>
@@ -25,10 +26,11 @@ export default {
             {node.shortest_path != null && <InfoBlock value={node.shortest_path} {...store.getPropertyMetaData('shortest_path')} />}
             {node.deg_neigh != null && <InfoBlock value={node.deg_neigh} {...store.getPropertyMetaData('deg_neigh')} />}
 
-            
             <div style={{ width: '100%', height: '15rem' }}>
                 <Structure cjson={node.structure} />
             </div>
+
+            <a href={structureFile} download>structure data</a>
         </>;
     },
     tooltip
