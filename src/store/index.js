@@ -753,6 +753,11 @@ export class ApplicationStore {
     resetSubGraphLayout() {
         this.subGraphLayout = {};
     }
+
+    @action
+    resetZoom() {
+        this.zoom = -2.3;
+    }
 }
 
 export default createContext();
