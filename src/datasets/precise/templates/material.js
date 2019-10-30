@@ -8,7 +8,9 @@ export default {
     label: 'Material',
     render: (node, store) => {
         const hypothetical = node.discovery == null;
-        const structureFile = `/sample-data/structures/${node.name}.cjson`;
+        const structureFile = `${node.name}.cjson`;
+        const structurePath = `/sample-data/structures/${structureFile}`;
+        const oqmdLink = `http://oqmd.org/materials/composition/${node.name}`;
 
         return <>
             <Typography gutterBottom variant="h4">{`${node.name} (${hypothetical ? 'undiscovered' : node.discovery})`}</Typography>
@@ -30,7 +32,13 @@ export default {
                 <Structure cjson={node.structure} />
             </div>
 
-            <a href={structureFile} download>structure data</a>
+            <div>
+                <a href={structurePath} download>download {structureFile}</a>
+            </div>
+
+            <div>
+                <a href={oqmdLink} target="_blank">OQMD</a>
+            </div>
         </>;
     },
     tooltip
