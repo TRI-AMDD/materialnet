@@ -20,20 +20,20 @@ class Filters extends React.Component {
     const store = this.context;
     return (<Grid>
       { /* dataset specific */}
-      {store.yearRange && <SliderControl
-        value={store.year}
+      {store.yearRange && <RangeSliderControlComponent
+        value={[1945, store.year]}
         range={store.yearRange}
         step={1}
         label={'Discovered before'}
         digits={0}
-        onChange={(val) => { store.year = val; }}
+        onChange={(val) => { store.year = val[1]; }}
       >
         <IconButton
           onClick={() => store.toggleAutoplay()}
         >
           {store.play ? <Pause /> : <PlayArrow />}
         </IconButton>
-      </SliderControl>}
+      </RangeSliderControlComponent>}
       {store.propertyList.filter((meta) => meta.filterable).map((meta) => <RangeSliderControlComponent
         key={meta.label}
         value={store.filters[meta.property] ? store.filters[meta.property].slice() : meta.domain.slice()}
