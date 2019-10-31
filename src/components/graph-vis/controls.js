@@ -26,6 +26,7 @@ import PinnedNode from './PinnedNode';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RotatedPin from './RotatedPin';
 import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
+import { HelpPanel } from './helpPanel';
 
 function simplify(label) {
   // simplify the label for better values
@@ -104,7 +105,12 @@ class Controls extends React.Component {
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Options</Typography>
+            <Typography>
+              <HelpPanel name='options-help'>
+                <p>Hello</p>
+              </HelpPanel>&nbsp;
+              Options
+            </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Grid>
