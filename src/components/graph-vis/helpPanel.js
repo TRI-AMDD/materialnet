@@ -1,9 +1,18 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
+import Typography from '@material-ui/core/Typography';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
+const useStyles = makeStyles(theme => ({
+  typography: {
+    padding: theme.spacing(1),
+  }
+}));
+
 export function HelpPanel({name, children}) {
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = event => {
@@ -38,7 +47,9 @@ export function HelpPanel({name, children}) {
           vertical: 'top',
           horizontal: 'center',
         }}>
-          {children}
+          <Typography className={classes.typography}>
+            {children}
+          </Typography>
       </Popover>
     </>
   );
