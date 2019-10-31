@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  Button,
   Checkbox,
   IconButton,
   ExpansionPanel,
@@ -108,6 +109,10 @@ class Controls extends React.Component {
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Grid>
+              <Button onClick={() => store.resetZoom()}>
+                reset zoom
+              </Button>
+
               <SliderControl
                 value={store.zoom}
                 range={store.zoomRange}
