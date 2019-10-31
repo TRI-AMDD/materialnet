@@ -117,7 +117,8 @@ class Controls extends React.Component {
               <SliderControl
                 value={store.zoom}
                 range={store.zoomRange}
-                label={'Zoom'}
+                // label={'Zoom'}
+                label={<span><HelpPanel name='zoom-help'><p>Zoooooom</p></HelpPanel>&nbsp;Zoom</span>}
                 onChange={(val) => { store.zoom = val; }}
               />
               <SliderControl
