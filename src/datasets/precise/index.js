@@ -51,6 +51,6 @@ export default {
         zoom: -2.3,
         size: sizes[1],
         colorYear: 2016,
-        year: 2016,
+        year: [1945, 2016],
     },
 }

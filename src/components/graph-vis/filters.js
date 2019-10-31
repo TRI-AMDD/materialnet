@@ -21,12 +21,12 @@ class Filters extends React.Component {
     return (<Grid>
       { /* dataset specific */}
       {store.yearRange && <RangeSliderControlComponent
-        value={[1945, store.year]}
+        value={store.year}
         range={store.yearRange}
         step={1}
         label={'Discovered before'}
         digits={0}
-        onChange={(val) => { store.year = val[1]; }}
+        onChange={(val) => { store.year = val.slice(); }}
       >
         <IconButton
           onClick={() => store.toggleAutoplay()}

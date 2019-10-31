@@ -153,10 +153,10 @@ export class ApplicationStore {
 
     @computed
     get filterDiscoveryYear() {
-        const cutoff = this.year;
+        const [low, high] = this.year;
         return (node) => {
-            const year = node.discovery;
-            return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+            const discovery = node.discovery;
+            return (discovery == null && high === 2016) || (discovery != null && low <= discovery && discovery <= high);
         };
     };
 
