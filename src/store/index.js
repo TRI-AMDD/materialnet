@@ -756,7 +756,7 @@ export class ApplicationStore {
 
     @action
     resetZoom() {
-        this.zoom = -2.3;
+        this.zoom = this.dataset.defaults.zoom;
     }
 }
 
