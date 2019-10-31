@@ -541,11 +541,11 @@ export class ApplicationStore {
 
         if (!this.play) {
             interval = setInterval(() => {
-                let nextYear = this.year + 1;
-                if (this.year === this.yearRange[1]) {
+                let nextYear = this.year[1] + 1;
+                if (this.year[1] === this.yearRange[1]) {
                     nextYear = this.yearRange[0];
                 }
-                this.year = nextYear;
+                this.year = [this.yearRange[0], nextYear];
             }, 300);
         }
 
