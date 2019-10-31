@@ -54,3 +54,16 @@ export function HelpPanel({name, children}) {
     </>
   );
 }
+
+export function HelpPanelLabel({name, label, children}) {
+  return (
+    <span>
+      {label}
+      &nbsp;
+      <HelpPanel
+        name={name}
+        children={children}
+      />
+    </span>
+  );
+}
