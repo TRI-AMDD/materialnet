@@ -4,7 +4,6 @@ import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
 import ReactSelectWrapper from '../controls/reactselect';
-import SliderControl from '../controls/slider';
 import RangeSliderControlComponent from '../controls/rangeslider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
@@ -24,7 +23,7 @@ class Filters extends React.Component {
         value={store.year}
         range={store.yearRange}
         step={1}
-        label={'Discovered before'}
+        label={'Discovery year'}
         digits={0}
         onChange={(val) => { store.year = val.slice(); }}
       >
