@@ -37,7 +37,7 @@ export default {
             </div>
 
             <div>
-                <a href={oqmdLink} target="_blank" rel="noopener">OQMD</a>
+                <a href={oqmdLink} target="_blank" rel="noopener noreferrer">OQMD</a>
             </div>
         </>;
     },
