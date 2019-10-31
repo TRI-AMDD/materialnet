@@ -67,3 +67,19 @@ export function HelpPanelLabel({name, label, children}) {
     </span>
   );
 }
+
+export function ZoomHelp() {
+  return (
+    <HelpPanelLabel name='zoom-help' label='Zoom'>
+      <p>Zooooom</p>
+    </HelpPanelLabel>
+  );
+}
+
+export function SpacingHelp() {
+  return (
+    <HelpPanelLabel name='spacing-help' label='Node spacing'>
+      <p>Spaaaace!</p>
+    </HelpPanelLabel>
+  );
+}

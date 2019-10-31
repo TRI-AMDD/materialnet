@@ -26,7 +26,11 @@ import PinnedNode from './PinnedNode';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RotatedPin from './RotatedPin';
 import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
-import { HelpPanel, HelpPanelLabel } from './helpPanel';
+import {
+  HelpPanel,
+  ZoomHelp,
+  SpacingHelp,
+} from './helpPanel';
 
 function simplify(label) {
   // simplify the label for better values
@@ -117,14 +121,14 @@ class Controls extends React.Component {
               <SliderControl
                 value={store.zoom}
                 range={store.zoomRange}
-                label={<HelpPanelLabel name='zoom-help' label='Zoom'><p>Zoooooom</p></HelpPanelLabel>}
+                label={<ZoomHelp />}
                 onChange={(val) => { store.zoom = val; }}
               />
               <SliderControl
                 value={store.spacing}
                 range={store.spacingRange}
                 step={0.1}
-                label={<HelpPanelLabel name='spacing-help' label='Node spacing'><p>Spaaaaace</p></HelpPanelLabel>}
+                label={<SpacingHelp />}
                 onChange={(val) => { store.spacing = val; }}
               />
               <SliderControl
