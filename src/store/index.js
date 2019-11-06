@@ -156,7 +156,10 @@ export class ApplicationStore {
         const [low, high] = this.year;
         return (node) => {
             const discovery = node.discovery;
-            return (discovery == null && high === 2016) || (discovery != null && low <= discovery && discovery <= high);
+
+            // If the high end is set to the max value, then consider all
+            // undiscovered materials to be visible.
+            return (discovery == null && high === this.yearRange[1]) || (discovery != null && low <= discovery && discovery <= high);
         };
     };
 
