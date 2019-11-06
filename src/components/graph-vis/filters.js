@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
 import { IconButton } from '@material-ui/core';
 import { PlayArrow, Pause } from '@material-ui/icons';
-import { DiscoveryYearHelp, ElementsHelp } from './helpPanel';
+import { DiscoveryYearHelp } from './helpPanel';
 
 @observer
 class Filters extends React.Component {
@@ -51,7 +51,7 @@ class Filters extends React.Component {
         }}
       />)}
       <ReactSelectWrapper
-        label={<ElementsHelp />}
+        label={<><FontAwesomeIcon icon={faFlask} /> Elements</>}
         value={store.defineSubspaceNodes.map((value) => ({ label: value.name, value: value.name, icon: <FontAwesomeIcon icon={faFlask} />}))}
         isMulti
         options={store.knownElements.map((value) => ({ label: value, value }))}
