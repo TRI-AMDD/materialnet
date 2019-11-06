@@ -20,7 +20,7 @@ class Filters extends React.Component {
     return (<Grid>
       { /* dataset specific */}
       {store.yearRange && <RangeSliderControlComponent
-        value={store.year}
+        value={store.year.slice()}
         range={store.yearRange}
         step={1}
         label={'Discovery year'}
