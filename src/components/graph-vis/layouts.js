@@ -19,7 +19,7 @@ class Layouts extends React.Component {
       </Button>}
       {store.subGraphLayouting && <Button
         onClick={() => store.abortSubGraphLayout()}>
-        <CircularProgress />&nbsp;Stop
+        Stop
       </Button>}
       {!store.subGraphLayouting && <Button
         disabled={Object.keys(store.subGraphLayout).length === 0}
