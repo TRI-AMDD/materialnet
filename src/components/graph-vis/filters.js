@@ -7,6 +7,8 @@ import ReactSelectWrapper from '../controls/reactselect';
 import RangeSliderControlComponent from '../controls/rangeslider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
+import { IconButton } from '@material-ui/core';
+import { PlayArrow, Pause } from '@material-ui/icons';
 
 @observer
 class Filters extends React.Component {
@@ -16,6 +18,21 @@ class Filters extends React.Component {
   render() {
     const store = this.context;
     return (<Grid>
+      { /* dataset specific */}
+      {store.yearRange && <RangeSliderControlComponent
+        value={store.year.slice()}
+        range={store.yearRange}
+        step={1}
+        label={'Discovery year'}
+        digits={0}
+        onChange={(val) => { store.year = val.slice(); }}
+      >
+        <IconButton
+          onClick={() => store.toggleAutoplay()}
+        >
+          {store.play ? <Pause /> : <PlayArrow />}
+        </IconButton>
+      </RangeSliderControlComponent>}
       {store.propertyList.filter((meta) => meta.filterable).map((meta) => <RangeSliderControlComponent
         key={meta.label}
         value={store.filters[meta.property] ? store.filters[meta.property].slice() : meta.domain.slice()}

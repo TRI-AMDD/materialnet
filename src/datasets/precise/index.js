@@ -6,7 +6,7 @@ import defaultTemplate from '../default';
 
 export default {
     ...defaultTemplate,
-    yearRange: [1945, 2016],
+    yearRange: [1920, 2016],
     templates,
     colors,
     sizes,
@@ -51,6 +51,6 @@ export default {
         zoom: -2.3,
         size: sizes[1],
         colorYear: 2016,
-        year: 2016,
+        year: [1920, 2016],
     },
 }

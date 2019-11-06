@@ -11,7 +11,7 @@ import {
   withStyles
 } from '@material-ui/core';
 
-import { PlayArrow, Pause, ExpandMore} from '@material-ui/icons';
+import { ExpandMore } from '@material-ui/icons';
 
 import Grid from '../controls/grid';
 import { ReactSelectSearchWrapper} from '../controls/reactselect';
@@ -142,21 +142,6 @@ class Controls extends React.Component {
                 label={'Template'}
                 onChange={(val) => { store.template = store.templates.find((d) => toOption(d).value === val); }}
               />}
-              { /* dataset specific */}
-              {store.yearRange && <SliderControl
-                value={store.year}
-                range={store.yearRange}
-                step={1}
-                label={'Discovered before'}
-                digits={0}
-                onChange={(val) => { store.year = val; }}
-              >
-                <IconButton
-                  onClick={() => store.toggleAutoplay()}
-                >
-                  {store.play ? <Pause /> : <PlayArrow />}
-                </IconButton>
-              </SliderControl>}
               <SelectControl
                 value={toOption(store.size).value}
                 options={store.sizes.map(toOption)}

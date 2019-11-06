@@ -153,10 +153,13 @@ export class ApplicationStore {
 
     @computed
     get filterDiscoveryYear() {
-        const cutoff = this.year;
+        const [low, high] = this.year;
         return (node) => {
-            const year = node.discovery;
-            return (year == null && cutoff === 2016) || (year != null && year <= cutoff);
+            const discovery = node.discovery;
+
+            // If the high end is set to the max value, then consider all
+            // undiscovered materials to be visible.
+            return (discovery == null && high === this.yearRange[1]) || (discovery != null && low <= discovery && discovery <= high);
         };
     };
 
@@ -541,11 +544,11 @@ export class ApplicationStore {
 
         if (!this.play) {
             interval = setInterval(() => {
-                let nextYear = this.year + 1;
-                if (this.year === this.yearRange[1]) {
+                let nextYear = this.year[1] + 1;
+                if (this.year[1] === this.yearRange[1]) {
                     nextYear = this.yearRange[0];
                 }
-                this.year = nextYear;
+                this.year = [this.yearRange[0], nextYear];
             }, 300);
         }
 
