@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
 import { IconButton } from '@material-ui/core';
 import { PlayArrow, Pause } from '@material-ui/icons';
-import { DiscoveryYearHelp } from './helpPanel';
 
 @observer
 class Filters extends React.Component {

@@ -1,9 +1,7 @@
-import React from 'react';
 import templates from './templates';
 import colors from './colors';
 import sizes from './sizes';
 import defaultTemplate from '../default';
-import * as panels from '../../components/graph-vis/helpPanel';
 
 export default {
     ...defaultTemplate,

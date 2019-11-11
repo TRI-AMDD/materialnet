@@ -3,7 +3,7 @@ import React from 'react';
 import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
 @observer
 class Layouts extends React.Component {
