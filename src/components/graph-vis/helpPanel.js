@@ -298,22 +298,22 @@ export function LayoutHelp() {
       </p>
 
       <p>
-        The "Start" button kicks off a background worker that uses a force-based
-        layout algorithm to flow the node of the graph around the map as though
-        the links between them were springs pulling them closer together.
-        Because this can be a costly operation, you may see more infrequent
-        updates for larger subgraphs, but this is normal.
+        The <code>start</code> button kicks off a background worker that uses a
+        force-based layout algorithm to flow the node of the graph around the
+        map as though the links between them were springs pulling them closer
+        together.  Because this can be a costly operation, you may see more
+        infrequent updates for larger subgraphs, but this is normal.
       </p>
 
       <p>
-        Once live layout begins, a "Stop" button will appear; whenever you wish
+        Once live layout begins, a <code>stop</code> button will appear; whenever you wish
         to pause the layout process, click this button. That will cause the
-        "Start" button to reappear, along with the "Reset" button.
+        <code>start</code> button to reappear, along with the "Reset" button.
       </p>
 
       <p>
-        "Reset" will restore the layout of the whole graph back to its original
-        state.
+        The <code>reset</code> button will restore the layout of the whole graph
+        back to its original state.
       </p>
 
     </HelpPanelLabel>
