@@ -3,7 +3,6 @@ import colors from './colors';
 import sizes from './sizes';
 import defaultTemplate from '../default';
 
-
 export default {
     ...defaultTemplate,
     yearRange: [1920, 2016],
@@ -17,23 +16,23 @@ export default {
             format: 'd'
         },
         formation_energy: {
-            label: "Formation energy",
+            label: 'Formation Energy',
             filterable: true,
             format: '.3f',
             suffix: ` eV/atom`
         },
         synthesis_probability: {
-            label: "Synthesis probability",
+            label: 'Synthesis Probability',
             filterable: true,
             format: '.1%',
             domain: [0, 1]
         },
         eigen_cent: {
-            label: 'Eigenvector centrality',
+            label: 'Eigenvector Centrality',
             filterable: true,
         },
         deg_cent: {
-            label: 'Degree centrality',
+            label: 'Degree Centrality',
             filterable: true,
         },
         shortest_path: {

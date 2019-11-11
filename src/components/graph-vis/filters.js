@@ -23,7 +23,7 @@ class Filters extends React.Component {
         value={store.year.slice()}
         range={store.yearRange}
         step={1}
-        label={'Discovery year'}
+        label='Discovery Year'
         digits={0}
         onChange={(val) => { store.year = val.slice(); }}
       >

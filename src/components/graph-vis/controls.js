@@ -27,6 +27,7 @@ import PinnedNode from './PinnedNode';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RotatedPin from './RotatedPin';
 import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
+import * as panels from './helpPanel';
 
 function simplify(label) {
   // simplify the label for better values
@@ -84,11 +85,11 @@ class Controls extends React.Component {
         {store.datasets.length > 1 && <SelectControl
           value={toOption(store.dataset).value}
           options={store.datasets.map(toOption)}
-          label={'Dataset'}
+          label='Dataset'
           onChange={(val) => { store.dataset = store.datasets.find((d) => toOption(d).value === val); }}
         />}
         <ReactSelectSearchWrapper
-          label={'Search'}
+          label={<panels.SearchHelp />}
           options={store.searchOptions}
           optionButtons={this.renderOptionButtons}
           value={store.search ? {label: store.search, value: store.search} : null}
@@ -105,7 +106,9 @@ class Controls extends React.Component {
 
         <ExpansionPanel expanded={store.drawerExpanded.options} onChange={(_, isExpanded) => { store.drawerExpanded.options = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Options</Typography>
+            <Typography>
+              <panels.OptionsHelp />
+            </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Grid>
@@ -116,21 +119,21 @@ class Controls extends React.Component {
               <SliderControl
                 value={store.zoom}
                 range={store.zoomRange}
-                label={'Zoom'}
+                label='Zoom'
                 onChange={(val) => { store.zoom = val; }}
               />
               <SliderControl
                 value={store.spacing}
                 range={store.spacingRange}
                 step={0.1}
-                label={'Node spacing'}
+                label={<panels.SpacingHelp />}
                 onChange={(val) => { store.spacing = val; }}
               />
               <SliderControl
                 value={store.opacity}
                 range={[0, 0.1]}
                 step={0.001}
-                label={'Link opacity / display'}
+                label='Link opacity / display'
                 disabled={!store.showLinks}
                 onChange={(val) => { store.opacity = val; }}
               >
@@ -139,13 +142,13 @@ class Controls extends React.Component {
               {store.templates.length > 1 && <SelectControl
                 value={toOption(store.template).value}
                 options={store.templates.map(toOption)}
-                label={'Template'}
+                label={<panels.TemplateHelp />}
                 onChange={(val) => { store.template = store.templates.find((d) => toOption(d).value === val); }}
               />}
               <SelectControl
                 value={toOption(store.size).value}
                 options={store.sizes.map(toOption)}
-                label={'Node size'}
+                label='Node size'
                 onChange={(val) => {
                   store.size = store.sizes.find((d) => toOption(d).value === val);
                 }}
@@ -153,7 +156,7 @@ class Controls extends React.Component {
               <SelectControl
                 value={toOption(store.color).value}
                 options={store.colors.map(toOption)}
-                label={'Node color'}
+                label='Node color'
                 onChange={(val) => { store.color = store.colors.find((d) => toOption(d).value === val); }}
               />
               { /* dataset specific */}
@@ -161,38 +164,38 @@ class Controls extends React.Component {
                 value={store.colorYear}
                 range={store.yearRange}
                 step={1}
-                label={'Color year'}
+                label={<panels.ColorYearHelp />}
                 digits={0}
                 disabled={!store.color || store.color.label !== 'Discovered/Undiscovered'}
                 onChange={(val) => { store.colorYear = val; }}
               />}
               <CheckboxControl
                 className={classes.denseCheckbox}
-                label="Show Sub Graph Only"
+                label={<panels.SubgraphOnlyHelp />}
                 value={store.showSubGraphOnly}
                 onChange={(val) => { store.showSubGraphOnly = val; }}
               />
               <CheckboxControl
                 className={classes.denseCheckbox}
-                label="Auto Include Neigbhors of Selected"
+                label={<panels.AutoNeighborsHelp />}
                 value={store.autoIncludeNeighorsForSelection}
                 onChange={(val) => { store.autoIncludeNeighorsForSelection = val; }}
               />
               <CheckboxControl
                 className={classes.denseCheckbox}
-                label="Show Legend"
+                label='Show Legend'
                 value={store.showLegend}
                 onChange={(val) => { store.showLegend = val; }}
               />
               <CheckboxControl
                 className={classes.denseCheckbox}
-                label="Show Table"
+                label={<panels.TableHelp />}
                 value={store.showTable}
                 onChange={(val) => { store.showTable = val; }}
               />
               <CheckboxControl
                 className={classes.denseCheckbox}
-                label="Night mode"
+                label='Night Mode'
                 value={store.nightMode}
                 onChange={(val) => { store.nightMode = val; }}
                 />
@@ -201,7 +204,9 @@ class Controls extends React.Component {
         </ExpansionPanel>
         <ExpansionPanel expanded={store.drawerExpanded.filter} onChange={(_, isExpanded) => { store.drawerExpanded.filter = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Filtering</Typography>
+            <Typography>
+              <panels.FilteringHelp />
+            </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Filters />
@@ -210,7 +215,9 @@ class Controls extends React.Component {
 
         <ExpansionPanel expanded={store.drawerExpanded.layouts} onChange={(_, isExpanded) => { store.drawerExpanded.layouts = isExpanded }}>
           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-            <Typography>Layout</Typography>
+            <Typography>
+              <panels.LayoutHelp />
+            </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Layouts />

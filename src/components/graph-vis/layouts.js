@@ -3,7 +3,7 @@ import React from 'react';
 import Grid from '../controls/grid';
 import Store from '../../store';
 import { observer } from 'mobx-react';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
 @observer
 class Layouts extends React.Component {
@@ -15,16 +15,16 @@ class Layouts extends React.Component {
       {!store.subGraphLayouting && <Button
         disabled={!store.doesShowSubgraph}
         onClick={() => store.computeSubGraphLayout()}>
-        start layout
+        Start
       </Button>}
       {store.subGraphLayouting && <Button
         onClick={() => store.abortSubGraphLayout()}>
-        <CircularProgress />&nbsp;abort
+        Stop
       </Button>}
       {!store.subGraphLayouting && <Button
         disabled={Object.keys(store.subGraphLayout).length === 0}
         onClick={() => store.resetSubGraphLayout()}>
-        reset layout
+        Reset
       </Button>}
     </Grid>
     );
