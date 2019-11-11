@@ -75,7 +75,7 @@ export function HelpPanelLabel({name, label, children}) {
 
 export function SearchHelp() {
   return (
-    <HelpPanelLabel name='search-help' label='Search'>
+    <HelpPanelLabel name="search-help" label="Search">
       <p>
         Use this panel to search for items in the loaded dataset. Search results
         will match the phrase used anywhere in the name of the item. For
