@@ -125,12 +125,13 @@ export function SearchHelp() {
 
       <p>
         These states can also be toggled by interacting with the map directly:
-        Ctrl-click will pin an item; shift-click will pin it and show neighbors;
-        and alt-click will add its constituents to the subspace.  You can also
-        simply <i>select</i> an item by clicking on it without any keys pressed:
-        while this opens the detail panel, it does not affect the item's
-        pinned/neighbor/subspace status. Once the detail panel is open, you can
-        also use the icons to affect that status for that item.
+        <code>ctrl-click</code> will pin an item; <code>shift-click</code> will
+        pin it and show neighbors; and <code>alt-click</code> will add its
+        constituents to the subspace.  You can also simply <i>select</i> an
+        item by clicking on it without any keys pressed: while this opens the
+        detail panel, it does not affect the item's pinned/neighbor/subspace
+        status. Once the detail panel is open, you can also use the icons to
+        affect that status for that item.
       </p>
     </HelpPanelLabel>
   );
@@ -158,7 +159,7 @@ export function SpacingHelp() {
       </p>
 
       <p>
-        In addition to using the slider, you can also hold <samp>Ctrl</samp> while
+        In addition to using the slider, you can also hold <code>ctrl</code> while
         rolling the mousewheel on on the map. The zoom effect will center on the
         mouse position.
       </p>
