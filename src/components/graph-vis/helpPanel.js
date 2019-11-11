@@ -79,9 +79,9 @@ export function SearchHelp() {
       <p>
         Use this panel to search for items in the loaded dataset. Search results
         will match the phrase used anywhere in the name of the item. For
-        example, searching for <tt>N</tt> will match Nitrogen (<tt>N</tt>), but
-        also Sodium (<tt>Na</tt>), Sodium Chloride (<tt>NaCl</tt>), and
-        Potassium Azide (<tt>KN<sub>3</sub></tt>).
+        example, searching for <samp>N</samp> will match Nitrogen (<samp>N</samp>), but
+        also Sodium (<samp>Na</samp>), Sodium Chloride (<samp>NaCl</samp>), and
+        Potassium Azide (<samp>KN<sub>3</sub></samp>).
       </p>
 
       <h5>Pinning, Neighbors, and Subspaces</h5>
@@ -104,10 +104,10 @@ export function SearchHelp() {
         Finally, you can click on the <i>subspace</i> icon to add the item to
         the elemental subspace. This is a special collection of items that
         causes all materials containing any of the elements in it to appear. For
-        instance, marking <tt>N</tt> and <tt>O</tt> for inclusion in the
-        subspace will cause Nitrogen (<tt>N</tt>), Oxygen (<tt>O</tt>) to
-        appear, but also Nitrogen Dioxide (<tt>NO<sub>2</sub></tt>) and Nitrous
-        Oxide (<tt>N<sub>2</sub>O</tt>), and any other compound made exclusively
+        instance, marking <samp>N</samp> and <samp>O</samp> for inclusion in the
+        subspace will cause Nitrogen (<samp>N</samp>), Oxygen (<samp>O</samp>) to
+        appear, but also Nitrogen Dioxide (<samp>NO<sub>2</sub></samp>) and Nitrous
+        Oxide (<samp>N<sub>2</sub>O</samp>), and any other compound made exclusively
         from nitrogen and oxygen atoms.
       </p>
 
@@ -158,7 +158,7 @@ export function SpacingHelp() {
       </p>
 
       <p>
-        In addition to using the slider, you can also hold <tt>Ctrl</tt> while
+        In addition to using the slider, you can also hold <samp>Ctrl</samp> while
         rolling the mousewheel on on the map. The zoom effect will center on the
         mouse position.
       </p>
