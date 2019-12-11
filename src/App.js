@@ -9,6 +9,7 @@ import GraphVisComponent from './components/graph-vis';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import logo from './components/header/logo.png';
+import AboutPage from './components/header/AboutPage';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import clsx from 'clsx';
@@ -178,6 +179,7 @@ class App extends React.Component {
                 </Typography>
               <div style={{ flex: 1 }}>
               </div>
+              <AboutPage />
             </Toolbar>
           </AppBar>
           <Drawer
