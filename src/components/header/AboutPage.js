@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -9,27 +8,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
-const useStyles = makeStyles(theme => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    width: 'fit-content',
-  },
-  formControl: {
-    marginTop: theme.spacing(2),
-    minWidth: 120,
-  },
-  formControlLabel: {
-    marginTop: theme.spacing(1),
-  },
-}));
-
 export default function AboutPage() {
-  const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState('sm');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -37,14 +17,6 @@ export default function AboutPage() {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleMaxWidthChange = event => {
-    setMaxWidth(event.target.value);
-  };
-
-  const handleFullWidthChange = event => {
-    setFullWidth(event.target.checked);
   };
 
   return (
@@ -79,8 +51,11 @@ export default function AboutPage() {
               License 2.0</a>, and the <a
               href="https://github.com/arclamp/materialnet">source code</a> is
               available for free on GitHub. If you run into trouble with the
-              software, you can <a href="">file an issue</a> or <a href="">open
-              a pull request</a>.
+              software, you can <a
+              href="https://github.com/arclamp/materialnet/issues">file an
+              issue</a> or <a
+              href="https://github.com/arclamp/materialnet/pulls">open a pull
+              request</a>.
             </p>
 
             <p>
