@@ -46,6 +46,15 @@ export default function AboutPage() {
             </p>
 
             <p>
+              In its current deployment, MaterialNet provides an interactive map
+              for the materials stability network (<a
+              href="https://doi.org/10.1038/s41467-019-10030-5" target="_blank"
+              rel="noopener noreferrer">Aykol et al. in Nat. Comm. 2019</a>) and
+              a text co-occurrence network network extracted from <a
+              href="http://www.matscholar.com" target="_blank" rel="noopener noreferrer">MatScholar</a>.
+            </p>
+
+            <p>
               MaterialNet is released under the <a
               href="https://www.apache.org/licenses/LICENSE-2.0.txt"
               target="_blank" rel="noopener noreferrer">Apache License 2.0</a>,
