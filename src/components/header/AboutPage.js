@@ -47,24 +47,25 @@ export default function AboutPage() {
 
             <p>
               MaterialNet is released under the <a
-              href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache
-              License 2.0</a>, and the <a
-              href="https://github.com/arclamp/materialnet">source code</a> is
+              href="https://www.apache.org/licenses/LICENSE-2.0.txt"
+              target="_blank" rel="noopener noreferrer">Apache License 2.0</a>,
+              and the <a href="https://github.com/arclamp/materialnet"
+              target="_blank" rel="noopener noreferrer">source code</a> is
               available for free on GitHub. If you run into trouble with the
               software, you can <a
-              href="https://github.com/arclamp/materialnet/issues">file an
-              issue</a> or <a
-              href="https://github.com/arclamp/materialnet/pulls">open a pull
-              request</a>.
+              href="https://github.com/arclamp/materialnet/issues"
+              target="_blank" rel="noopener noreferrer">file an issue</a> or <a
+              href="https://github.com/arclamp/materialnet/pulls"
+              target="_blank" rel="noopener noreferrer">open a pull request</a>.
             </p>
 
             <p>
               MaterialNet is a research collaboration between the <a
-              href="https://www.tri.global/">Toyota Research Institute</a> and <a
-              href="https://www.kitware.com/">Kitware Inc.</a> We are
-              committed to open science and the open source software that
-              supports it. If you feel we can help you solve your problems,
-              please do not hesitate to contact us.
+              href="https://www.tri.global/" target="_blank" rel="noopener noreferrer">Toyota Research Institute</a> and
+              <a href="https://www.kitware.com/" target="_blank" rel="noopener noreferrer">Kitware Inc.</a> We
+              are committed to open science and
+              the open source software that supports it. If you feel we can help
+              you solve your problems, please do not hesitate to contact us.
             </p>
 
           </DialogContentText>
