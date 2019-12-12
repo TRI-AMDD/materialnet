@@ -44,12 +44,12 @@ self.__precacheManifest = [
     "url": "/materialnet/static/js/10.30682ef6.chunk.js"
   },
   {
-    "revision": "a75327623f564a7f072c",
+    "revision": "0fdec6ab8b788dc9b33b",
     "url": "/materialnet/static/css/main.bd3f93b6.chunk.css"
   },
   {
-    "revision": "a75327623f564a7f072c",
-    "url": "/materialnet/static/js/main.a7532762.chunk.js"
+    "revision": "0fdec6ab8b788dc9b33b",
+    "url": "/materialnet/static/js/main.0fdec6ab.chunk.js"
   },
   {
     "revision": "6e871c8c1b8e9d698c26",
@@ -160,16 +160,16 @@ self.__precacheManifest = [
     "url": "/materialnet/82afec16769321fce590.worker.js"
   },
   {
+    "url": "/materialnet/static/media/6dbea47babde65521717314b0f38d514.6dbea47b.ttf"
+  },
+  {
     "url": "/materialnet/static/media/ccda38f2ae7b5f07875dc4bba68b9586.ccda38f2.svg"
   },
   {
     "url": "/materialnet/static/media/29334f20971b9251d88c2b7c1a082917.29334f20.eot"
   },
   {
-    "url": "/materialnet/static/media/6dbea47babde65521717314b0f38d514.6dbea47b.ttf"
-  },
-  {
-    "revision": "8b662638219de4b4be91449704efda41",
+    "revision": "4486d1e72433b7a4ecb7f6afb0bc291e",
     "url": "/materialnet/index.html"
   }
 ];
