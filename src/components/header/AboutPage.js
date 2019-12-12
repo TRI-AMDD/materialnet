@@ -68,8 +68,9 @@ export default function AboutPage() {
 
           <DialogContentText>
             MaterialNet is a research collaboration between the <a
-            href="https://www.tri.global/" target="_blank" rel="noopener noreferrer">Toyota Research Institute</a> and
-            <a href="https://www.kitware.com/" target="_blank" rel="noopener noreferrer">Kitware Inc.</a> We
+            href="https://www.tri.global/" target="_blank"
+            rel="noopener noreferrer">Toyota Research Institute</a> and <a href="https://www.kitware.com/"
+            target="_blank" rel="noopener noreferrer">Kitware Inc.</a> We
             are committed to open science and
             the open source software that supports it. If you feel we can help
             you solve your problems, please do not hesitate to contact us.
