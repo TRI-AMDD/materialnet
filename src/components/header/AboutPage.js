@@ -73,7 +73,8 @@ export default function AboutPage() {
             target="_blank" rel="noopener noreferrer">Kitware Inc.</a> We
             are committed to open science and
             the open source software that supports it. If you feel we can help
-            you solve your problems, please do not hesitate to contact us.
+            you solve your problems, please do not hesitate to <a
+            href="https://www.kitware.com/contact-us/" target="_blank" rel="noopener noreferrer">contact us</a>.
           </DialogContentText>
         </DialogContent>
 
