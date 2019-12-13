@@ -59,9 +59,9 @@ deployment of MaterialNet can be accessed at
 [http://matr.io/materialnet](https://arclamp.github.io/materialnet/?ds=Precise).
 
 ![**MaterialNet displaying the local network environment of a target material.**
-The main material selected, LiOsO<sub>2</sub>, is hypothetical (i.e., a
-computational discovery) and is therefore labeled "undiscovered". A well-known
-material, Li<sub>2</sub>O, that exists in the vicinity of this target
+The main material selected, LiOsO₃, is hypothetical (i.e., a
+computational discovery) and is therefore labeled "undiscovered." A well-known
+material, Li₂O, that exists in the vicinity of this target
 material is also added to the displayed subgraph. Node sizes represent the node
 degree (i.e. the number of links) for each material.](fig1.png)
 
@@ -132,6 +132,7 @@ they do so.
 
 In the future, we aim to explore several directions to increase the reach and
 value of MaterialNet:
+
 - MaterialNet has been architected to support different types of data.
   The current deployment at
   [http://matr.io/materialnet](https://arclamp.github.io/materialnet/?ds=Precise)
