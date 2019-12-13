@@ -54,7 +54,7 @@ experts [@Aykol2019b].  To the best of our knowledge, there exist no other
 interactive visualization tool for materials networks.  MaterialNet provides
 interactive "maps" of the materials space exposed in large
 material databases, helping researchers navigate this space with a
-particular research task in mind, as showcased in Figure 1. A live
+particular research task in mind, as showcased in <span>Figure&nbsp;1</span>. A live
 deployment of MaterialNet can be accessed at
 [http://matr.io/materialnet](https://arclamp.github.io/materialnet/?ds=Precise).
 
