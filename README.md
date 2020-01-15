@@ -4,6 +4,45 @@ MaterialNet
 MaterialNet is a visual exploration tool to explore large networks in the context of material science.
 
 
+Requirements
+------------
+* [Yarn](https://yarnpkg.com/lang/en/)
+
+Setup
+-----
+1. Install the project dependencies:
+
+    ```
+    yarn install
+    ```
+
+2. Create sample data directory:
+
+    ```
+    mkdir public/sample-data
+    ```
+3. Unpackage sample data with your preferred tool. Example:
+
+    ```
+    tar -xf <SAMPLE_DATA>.tar.gz
+    ```
+
+    After this step, the `public/sample-data` directory should look something like this:
+
+    ```
+    precise-gephi.json
+    precise.json
+    sample1-gephi.json
+    sample1.json
+    sample2.json
+    structures/
+    ```
+
+
+Once these steps are completed, reloading the page in your browser should render the chosen sample dataset.
+
+
+
 Interactions
 ------------
 
@@ -22,7 +61,7 @@ Internal Notes
 
 Every property of the ApplicationState class (see ./src/store/index.js) annotated with the `@observable` annotation will be automatically tracked. This can be a primitive value, array or object.
 
-In addition, the components itself has to observe the injected store using the `@observer` annotation. 
+In addition, the components itself has to observe the injected store using the `@observer` annotation.
 
 Example component with proper store injection:
 
@@ -56,7 +95,7 @@ Besides regular properties, derived/computed properties are used. Just define a 
 
 ### What is autorun?
 
-`autorun` is similar to registering an observer. The given function will be observed for changes and reevaluated when needed. 
+`autorun` is similar to registering an observer. The given function will be observed for changes and reevaluated when needed.
 
 e.g.
 ```js
