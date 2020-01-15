@@ -27,7 +27,19 @@ Setup
     tar -xf <SAMPLE_DATA>.tar.gz
     ```
 
-    After this reloading the page in your browser should render whichever sample dataset is chosen
+    After this step, the `public/sample-data` directory should look something like this:
+
+    ```
+    precise-gephi.json
+    precise.json
+    sample1-gephi.json
+    sample1.json
+    sample2.json
+    structures/
+    ```
+
+
+Once these steps are completed, reloading the page in your browser should render the chosen sample dataset.
 
 
 
