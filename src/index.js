@@ -6,7 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import Store, { ApplicationStore } from './store';
 
 import { defineCustomElements as defineSplitMe } from 'split-me/dist/loader';
-import { defineCustomElements as defineMolecule } from '@openchemistry/molecule';
+import { defineCustomElements as defineMolecule } from '@openchemistry/molecule/loader';
 defineSplitMe(window);
 defineMolecule(window);
 
