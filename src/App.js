@@ -8,7 +8,8 @@ import InfoPanel from './components/graph-vis/info-panel';
 import GraphVisComponent from './components/graph-vis';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import logo from './components/header/logo.png';
+import tri_logo from './components/header/tri_logo.png';
+import tri_logo_dark from './components/header/tri_logo_dark.png';
 import AboutPage from './components/header/AboutPage';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
@@ -172,7 +173,7 @@ class App extends React.Component {
                 <MenuIcon />
               </IconButton>
               <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }} onClick={this.onLogoClick}>
-                <img className='logo' src={logo} alt="logo" style={{ filter: store.nightMode ? `invert(100%)` : null }}/>
+                <img className='logo' src={store.nightMode ? tri_logo_dark : tri_logo} alt="logo"/>
               </Button>
               <Typography variant="h5" color="inherit" noWrap>
                 MaterialNet - {store.dataset.label}{store.selected ? ` - ${store.selected.name}` : ''}
