@@ -1,5 +1,62 @@
 import json
 import sys
+import xml.sax
+
+
+class GraphMLHandler(xml.sax.ContentHandler):
+    def __init__(self, debug=False):
+        self.mode = None
+
+        self.id = None
+        self.x = None
+        self.y = None
+
+        self.table = {}
+
+        self.debug = debug
+
+    def startElement(self, tag, attributes):
+        if tag == "node":
+            self.id = attributes["id"]
+
+            if self.debug:
+                print(f"encountered node {self.id}", file=sys.stderr)
+
+        elif tag == "data" and attributes["key"] in ["x", "y"]:
+            self.mode = attributes["key"]
+
+            if self.debug:
+                print(f"encountered data {self.mode}", file=sys.stderr)
+
+    def characters(self, content):
+        if self.mode == "x":
+            self.x = content
+
+            if self.debug:
+                print(f"x: {content}", file=sys.stderr)
+
+        elif self.mode == "y":
+            self.y = content
+
+            if self.debug:
+                print(f"x: {content}", file=sys.stderr)
+
+    def endElement(self, tag):
+        self.mode = None
+
+        if tag == "node":
+            self.table[self.id] = {"x": self.x, "y": self.y}
+
+def get_positions(filename):
+    parser = xml.sax.make_parser()
+    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
+
+    handler = GraphMLHandler()
+    parser.setContentHandler(handler)
+
+    parser.parse(filename)
+
+    return handler.table
 
 
 def compute_id_table(nodes):
@@ -35,13 +92,22 @@ def compute_new_edges(edges, ids):
 
 
 def main():
-    data = json.loads(sys.stdin.read())
+    gmlfile = sys.argv[1]
 
+    print("extracting position data...", file=sys.stderr)
+    position = get_positions(gmlfile)
+
+    print("remapping IDs to formulae...", file=sys.stderr)
+    data = json.loads(sys.stdin.read())
     ids = compute_id_table(data["nodes"])
 
+    print("computing new nodes...", file=sys.stderr)
     new_nodes = compute_new_nodes(data["nodes"])
+
+    print("computing new edges...", file=sys.stderr)
     new_edges = compute_new_edges(data["edges"], ids)
 
+    print("dumping data to stdout...", file=sys.stderr)
     new_data = {"nodes": new_nodes, "edges": new_edges}
     print(json.dumps(new_data))
 
