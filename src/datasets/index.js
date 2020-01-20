@@ -5,17 +5,17 @@ import cooccurence from './cooccurence';
 export default [
     {
         label: 'Materials Stability Network',
-        fileName: './sample-data/precise-gephi.json',
+        fileName: './sample-data/stability.json',
         ...precise
     },
     {
         label: 'Materials Co-occurrence Network (~1000 edges)',
-        fileName: './sample-data/sample_cooccurence.json',
+        fileName: './sample-data/cooccurrence-1k.json',
         ...cooccurence
     },
     {
         label: 'Materials Co-occurrence Network (~500000 edges)',
-        fileName: './sample-data/full_cooccurence.json',
+        fileName: './sample-data/cooccurrence-500k.json',
         ...cooccurence
     }
 ];
