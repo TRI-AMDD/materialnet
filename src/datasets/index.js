@@ -17,5 +17,10 @@ export default [
         label: 'Materials Co-occurrence Network (~500000 edges)',
         fileName: './sample-data/cooccurrence-500k.json',
         ...cooccurence
+    },
+    {
+        label: 'Materials Similarity Network',
+        fileName: './sample-data/similarity.json',
+        ...precise
     }
 ];
