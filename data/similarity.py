@@ -11,6 +11,8 @@ class GraphMLHandler(xml.sax.ContentHandler):
         self.x = None
         self.y = None
 
+        self.buf = ""
+
         self.table = {}
 
         self.debug = debug
@@ -29,22 +31,22 @@ class GraphMLHandler(xml.sax.ContentHandler):
                 print(f"encountered data {self.mode}", file=sys.stderr)
 
     def characters(self, content):
-        if self.mode == "x":
-            self.x = content
-
-            if self.debug:
-                print(f"x: {content}", file=sys.stderr)
-
-        elif self.mode == "y":
-            self.y = content
-
-            if self.debug:
-                print(f"x: {content}", file=sys.stderr)
+        if self.mode in ["x", "y"]:
+            self.buf += content
 
     def endElement(self, tag):
-        self.mode = None
+        if tag == "data" and self.mode is not None:
+            value = float(self.buf)
 
-        if tag == "node":
+            if self.mode == "x":
+                self.x = value
+            elif self.mode == "y":
+                self.y = value
+
+            self.mode = None
+            self.buf = ""
+
+        elif tag == "node":
             self.table[self.id] = {"x": self.x, "y": self.y}
 
 def get_positions(filename):
@@ -68,7 +70,7 @@ def compute_id_table(nodes):
     return table
 
 
-def compute_new_nodes(nodes):
+def compute_new_nodes(nodes, position):
     result = {}
 
     for key in nodes:
@@ -76,6 +78,9 @@ def compute_new_nodes(nodes):
 
         formula = node["formula"]
         del node["formula"]
+
+        node["x"] = position[key]["x"]
+        node["y"] = position[key]["y"]
 
         result[formula] = node
 
@@ -102,7 +107,7 @@ def main():
     ids = compute_id_table(data["nodes"])
 
     print("computing new nodes...", file=sys.stderr)
-    new_nodes = compute_new_nodes(data["nodes"])
+    new_nodes = compute_new_nodes(data["nodes"], position)
 
     print("computing new edges...", file=sys.stderr)
     new_edges = compute_new_edges(data["edges"], ids)
