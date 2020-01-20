@@ -30,11 +30,9 @@ Setup
     After this step, the `public/sample-data` directory should look something like this:
 
     ```
-    precise-gephi.json
-    precise.json
-    sample1-gephi.json
-    sample1.json
-    sample2.json
+    stability.json
+    cooccurrence-1k.json
+    cooccurrence-500k.json
     structures/
     ```
 
