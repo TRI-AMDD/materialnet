@@ -55,8 +55,7 @@ interactive visualization tool for materials networks.  MaterialNet provides
 interactive "maps" of the materials space exposed in large
 material databases, helping researchers navigate this space with a
 particular research task in mind, as showcased in <span>Figure&nbsp;1</span>. A live
-deployment of MaterialNet can be accessed at
-[http://matr.io/materialnet](https://arclamp.github.io/materialnet/?ds=Precise).
+deployment of MaterialNet can be accessed at http://maps.matr.io/.
 
 ![**MaterialNet displaying the local network environment of a target material.**
 The main material selected, LiOsO<sub>3</sub>, is hypothetical (i.e., a
@@ -134,12 +133,11 @@ In the future, we aim to explore several directions to increase the reach and
 value of MaterialNet:
 
 - MaterialNet has been architected to support different types of data.
-  The current deployment at
-  [http://matr.io/materialnet](https://arclamp.github.io/materialnet/?ds=Precise)
-  includes the materials stability network [@Aykol2019a] and a text
-  co-occurrence network extracted from
-  [MatScholar](http://www.matscholar.com), but the tool can be easily extended
-  to display any other type of material network as well.
+  The current deployment at http://maps.matr.io/ includes the materials
+  stability network [@Aykol2019a], a text co-occurrence network extracted from
+  [MatScholar](http://www.matscholar.com), and a materials similarity network,
+  but the tool can be easily extended to display any other type of material
+  network as well.
 - A more powerful and flexible search mode, featuring a domain-specific
   language tailored to searching materials databases, will extend the
   researcher's ability to find materials with very specific properties or
