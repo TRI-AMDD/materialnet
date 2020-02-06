@@ -78,6 +78,7 @@ def compute_new_nodes(nodes, position):
 
         node["x"] = position[key]["x"]
         node["y"] = position[key]["y"]
+        node["id"] = key
 
         result[key] = node
 
