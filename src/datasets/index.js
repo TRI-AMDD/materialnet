@@ -1,4 +1,5 @@
 import precise from './precise';
+import similarity from './similarity';
 import cooccurence from './cooccurence';
 
 
@@ -21,6 +22,6 @@ export default [
     {
         label: 'Materials Similarity Network',
         fileName: './sample-data/similarity.json',
-        ...precise
+        ...similarity
     }
 ];
