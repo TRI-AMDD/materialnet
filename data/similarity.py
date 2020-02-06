@@ -76,13 +76,10 @@ def compute_new_nodes(nodes, position):
     for key in nodes:
         node = nodes[key]
 
-        formula = node["formula"]
-        del node["formula"]
-
         node["x"] = position[key]["x"]
         node["y"] = position[key]["y"]
 
-        result[formula] = node
+        result[key] = node
 
     return result
 
@@ -91,7 +88,7 @@ def compute_new_edges(edges, ids):
     result = []
 
     for edge in edges:
-        result.append([ids[edge[0]], ids[edge[1]]])
+        result.append([edge[0], edge[1]])
 
     return result
 
