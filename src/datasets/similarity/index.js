@@ -11,7 +11,7 @@ const templates = [
         label: 'Similarity',
         render: (node, store) => {
             return <>
-                <Typography gutterBottom variant="h4">{node.formula} ({node.id})</Typography>
+                <Typography gutterBottom variant="h4">{node.formula} ({node.name})</Typography>
                 <Typography gutterBottom variant="subtitle1" component="div">Properties</Typography>
 
                 {store.propertyList.map((prop) => {

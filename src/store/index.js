@@ -153,6 +153,9 @@ export class ApplicationStore {
 
     @computed
     get filterDiscoveryYear() {
+        if (!this.year || !this.yearRange) {
+            return () => true;
+        }
         const [low, high] = this.year;
         return (node) => {
             const discovery = node.discovery;
