@@ -40,7 +40,8 @@ export class DiskDataProvider extends DataProvider {
     // inject the name of the node into the object
     Object.entries(nodes).forEach(([k, v]) => {
       v.name = k;
-      v._elements = extractElements(k);
+      const formula = v.formula || k;
+      v._elements = extractElements(formula);
     });
 
     this._names = Object.keys(this.nodes);
@@ -48,6 +49,9 @@ export class DiskDataProvider extends DataProvider {
     if (bad > -1) {
       this._names = this._names.slice(0, bad).concat(this._names.slice(bad + 1));
     }
+
+    const values = Object.values(this.nodes);
+    this._formulas = values[0].formula ? values.map((d) => d.formula) : this._names;
   }
 
   getBounds() {
