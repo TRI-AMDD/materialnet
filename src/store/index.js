@@ -472,7 +472,7 @@ export class ApplicationStore {
         return nodes.sort(sorter).map((value, idx) => {
             return {
                 label: value.formula,
-                value: value.name,
+                value: value.formula,
                 node: this.data.nodes[value.name],
             };
         });
