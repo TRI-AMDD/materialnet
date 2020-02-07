@@ -461,7 +461,21 @@ export class ApplicationStore {
         if (!this.data) {
             return [];
         }
-        return this.nodeNames.slice().sort(sortStringsLength).map(value => ({ label: value, value, node: this.nodes[value] }));
+
+        let nodes = this.data._formulas.map((formula, idx) => ({
+            formula,
+            name: this.data._names[idx],
+        }));
+
+        const sorter = (a, b) => sortStringsLength(a.formula, b.formula);
+
+        return nodes.sort(sorter).map((value, idx) => {
+            return {
+                label: value.formula,
+                value: value.formula,
+                node: this.data.nodes[value.name],
+            };
+        });
     }
 
     _createProperty(property, info = {}) {

@@ -13,8 +13,10 @@ class PinnedNode extends React.Component {
         const store = this.context;
         const { node, includeNeighbors, defineSubspace } = this.props;
 
-        const neighbors = <Chip icon={<FontAwesomeIcon icon={faProjectDiagram} />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.toggleIncludeNeighbors(node)} />;
-        const subspace = <Chip icon={<FontAwesomeIcon icon={faFlask} />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.toggleDefineSubspace(node)} />;
+        const label = node.formula || node.name;
+
+        const neighbors = <Chip icon={<FontAwesomeIcon icon={faProjectDiagram} />} label={label} onClick={() => store.selected = node} onDelete={() => store.toggleIncludeNeighbors(node)} />;
+        const subspace = <Chip icon={<FontAwesomeIcon icon={faFlask} />} label={label} onClick={() => store.selected = node} onDelete={() => store.toggleDefineSubspace(node)} />;
 
         if (includeNeighbors && defineSubspace) {
             return <>{neighbors} {subspace}</>;
@@ -23,7 +25,7 @@ class PinnedNode extends React.Component {
         } else if (defineSubspace) {
             return subspace;
         }
-        return <Chip icon={<RotatedPin />} label={node.name} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />;
+        return <Chip icon={<RotatedPin />} label={label} onClick={() => store.selected = node} onDelete={() => store.removePinned(node)} />;
     }
 }
 
