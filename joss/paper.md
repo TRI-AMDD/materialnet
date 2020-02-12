@@ -135,7 +135,7 @@ value of MaterialNet:
 - MaterialNet has been architected to support different types of data.
   The current deployment at http://maps.matr.io/ includes the materials
   stability network [@Aykol2019a], a text co-occurrence network extracted from
-  [MatScholar](http://www.matscholar.com) [@weston2019, @tshitoyan2019], and a
+  [MatScholar](http://www.matscholar.com) [@weston2019; @tshitoyan2019], and a
   materials similarity network [@ward2017],
   but the tool can be easily extended to display any other type of material
   network as well.
