@@ -30,32 +30,40 @@ Materials science research deals primarily with understanding the relationship
 between the structure and properties of materials. With recent advances in
 computational power and automation of simulation techniques, material structure
 and property databases have emerged [@Jain2013; @Kirklin2015; @Curtarolo2012],
-allowing a more data-driven approach to carrying out materials research.
-Recent studies have demonstrated that representing these databases as
-material networks can enable extraction of new materials knowledge
-[@Hegde2018; @Isayev2015] or help tackle challenges like predictive synthesis
-[@Aykol2019a], which require relational information between materials. In
-these new approaches, materials can be represented  with a graph structure that
-has *nodes* standing in for materials, and *links* between them encoding the
-appropriate relationships of interest, such as thermodynamic co-existence,
-chemical similarity or co-occurence in text, to name a few.
+allowing a more data-driven approach to carrying out materials research.  Recent
+studies have demonstrated that representing these databases as material networks
+can enable extraction of new materials knowledge [@Hegde2018; @Isayev2015] or
+help tackle challenges like predictive synthesis [@Aykol2019a], which require
+relational information between materials. Materials databases have become very
+popular because they enable their users to do rapid prototyping by searching
+near globally for figures of merit for their target application. However, both
+scientists and engineers have little in the way of visualization of aggregates
+from these databases, i.e., intuitive layouts that help understand which
+materials are related and how they are related. The need for a tool that does
+this is particularly crucial in materials science because properties like phase
+stability and crystal structure similarity are themselves functions of a
+material dataset, rather than of individual materials.
 
-**MaterialNet** is an open-source web application designed to explore the
-topology of such material networks, while also displaying information
-about each material, highlighting its immediate neighborhood within the graph,
-and offering several auxiliary tools to help drill down into the details
-contained within the dataset. Such graph-encoded datasets for a collection of
-materials can become large and complex: for example, the materials stability
-network exemplified in this paper contains on the order of 20,000 materials,
-with on the order of 200,000 links between them [@Aykol2019a]. Large graphs of
-this sort demand *interactive visualization*, empowering materials researchers to
-explore the data, a key user requirement highlighted by field
-experts [@Aykol2019b].  To the best of our knowledge, there exist no other
-interactive visualization tool for materials networks.  MaterialNet provides
-interactive "maps" of the materials space exposed in large
-material databases, helping researchers navigate this space with a
-particular research task in mind, as showcased in <span>Figure&nbsp;1</span>. A live
-deployment of MaterialNet can be accessed at http://maps.matr.io/.
+In these new approaches, materials can be represented with a graph structure
+that has *nodes* standing in for materials, and *links* between them encoding
+the appropriate relationships of interest, such as thermodynamic co-existence,
+chemical similarity or co-occurence in text, to name a few. **MaterialNet** is
+an open-source web application designed to explore the topology of such material
+networks, while also displaying information about each material, highlighting
+its immediate neighborhood within the graph, and offering several auxiliary
+tools to help drill down into the details contained within the dataset. Such
+graph-encoded datasets for a collection of materials can become large and
+complex: for example, the materials stability network exemplified in this paper
+contains on the order of 20,000 materials, with on the order of 200,000 links
+between them [@Aykol2019a]. Large graphs of this sort demand *interactive
+visualization*, empowering materials researchers to explore the data, a key user
+requirement highlighted by field experts [@Aykol2019b].  To the best of our
+knowledge, there exist no other interactive visualization tool for materials
+networks.  MaterialNet provides interactive "maps" of the materials space
+exposed in large material databases, helping researchers navigate this space
+with a particular research task in mind, as showcased in
+<span>Figure&nbsp;1</span>. A live deployment of MaterialNet can be accessed at
+http://maps.matr.io/.
 
 ![**MaterialNet displaying the local network environment of a target material.**
 The main material selected, LiOsO<sub>3</sub>, is hypothetical (i.e., a
