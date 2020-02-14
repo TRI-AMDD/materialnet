@@ -1,8 +1,31 @@
 MaterialNet
 ===========
 
-MaterialNet is a visual exploration tool to explore large networks in the context of material science.
+MaterialNet is a visual exploration tool to explore large networks in the
+context of material science.
 
+In the past five years, materials databases have become very popular because
+they enable their users to do rapid prototyping by searching near globally for
+figures of merit for their target application. However, both scientists and
+engineers have little in the way of visualization of aggregates from these
+databases, i.e. intuitive layouts that help understand which materials are
+related and how they are related. The need for a tool that does this is
+particularly crucial in materials science because properties like phase
+stability and crystal structure similarity are themselves functions of a
+material dataset, rather than of individual materials.
+
+MaterialNet provides for this by enabling a simple layout of a given network of
+materials. The examples in the current implementation are for the aforementioned
+cases (i.e. visualization of the "complete" phase diagram of the OQMD and
+similarity metrics from crystal structure), but the tool may be applied to any
+case in which a materials network can be constructed.
+
+The most obvious extensions of this that we envision are users with their own
+database of formation energies which may differ from the OQMD. Similarly, any
+vector representing material properties can be used to construct a similarity
+network, a user might want to understand how the network of materials with
+similar optical properties differs from that of materials with similar
+mechanical properties.
 
 Requirements
 ------------
