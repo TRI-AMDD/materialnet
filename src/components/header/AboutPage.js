@@ -56,7 +56,7 @@ export default function AboutPage() {
             MaterialNet is released under the <a
             href="https://www.apache.org/licenses/LICENSE-2.0.txt"
             target="_blank" rel="noopener noreferrer">Apache License 2.0</a>,
-            and the <a href="https://github.com/arclamp/materialnet"
+            and the <a href="https://github.com/ToyotaResearchInstitute/materialnet"
             target="_blank" rel="noopener noreferrer">source code</a> is
             available for free on GitHub. If you run into trouble with the
             software, you can <a
