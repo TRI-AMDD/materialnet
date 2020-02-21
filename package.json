@@ -135,7 +135,7 @@
       "mobx"
     ]
   },
-  "homepage": "https://toyotaresearchinstitute.github.io/materialnet",
+  "homepage": "https://maps.matr.io",
   "devDependencies": {
     "babel-preset-mobx": "^2.0.0",
     "gh-pages": "^2.0.1",
