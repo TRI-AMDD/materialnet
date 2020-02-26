@@ -29,6 +29,8 @@ import RotatedPin from './RotatedPin';
 import { faProjectDiagram, faFlask } from '@fortawesome/free-solid-svg-icons';
 import * as panels from './helpPanel';
 
+import { fetchJSON } from '../../rest';
+
 function simplify(label) {
   // simplify the label for better values
   return deburr(label).replace(/[ ,.<>/|\\[]{}-_=+()*&^%$#@!~\t\n\r]+/gm, '');
@@ -75,6 +77,15 @@ class Controls extends React.Component {
         <FontAwesomeIcon icon={faFlask} />
       </IconButton>
     </>;
+  }
+
+  async componentDidMount() {
+    const store = this.context;
+
+    // Restrict available datasets by what is specified in the data bundle
+    // control file.
+    const control = await fetchJSON('sample-data/control.json')
+    store.datasets = store.datasets.filter((d) => control.includes(d.key));
   }
 
   render() {
