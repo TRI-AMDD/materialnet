@@ -41,30 +41,47 @@ Setup
     yarn install
     ```
 
-2. Create sample data directory:
+2. Move into the public assets directory:
 
     ```
-    mkdir public/sample-data
+    cd public
     ```
-3. Unpackage sample data with your preferred tool. Example:
+    
+3. Download the public sample data:
 
     ```
-    tar -xf <SAMPLE_DATA>.tar.gz
+    curl -O -J https://data.kitware.com/api/v1/item/5e5696b4af2e2eed35da2e42/download
+    ```
+    
+    (Alternatively, you can visit the cloud folder where this file is stored at
+    https://data.kitware.com/#collection/5e569610af2e2eed35da2e0b/folder/5e5696acaf2e2eed35da2e33
+    and download the file manually.)
+    
+4. Unpackage the sample data:
+
+    ```
+    tar xzvf sample-data.tar.gz
     ```
 
-    After this step, the `public/sample-data` directory should look something like this:
+    After this step, there will be a `public/sample-data` directory with
+    contents like this:
 
     ```
     stability.json
-    cooccurrence-1k.json
-    cooccurrence-500k.json
+    similarity.json
+    control.json
     structures/
     ```
+    
+5. Build and serve the application:
 
+    ```
+    BROWSER=none yarn start
+    ```
 
-Once these steps are completed, reloading the page in your browser should render the chosen sample dataset.
-
-
+6. Launch the application: visit http://localhost:3000 in your browser, and wait
+   a few moments for the initial dataset to load (the data is pretty big, so
+   this could take up to 10 seconds).
 
 Interactions
 ------------
