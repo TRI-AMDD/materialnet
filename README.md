@@ -138,6 +138,59 @@ synthesis attempt, potential competing phases or decomposition products
 
 ![](images/example-figA.png) ![](images/example-figB.png)
 
+## Graph Format
+
+The graph format used by MaterialNet is a simple JSON structure to encode
+the nodes (or materials), their attributes, and the links between them. The
+entire graph is a single JSON object with two keys, `nodes` and `edges`; `nodes`
+is an object, while `edges` is a list of lists:
+
+```JSON
+   {
+     "nodes": {...},
+     "edges": [ [...], [...], ...]
+   }
+```
+
+The `nodes` object contains keys corresponding to material names (e.g.,
+`"Gd5(SiGe)2"`), and values corresponding to attribute tables. For example:
+
+```JSON
+   {
+      "Gd5(SiGe)2": {
+        "formation_energy": ...,
+        "x": ...,
+        "y": ...,
+        "degree": ...,
+        .
+        .
+        .
+      }
+   }
+```
+
+The keys `x` and `y` specify a geometric location on-screen to display the
+material node within the network; `degree` is used by the system to calculate,
+e.g., display size based on node degree. Other values (such as
+`formation_energy`) can be used to encode quantitative or qualitative attributes
+about the material.
+
+The `edges` list encodes links between nodes using a particularly simple format:
+each link is a 2-element array of strings naming entries from the `nodes` object
+when a link between those two materials exists in the network:
+
+```JSON
+   {
+     "edges": [
+       ["CO2", "O"],
+       ["CO2", "C"],
+       .
+       .
+       .
+     ]
+   }
+```
+
 ## Internal Notes
 
 ### How to add a managed property to the mobx state?
