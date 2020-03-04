@@ -1,5 +1,4 @@
-MaterialNet
-===========
+# MaterialNet
 
 Try it live: https://maps.matr.io
 
@@ -29,12 +28,8 @@ network, a user might want to understand how the network of materials with
 similar optical properties differs from that of materials with similar
 mechanical properties.
 
-Requirements
-------------
-* [Yarn](https://yarnpkg.com/lang/en/)
+## Setup
 
-Setup
------
 1. Install the project dependencies:
 
     ```
@@ -83,19 +78,120 @@ Setup
    a few moments for the initial dataset to load (the data is pretty big, so
    this could take up to 10 seconds).
 
-Interactions
-------------
+## Interactions
 
 * Use the `mouse wheel` to zoom into the map
 * Use `ctrl + mouse wheel` to change the node spacing factor
 * `Clicking` on a node will select it, clicking on the same node again will deselect it
 * `ctrl + click` on a node to select and pin it
 
+## Example Usage
 
+We expect researchers to use MaterialNet both as an exploratory tool to traverse
+the present materials networks, and as a targeted analysis tool when they can
+leverage the underlying relational information for a scientific goal directly.
+Below we provide example use cases for each.
 
-Internal Notes
---------------
+### Similarity Network
 
+Since the similarity network relates materials on the basis of their structural
+and chemical resemblance (which may not always be obvious), it is interesting to
+explore for a curious materials scientist, traversing the nodes as one
+neighboring material inspires another. For instance, take the famous
+superconductor, YBCO, a version of which can be located by searching for
+Ba2Y(CuO2)4. We can pin this material using the "pin" icon and choose to
+restrict our view to its immediate neighborhood by clicking on the "show
+neighbors" icon. Optimizing the layout with “Live Layout” moves the remaining
+nodes closer and provides a compact view of this local environment. We can
+explore the first degree neighborhood of YBCO - and keep pinning more materials
+to venture out to second or third degree similarity neighborhoods. We find other
+interesting cuprates, and may stumble on other potential superconductors that we
+may not be aware of. We can do similar explorations starting off of thousands of
+other materials, e.g. the well-known magnetocaloric compound Gd5(SiGe)2.
+
+![](images/example-fig1A.png) ![](images/example-fig1B.png)
+
+### Stability Network
+
+The Materials Stability Network is temporal, and is constructed on the basis of
+a thermodynamic measure explained in an application on synthesis likelihood
+prediction (https://doi.org/10.1038/s41467-019-10030-5). A researcher interested
+in finding a new, cost-effective hypothetical (quite likely synthesizable!)
+candidate for a Li-ion battery material can start by filtering the network down
+to materials containing relevant elements of their choice (say Li, Fe, Ni and O)
+using the Filtering option. They can adjust the synthesis probability to focus
+on hypothetical materials with, for instance, greater than roughly 60% chance of
+being made. Using the LineUp Table, they can sort the results based on this
+probability. If they choose a material from the list to inspect further, such as
+Li4FeNiO6, they can select it by clicking on its row in the table or node in the
+network. They can focus attention to the local network environment of this
+selected material by using the three icons that appear in the material details
+to “pin”, “show neighbors” and “restrict subspace” to the relevant chemistry.
+The element filters can be cleared, and synthesis probability slider can be set
+back to its original position to visualize this relevant sub-network for
+Li4FeNiO6, and further optimizing the layout with “Live Layout” option can
+provide a more organized, compact view. This material’s connectivity to hub-like
+materials (like O, Fe, Li, Fe2O3, Li2O, etc.), less common known materials or
+other hypothetical materials can be inspected to provide guidance for a
+synthesis attempt, potential competing phases or decomposition products
+(https://doi.org/10.1038/s41467-019-10030-5).
+
+![](images/example-figA.png) ![](images/example-figB.png)
+
+## Graph Format
+
+The graph format used by MaterialNet is a simple JSON structure to encode
+the nodes (or materials), their attributes, and the links between them. The
+entire graph is a single JSON object with two keys, `nodes` and `edges`; `nodes`
+is an object, while `edges` is a list of lists:
+
+```JSON
+   {
+     "nodes": {...},
+     "edges": [ [...], [...], ...]
+   }
+```
+
+The `nodes` object contains keys corresponding to material names (e.g.,
+`"Gd5(SiGe)2"`), and values corresponding to attribute tables. For example:
+
+```JSON
+   {
+      "Gd5(SiGe)2": {
+        "formation_energy": ...,
+        "x": ...,
+        "y": ...,
+        "degree": ...,
+        .
+        .
+        .
+      }
+   }
+```
+
+The keys `x` and `y` specify a geometric location on-screen to display the
+material node within the network; `degree` is used by the system to calculate,
+e.g., display size based on node degree. Other values (such as
+`formation_energy`) can be used to encode quantitative or qualitative attributes
+about the material.
+
+The `edges` list encodes links between nodes using a particularly simple format:
+each link is a 2-element array of strings naming entries from the `nodes` object
+when a link between those two materials exists in the network:
+
+```JSON
+   {
+     "edges": [
+       ["CO2", "O"],
+       ["CO2", "C"],
+       .
+       .
+       .
+     ]
+   }
+```
+
+## Internal Notes
 
 ### How to add a managed property to the mobx state?
 
