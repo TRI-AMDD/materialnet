@@ -89,7 +89,7 @@ with standard mouse gestures to enable interactive exploration: for example, by
 clicking on a node, that material's data appears in a panel on-screen, and its
 one-hop neighborhood is highlighted in the graph view. Such nodes may also be
 "pinned", leaving them visible in a list while other actions are performed. They
-can also be made part of a chemical subspace, which selects out all materials
+can also be made part of a chemical subspace, which selects all materials
 containing one of several chemical elements. Additionally, MaterialNet can
 dynamically reconfigure the layout of these subgraphs, using a force-based
 simulation to bring related nodes closer together, providing a more organic
