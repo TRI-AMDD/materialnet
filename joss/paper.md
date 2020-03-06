@@ -33,7 +33,7 @@ and property databases have emerged [@Jain2013; @Kirklin2015; @Curtarolo2012],
 allowing a more data-driven approach to carrying out materials research. Recent
 studies have demonstrated that representing these databases as material networks
 can enable extraction of new materials knowledge [@Hegde2018; @Isayev2015] or
-help tackle challenges like predictive synthesis [@Aykol2019a], which require
+help tackle challenges like predictive synthesis [@Aykol2019a] that require
 relational information between materials. Materials databases have become very
 popular because they enable their users to do rapid prototyping by searching
 near globally for figures of merit for their target application. However, both
@@ -80,8 +80,8 @@ MaterialNet uses [GeoJS](https://opengeoscience.github.io/geojs/) [@geojs], an
 open-source mapping library developed by Kitware, to provide a highly
 interactive, attractive rendering of a node-link diagram representing the graph.
 Nodes in the graph are displayed with a color, encoding a data value carried on
-it (e.g. year of discovery, formation energy), and with a specific
-size, encoding some other data value (e.g. degree of connectivity within
+it (e.g., year of discovery, formation energy), and with a specific
+size, encoding some other data value (e.g., degree of connectivity within
 the graph). Layout software such as Gephi provides an initial configuration of
 the nodes in the graph, and MaterialNet has its own dynamic,
 force-based layout mode as well. The GeoJS node-link diagram is equipped
@@ -97,7 +97,7 @@ sense of continuity and structure.
 
 ## Searching, Filtering, and Chemical Subspaces
 
-Effective, contextual search and filtering of materials (e.g. by using chemical
+Effective, contextual search and filtering of materials (e.g., by using chemical
 formulas, constraining to chemical spaces, filtering based on material
 properties, historical material data) are essential for this visualization
 tool to be useful for the researchers.  For this purpose, MaterialNet includes a
