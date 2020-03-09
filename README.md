@@ -1,6 +1,7 @@
 # MaterialNet
 
 Try it live: https://maps.matr.io
+Read the paper: [![DOI](https://joss.theoj.org/papers/10.21105/joss.02105/status.svg)](https://doi.org/10.21105/joss.02105)
 
 MaterialNet is a visual exploration tool to explore large networks in the
 context of material science.
