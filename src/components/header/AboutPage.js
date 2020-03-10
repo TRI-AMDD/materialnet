@@ -47,9 +47,18 @@ export default function AboutPage() {
             In its current deployment, MaterialNet provides an interactive map
             for the materials stability network (<a
             href="https://doi.org/10.1038/s41467-019-10030-5" target="_blank"
-            rel="noopener noreferrer">Aykol et al. in Nat. Comm. 2019</a>) and
-            a text co-occurrence network network extracted from <a
-            href="http://www.matscholar.com" target="_blank" rel="noopener noreferrer">MatScholar</a>.
+            rel="noopener noreferrer">Aykol et al. in Nat. Comm. 2019</a>), a
+            materials similarity network (<a
+            href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.96.024104"
+            target="_blank" rel="noopener noreferrer">Ward et al. Phys. Rev. B
+            96 (2017)</a>), and a text co-occurrence network network extracted
+            from <a href="http://www.matscholar.com" target="_blank"
+            rel="noopener noreferrer">MatScholar</a>. The Material Similarity
+            Network (v1) displays OQMD data in a visually interactive way, where
+            similar materials are assumed to have a link. Similarity is defined
+            within the Voronoi-based feature space by Ward et al. (including
+            formation energies as well) as the 0.1% quantile threshold of all
+            Euclidean distances.
           </DialogContentText>
 
           <DialogContentText>
