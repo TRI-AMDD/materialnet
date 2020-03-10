@@ -5,6 +5,12 @@ import cooccurence from './cooccurence';
 
 export default [
     {
+        key: 'similarity',
+        label: 'Materials Similarity Network',
+        fileName: './sample-data/similarity.json',
+        ...similarity
+    },
+    {
         key: 'stability',
         label: 'Materials Stability Network',
         fileName: './sample-data/stability.json',
@@ -22,10 +28,4 @@ export default [
         fileName: './sample-data/cooccurrence-500k.json',
         ...cooccurence
     },
-    {
-        key: 'similarity',
-        label: 'Materials Similarity Network',
-        fileName: './sample-data/similarity.json',
-        ...similarity
-    }
 ];
