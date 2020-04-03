@@ -44,6 +44,13 @@ export default function AboutPage() {
           </DialogContentText>
 
           <DialogContentText>
+            You can also read our JOSS paper: <a
+              href="https://joss.theoj.org/papers/10.21105/joss.02105"
+            target="_blank" rel="noopener noreferrer">MaterialNet: A web-based
+            graph explorer for materials science data</a>.
+          </DialogContentText>
+
+          <DialogContentText>
             In its current deployment, MaterialNet provides an interactive map
             for the materials stability network (<a
             href="https://doi.org/10.1038/s41467-019-10030-5" target="_blank"
