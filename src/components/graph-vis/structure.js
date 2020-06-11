@@ -2,7 +2,7 @@ import React from 'react';
 
 import { wc } from '../../utils/webcomponents.js';
 
-const Structure = ({cjson}) => (
+const Structure = ({ cjson }) => (
   <oc-molecule
     ref={wc(
       // Events

@@ -19,7 +19,13 @@ const PINNED_STROKE_WIDTH = 2;
 const DEFAULT_STROKE_WIDTH = 1;
 
 export class GeoJSSceneManager {
-  constructor({ onZoomChanged, picked, hovered, hoveredLine, onNodeSpacingChanged }) {
+  constructor({
+    onZoomChanged,
+    picked,
+    hovered,
+    hoveredLine,
+    onNodeSpacingChanged,
+  }) {
     this.dp = null;
     this.parent = null;
     this.onZoomChanged = onZoomChanged;
@@ -51,7 +57,11 @@ export class GeoJSSceneManager {
     }
 
     const bounds = dp.getBounds();
-    const params = geo.util.pixelCoordinateParams(this.parent, bounds.maxx - bounds.minx, bounds.maxy - bounds.miny);
+    const params = geo.util.pixelCoordinateParams(
+      this.parent,
+      bounds.maxx - bounds.minx,
+      bounds.maxy - bounds.miny
+    );
 
     // the utility function assumes top left is 0, 0.  Move it to minx, miny.
     params.map.maxBounds.left += bounds.minx;
@@ -62,7 +72,10 @@ export class GeoJSSceneManager {
     params.map.center.y += bounds.miny;
 
     // inflate the bounds to add a border
-    const maxwh = Math.max(bounds.maxx - bounds.minx, bounds.maxy - bounds.miny);
+    const maxwh = Math.max(
+      bounds.maxx - bounds.minx,
+      bounds.maxy - bounds.miny
+    );
     const factor = 0.5;
     params.map.maxBounds.left -= maxwh * factor;
     params.map.maxBounds.top -= maxwh * factor;
@@ -75,16 +88,14 @@ export class GeoJSSceneManager {
     params.map.allowRotation = false;
     params.map.clampBoundsY = params.map.clampBoundsX = false;
 
-    const map = this.map = geo.map(params.map);
+    const map = (this.map = geo.map(params.map));
 
     const layer = map.createLayer('feature', {
-      features: [
-        'point',
-        'line',
-      ],
+      features: ['point', 'line'],
     });
 
-    this.lines = layer.createFeature('line')
+    this.lines = layer
+      .createFeature('line')
       .data(dp.edges)
       .style({
         position: this._position,
@@ -94,7 +105,8 @@ export class GeoJSSceneManager {
       })
       .visible(this.linesVisible); // disable by default
 
-    this.highlightLines = layer.createFeature('line')
+    this.highlightLines = layer
+      .createFeature('line')
       .data([])
       .style({
         position: this._position,
@@ -104,50 +116,56 @@ export class GeoJSSceneManager {
       })
       .visible(this.linesVisible && this._isHighlighted());
 
-    const points = this.points = layer.createFeature('point', {
-      // primitiveShape: 'triangle',
-      style: {
-        strokeColor: this._strokeColor,
-        strokeWidth: this._strokeWidth,
-        fillColor: 'gray',
-        strokeOpacity: this._nodeOpacity,
-        fillOpacity: this._nodeOpacity,
-        radius: 10,
-      },
-      position: this._position,
-    })
-      .data(dp.nodeNames());
+    const points = (this.points = layer
+      .createFeature('point', {
+        // primitiveShape: 'triangle',
+        style: {
+          strokeColor: this._strokeColor,
+          strokeWidth: this._strokeWidth,
+          fillColor: 'gray',
+          strokeOpacity: this._nodeOpacity,
+          fillOpacity: this._nodeOpacity,
+          radius: 10,
+        },
+        position: this._position,
+      })
+      .data(dp.nodeNames()));
 
     let onNode = null;
 
-    points.geoOn(geo.event.feature.mouseon, evt => {
+    points.geoOn(geo.event.feature.mouseon, (evt) => {
       onNode = this.dp.nodes[evt.data];
 
       // compute point dimensions
-      const radius = points.style("radius")(evt.data);
+      const radius = points.style('radius')(evt.data);
       // position relative to canvas
-      const position = this.points.featureGcsToDisplay(points.position()(evt.data));
+      const position = this.points.featureGcsToDisplay(
+        points.position()(evt.data)
+      );
       this.hovered(onNode, position, radius);
     });
-    points.geoOn(geo.event.feature.mouseoff, evt => {
+    points.geoOn(geo.event.feature.mouseoff, (evt) => {
       onNode = null;
       this.hovered(null, null, null);
     });
 
     let lastPointEvent = null;
-    points.geoOn(geo.event.feature.mouseclick, evt => {
+    points.geoOn(geo.event.feature.mouseclick, (evt) => {
       if (evt.top) {
         this.picked(this.dp.nodes[evt.data], evt.mouse.modifiers);
       }
       lastPointEvent = evt.mouse;
     });
-    this.map.geoOn(geo.event.mouseclick, debounce((evt) => {
-      if (lastPointEvent && lastPointEvent.time === evt.time) {
-        return;
-      }
-      // seems like we have a click that didn't hit something
-      this.picked(null, {});
-    }, 100));
+    this.map.geoOn(
+      geo.event.mouseclick,
+      debounce((evt) => {
+        if (lastPointEvent && lastPointEvent.time === evt.time) {
+          return;
+        }
+        // seems like we have a click that didn't hit something
+        this.picked(null, {});
+      }, 100)
+    );
 
     // NOTE: disable line hovering for now till figured out where to show
     // let onLine = null;
@@ -192,9 +210,9 @@ export class GeoJSSceneManager {
     }
     return {
       x: pos.x * this.expansion,
-      y: pos.y * this.expansion
+      y: pos.y * this.expansion,
     };
-  }
+  };
 
   setPositions(overrides) {
     this.positionOverrides = overrides;
@@ -218,7 +236,7 @@ export class GeoJSSceneManager {
       return PINNED_STROKE_WIDTH;
     }
     return DEFAULT_STROKE_WIDTH;
-  }
+  };
 
   _strokeColor = (name) => {
     if (name === this.selected) {
@@ -228,7 +246,7 @@ export class GeoJSSceneManager {
       return PINNED_STROKE_COLOR;
     }
     return DEFAULT_STROKE_COLOR;
-  }
+  };
 
   _darkStrokePointColor = (name) => {
     if (name === this.selected) {
@@ -238,7 +256,7 @@ export class GeoJSSceneManager {
       return PINNED_NIGHT_STROKE_COLOR;
     }
     return DEFAULT_NIGHT_STROKE_COLOR;
-  }
+  };
 
   _nodeOpacity = (name) => {
     const hasFocus = this.selected || this.pinned.size > 0;
@@ -251,7 +269,7 @@ export class GeoJSSceneManager {
     }
 
     return CONTEXT_OPACITY;
-  }
+  };
 
   _handleNodeSpacing() {
     let deltaDirection = null;
@@ -315,13 +333,13 @@ export class GeoJSSceneManager {
       // set when the user zoomed in via mouse
       const offCenter = {
         x: this.nextExpansionFocus.x - center.x,
-        y: this.nextExpansionFocus.y - center.y
+        y: this.nextExpansionFocus.y - center.y,
       };
 
       // same distance from the visible center as before but the new target
       this.map.center({
         x: factor * this.nextExpansionFocus.x - offCenter.x,
-        y: factor * this.nextExpansionFocus.y - offCenter.y
+        y: factor * this.nextExpansionFocus.y - offCenter.y,
       });
 
       // Expand the click position in order to work around a bug in GeoJS.
@@ -330,7 +348,7 @@ export class GeoJSSceneManager {
     } else {
       this.map.center({
         x: factor * center.x,
-        y: factor * center.y
+        y: factor * center.y,
       });
     }
 
@@ -345,7 +363,7 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  setLinkOpacity (value) {
+  setLinkOpacity(value) {
     this.linkOpacity = value;
     this.lines.style('strokeOpacity', this.linkOpacity);
     this.highlightLines.style('strokeOpacity', this.linkOpacity);
@@ -363,13 +381,16 @@ export class GeoJSSceneManager {
   hideAfter() {}
 
   setNodeSize(scale, factor) {
-    this.points.style('radius', (nodeId) => factor * scale(this.dp.nodes[nodeId]));
+    this.points.style(
+      'radius',
+      (nodeId) => factor * scale(this.dp.nodes[nodeId])
+    );
     if (this.map) {
       this.map.draw();
     }
   }
 
-  pickName (name) {
+  pickName(name) {
     if (!this.dp.hasNode(name)) {
       return null;
     }
@@ -403,7 +424,13 @@ export class GeoJSSceneManager {
       return;
     }
 
-    this.highlightLines.data(this.lines.data().filter(([a, b]) => this.subGraphNodes.has(a) && this.subGraphNodes.has(b)));
+    this.highlightLines.data(
+      this.lines
+        .data()
+        .filter(
+          ([a, b]) => this.subGraphNodes.has(a) && this.subGraphNodes.has(b)
+        )
+    );
     this.highlightLines.visible(true);
   }
 
@@ -421,10 +448,12 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  setNightMode (night) {
+  setNightMode(night) {
     const bgColor = night ? 'black' : 'white';
     const strokeColor = night ? 'white' : 'black';
-    const pointStrokeColor = night ? this._darkStrokePointColor : this._strokeColor;
+    const pointStrokeColor = night
+      ? this._darkStrokePointColor
+      : this._strokeColor;
 
     this.parent.style.backgroundColor = bgColor;
     this.points.style('strokeColor', pointStrokeColor);
@@ -438,22 +467,22 @@ export class GeoJSSceneManager {
     this.map.draw();
   }
 
-  render () {}
+  render() {}
   resize() {
     if (!this.map || !this.parent) {
       return;
     }
     this.map.size(this.parent.getBoundingClientRect());
   }
-  pick () {}
-  moveCamera () {}
-  clear () {}
+  pick() {}
+  moveCamera() {}
+  clear() {}
 
-  get zoom () {
+  get zoom() {
     return this.map.zoom();
   }
 
-  set zoom (zoom) {
+  set zoom(zoom) {
     this.map.zoom(zoom);
   }
 }

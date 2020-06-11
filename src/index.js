@@ -13,10 +13,11 @@ defineMolecule(window);
 const store = new ApplicationStore();
 
 ReactDOM.render(
-    <Store.Provider value={store}>
-        <App />
-    </Store.Provider>,
-    document.getElementById('root'));
+  <Store.Provider value={store}>
+    <App />
+  </Store.Provider>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -1,6 +1,15 @@
 import React from 'react';
 
-import { withStyles, Drawer, AppBar, Toolbar, IconButton, Button, Typography, CircularProgress } from '@material-ui/core';
+import {
+  withStyles,
+  Drawer,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Typography,
+  CircularProgress,
+} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Controls from './components/graph-vis/controls';
@@ -30,18 +39,18 @@ const theme = createMuiTheme({
   palette: {
     background: {
       paper: grey[100],
-      default: grey[100]
-    }
-  }
+      default: grey[100],
+    },
+  },
 });
 
 const darkTheme = createMuiTheme({
   palette: {
-    type: 'dark'
-  }
+    type: 'dark',
+  },
 });
 
-const appStyles = theme => ({
+const appStyles = (theme) => ({
   root: {
     width: '100%',
     minHeight: '100%',
@@ -65,7 +74,7 @@ const appStyles = theme => ({
     marginRight: theme.spacing(1),
   },
   hide: {
-    display: 'none'
+    display: 'none',
   },
   drawer: {
     width: drawerWidth,
@@ -82,7 +91,7 @@ const appStyles = theme => ({
     overflow: 'auto',
     padding: theme.spacing(2),
     paddingTop: 0,
-    overflowX: 'hidden'
+    overflowX: 'hidden',
   },
   drawerHeader: {
     display: 'flex',
@@ -108,13 +117,13 @@ const appStyles = theme => ({
     marginLeft: 0,
   },
   content: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   graph: {
-    position: 'relative'
+    position: 'relative',
   },
   contentNightMode: {
-    color: 'white'
+    color: 'white',
   },
   legend: {
     zIndex: 100,
@@ -122,7 +131,7 @@ const appStyles = theme => ({
     bottom: 3,
     left: 0,
     display: 'flex',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   loaderWrapper: {
     zIndex: theme.zIndex.tooltip,
@@ -134,12 +143,12 @@ const appStyles = theme => ({
     background: 'rgba(255,255,255,0.25)',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   loader: {
-    margin: theme.spacing(2)
-  }
-})
+    margin: theme.spacing(2),
+  },
+});
 
 @observer
 class App extends React.Component {
@@ -157,7 +166,9 @@ class App extends React.Component {
       <ThemeProvider theme={store.nightMode ? darkTheme : theme}>
         <div className={classes.root}>
           <CssBaseline />
-          <AppBar color="default" position="fixed"
+          <AppBar
+            color="default"
+            position="fixed"
             className={clsx(classes.appBar, {
               [classes.appBarShift]: store.drawerVisible,
             })}
@@ -166,54 +177,94 @@ class App extends React.Component {
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
-                onClick={() => { store.drawerVisible = true; }}
+                onClick={() => {
+                  store.drawerVisible = true;
+                }}
                 edge="start"
-                className={clsx(classes.menuButton, store.drawerVisible && classes.hide)}
+                className={clsx(
+                  classes.menuButton,
+                  store.drawerVisible && classes.hide
+                )}
               >
                 <MenuIcon />
               </IconButton>
-              <Button color="inherit" aria-label="Logo" style={{ marginRight: 9 }} onClick={this.onLogoClick}>
-                <img className='logo' src={store.nightMode ? tri_logo_dark : tri_logo} alt="logo"/>
+              <Button
+                color="inherit"
+                aria-label="Logo"
+                style={{ marginRight: 9 }}
+                onClick={this.onLogoClick}
+              >
+                <img
+                  className="logo"
+                  src={store.nightMode ? tri_logo_dark : tri_logo}
+                  alt="logo"
+                />
               </Button>
               <Typography variant="h5" color="inherit" noWrap>
-                MaterialNet - {store.dataset.label}{store.selected ? ` - ${store.selected.name}` : ''}
-                </Typography>
-              <div style={{ flex: 1 }}>
-              </div>
+                MaterialNet - {store.dataset.label}
+                {store.selected ? ` - ${store.selected.name}` : ''}
+              </Typography>
+              <div style={{ flex: 1 }}></div>
               <AboutPage />
             </Toolbar>
           </AppBar>
           <Drawer
             className={classes.drawer}
-            variant='persistent'
+            variant="persistent"
             open={store.drawerVisible}
             classes={{
               paper: classes.drawerPaper,
             }}
           >
             <div className={classes.drawerHeader}>
-              <IconButton onClick={() => { store.drawerVisible = false; }}>
+              <IconButton
+                onClick={() => {
+                  store.drawerVisible = false;
+                }}
+              >
                 <ChevronLeftIcon />
               </IconButton>
             </div>
             <Controls />
           </Drawer>
-          <div className={clsx(classes.contentContainer, {
-            [classes.contentShift]: store.drawerVisible,
-            [classes.contentNightMode]: store.nightMode
-          })}>
+          <div
+            className={clsx(classes.contentContainer, {
+              [classes.contentShift]: store.drawerVisible,
+              [classes.contentNightMode]: store.nightMode,
+            })}
+          >
             <div className={classes.drawerHeader} />
-            <SplitContainer className={classes.content} value={store.graphRatio} onValueChanged={(value) => store.graphRatio = value}
-              top={(value) => <div className={classes.graph} style={{ flexGrow: value }}>
-                <GraphVisComponent />
-                {store.showLegend && <div className={classes.legend}>
-                  <NodeColorLegend />
-                </div>}
-                <InfoPanel />
-                <Tooltip />
-                {!store.data && <div className={classes.loaderWrapper}><CircularProgress disableShrink className={classes.loader} size={100} /></div>}
-              </div>}
-              bottom={store.showTable ? (value) => <Table style={{ flexGrow: value }} /> : null} />
+            <SplitContainer
+              className={classes.content}
+              value={store.graphRatio}
+              onValueChanged={(value) => (store.graphRatio = value)}
+              top={(value) => (
+                <div className={classes.graph} style={{ flexGrow: value }}>
+                  <GraphVisComponent />
+                  {store.showLegend && (
+                    <div className={classes.legend}>
+                      <NodeColorLegend />
+                    </div>
+                  )}
+                  <InfoPanel />
+                  <Tooltip />
+                  {!store.data && (
+                    <div className={classes.loaderWrapper}>
+                      <CircularProgress
+                        disableShrink
+                        className={classes.loader}
+                        size={100}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+              bottom={
+                store.showTable
+                  ? (value) => <Table style={{ flexGrow: value }} />
+                  : null
+              }
+            />
           </div>
         </div>
       </ThemeProvider>

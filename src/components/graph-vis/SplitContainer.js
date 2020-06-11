@@ -6,34 +6,36 @@ import clsx from 'clsx';
 
 // based on https://github.com/phovea/phovea_ui/tree/master/src/layout
 
-const visStyles = theme => ({
+const visStyles = (theme) => ({
   root: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   separator: {
     height: 3,
-    cursor: 'ns-resize'
+    cursor: 'ns-resize',
   },
   dragging: {
     userSelect: 'none',
     '& > *': {
       opacity: 0.5,
-      pointerEvents: 'none'
-    }
-  }
+      pointerEvents: 'none',
+    },
+  },
 });
 
 @observer
 class SplitContainer extends React.Component {
-
   state = {
-    draggingValue: null
-  }
+    draggingValue: null,
+  };
 
   onMouseDown = (evt) => {
     const { classes } = this.props;
-    if (evt.target instanceof HTMLElement && evt.target.classList.contains(classes.separator)) {
+    if (
+      evt.target instanceof HTMLElement &&
+      evt.target.classList.contains(classes.separator)
+    ) {
       this.enableDragging(evt.currentTarget);
     }
   };
@@ -44,7 +46,7 @@ class SplitContainer extends React.Component {
       const n = node;
       const bb = n.getBoundingClientRect();
       const y = evt.clientY - bb.top - n.clientTop + n.scrollTop;
-      const ratio = Math.round(100 * y / n.offsetHeight);
+      const ratio = Math.round((100 * y) / n.offsetHeight);
       this.setState({ draggingValue: ratio });
       //no events
       evt.stopPropagation();
@@ -73,20 +75,30 @@ class SplitContainer extends React.Component {
 
   render() {
     const { classes, top, bottom, className } = this.props;
-    const value = this.state.draggingValue != null ? this.state.draggingValue : this.props.value;
+    const value =
+      this.state.draggingValue != null
+        ? this.state.draggingValue
+        : this.props.value;
 
     if (!top || !bottom) {
-      return <div className={clsx(classes.root, className)}>
-        {top && top(100)}
-        {bottom && bottom(100)}
-      </div>;
+      return (
+        <div className={clsx(classes.root, className)}>
+          {top && top(100)}
+          {bottom && bottom(100)}
+        </div>
+      );
     }
 
-    return <div className={clsx(classes.root, className)} onMouseDown={this.onMouseDown}>
-      {value > 0 && top(value)}
-      <Paper className={classes.separator} />
-      {value < 100 && bottom(100 - value)}
-    </div>;
+    return (
+      <div
+        className={clsx(classes.root, className)}
+        onMouseDown={this.onMouseDown}
+      >
+        {value > 0 && top(value)}
+        <Paper className={classes.separator} />
+        {value < 100 && bottom(100 - value)}
+      </div>
+    );
   }
 }
 

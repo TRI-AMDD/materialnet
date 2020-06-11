@@ -2,50 +2,50 @@ import defaultTemplate from './default';
 import { propertyColorFactory, propertySizeFactory } from './utils';
 
 const properties = {
-    degree: {
-        label: 'Derived materials',
-        format: 'd'
-    },
-    deg_cent: {
-        label: "Degree Centrality",
-        filterable: true,
-    },
-    eigen_cent: {
-        label: "Eigenvector Centrality",
-        filterable: true,
-    },
+  degree: {
+    label: 'Derived materials',
+    format: 'd',
+  },
+  deg_cent: {
+    label: 'Degree Centrality',
+    filterable: true,
+  },
+  eigen_cent: {
+    label: 'Eigenvector Centrality',
+    filterable: true,
+  },
 };
 
 const colors = [
-    ...defaultTemplate.colors,
-    ...Object.entries(properties).map(([prop, info]) => {
-        return {
-            label: info.label,
-            factory: propertyColorFactory(prop)
-        };
-    })
-]
+  ...defaultTemplate.colors,
+  ...Object.entries(properties).map(([prop, info]) => {
+    return {
+      label: info.label,
+      factory: propertyColorFactory(prop),
+    };
+  }),
+];
 
 const sizes = [
-    ...defaultTemplate.sizes,
-    ...Object.entries(properties).map(([prop, info]) => {
-        return {
-            label: info.label,
-            factory: propertySizeFactory(prop)
-        };
-    })
-]
+  ...defaultTemplate.sizes,
+  ...Object.entries(properties).map(([prop, info]) => {
+    return {
+      label: info.label,
+      factory: propertySizeFactory(prop),
+    };
+  }),
+];
 
 export default {
-    ...defaultTemplate,
-    
-    properties,
-    colors,
-    sizes,
+  ...defaultTemplate,
 
-    defaults: {
-        ...defaultTemplate.defaults,
-        color: colors[1],
-        size: sizes[1]
-    },
-}
+  properties,
+  colors,
+  sizes,
+
+  defaults: {
+    ...defaultTemplate.defaults,
+    color: colors[1],
+    size: sizes[1],
+  },
+};

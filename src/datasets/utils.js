@@ -8,21 +8,28 @@ import { scaleLinear } from 'd3-scale';
  * @param {string} prop property to visualize
  */
 export function propertyColorFactory(prop) {
-    return (store) => {
-        const meta = store.getPropertyMetaData(prop);
-        const scale = store.colorScale.copy().domain(meta.domain);
+  return (store) => {
+    const meta = store.getPropertyMetaData(prop);
+    const scale = store.colorScale.copy().domain(meta.domain);
 
-        return {
-            legend: () => <>
-                <LegendGradient scale={scale} format={meta.format} />
-                <LegendCircle label="Unknown" color={ApplicationStore.INVALID_VALUE_COLOR} />
-            </>,
-            scale: (node) => {
-                const value = node[prop];
-                return value != null ? scale(value) : ApplicationStore.INVALID_VALUE_COLOR;
-            }
-        };
-    }
+    return {
+      legend: () => (
+        <>
+          <LegendGradient scale={scale} format={meta.format} />
+          <LegendCircle
+            label="Unknown"
+            color={ApplicationStore.INVALID_VALUE_COLOR}
+          />
+        </>
+      ),
+      scale: (node) => {
+        const value = node[prop];
+        return value != null
+          ? scale(value)
+          : ApplicationStore.INVALID_VALUE_COLOR;
+      },
+    };
+  };
 }
 
 /**
@@ -30,22 +37,32 @@ export function propertyColorFactory(prop) {
  * @param {string} prop property to visualize
  */
 export function booleanColorFactory(prop, discovered, undiscovered) {
-    return (store) => {
-        return {
-            legend: () => <>
-                <LegendCircle label={discovered} color={ApplicationStore.DISCOVERED_COLOR} />
-                <LegendCircle label={undiscovered} color={ApplicationStore.UNDISCOVERED_COLOR} />
-            </>,
-            scale: (node) => {
-                const value = node[prop];
-                return value != null ? ApplicationStore.DISCOVERED_COLOR : ApplicationStore.UNDISCOVERED_COLOR;
-            }
-        };
-    }
+  return (store) => {
+    return {
+      legend: () => (
+        <>
+          <LegendCircle
+            label={discovered}
+            color={ApplicationStore.DISCOVERED_COLOR}
+          />
+          <LegendCircle
+            label={undiscovered}
+            color={ApplicationStore.UNDISCOVERED_COLOR}
+          />
+        </>
+      ),
+      scale: (node) => {
+        const value = node[prop];
+        return value != null
+          ? ApplicationStore.DISCOVERED_COLOR
+          : ApplicationStore.UNDISCOVERED_COLOR;
+      },
+    };
+  };
 }
 
 function createDefaultScale(domain) {
-    return scaleLinear().domain(domain);
+  return scaleLinear().domain(domain);
 }
 
 /**
@@ -53,22 +70,26 @@ function createDefaultScale(domain) {
  * @param {string} prop property to visualize
  */
 export function propertySizeFactory(prop, createScale = createDefaultScale) {
-    return (store) => {
-        if (!store.data) {
-            return {
-                legend: () => null,
-                scale: () => store.sizeScaleRange[0]
-            };
-        }
-        const meta = store.getPropertyMetaData(prop);
-        const scale = createScale(meta.domain).range(store.sizeScaleRange).clamp(true);
-
-        return {
-            legend: (factor) => <SizeLegend scale={scale} factor={factor} format={meta.format}/>,
-            scale: (node) => {
-                const value = node[prop];
-                return value != null ? scale(value) : scale.range()[0];
-            },
-        };
+  return (store) => {
+    if (!store.data) {
+      return {
+        legend: () => null,
+        scale: () => store.sizeScaleRange[0],
+      };
     }
+    const meta = store.getPropertyMetaData(prop);
+    const scale = createScale(meta.domain)
+      .range(store.sizeScaleRange)
+      .clamp(true);
+
+    return {
+      legend: (factor) => (
+        <SizeLegend scale={scale} factor={factor} format={meta.format} />
+      ),
+      scale: (node) => {
+        const value = node[prop];
+        return value != null ? scale(value) : scale.range()[0];
+      },
+    };
+  };
 }
