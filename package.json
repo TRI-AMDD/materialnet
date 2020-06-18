@@ -81,10 +81,21 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "sample_data": "./scripts/sample_data.sh",
-    "deploy_s3": "./scripts/deploy_s3.sh"
+    "deploy_s3": "./scripts/deploy_s3.sh",
+    "prettier:check-staged": "pretty-quick --staged --check --pattern '**/*.{js,jsx,ts,tsx,css}'",
+    "prettier:write-staged": "pretty-quick --staged --write --pattern '**/*.{js,jsx,ts,tsx,css}'",
+    "prettier:check-modified": "pretty-quick --check --pattern '**/*.{js,jsx,ts,tsx,css}'",
+    "prettier:write-modified": "pretty-quick --write --pattern '**/*.{js,jsx,ts,tsx,css}'",
+    "prettier:check-all": "prettier --check '**/*.{js,jsx,ts,tsx,css}'",
+    "prettier:write-all": "prettier --write '**/*.{js,jsx,ts,tsx,css}'"
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --check --bail"
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -138,6 +149,9 @@
   "devDependencies": {
     "babel-preset-mobx": "^2.0.0",
     "gh-pages": "^2.0.1",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
     "worker-loader": "^2.0.0"
   }
 }

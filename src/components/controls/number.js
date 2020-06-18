@@ -1,27 +1,17 @@
 import React, { Component } from 'react';
 
-import {
-  FormControl,
-  TextField
-} from '@material-ui/core';
+import { FormControl, TextField } from '@material-ui/core';
 
 export default class NumberControlComponent extends Component {
-
   onChange = (value) => {
     if (Number.isFinite(Number.parseFloat(value))) {
       const { onChange } = this.props;
       onChange(value);
     }
-  }
+  };
 
   render() {
-    const {
-      label,
-      value,
-      min,
-      max,
-      step
-    } = this.props;
+    const { label, value, min, max, step } = this.props;
 
     return (
       <FormControl fullWidth>
@@ -35,7 +25,9 @@ export default class NumberControlComponent extends Component {
           InputLabelProps={{
             shrink: true,
           }}
-          onChange={e => {this.onChange(e.target.value)}}
+          onChange={(e) => {
+            this.onChange(e.target.value);
+          }}
         />
       </FormControl>
     );

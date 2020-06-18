@@ -3,8 +3,7 @@ import Store from '../../store';
 import { withStyles, Popper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
-
-const visStyles = theme => ({
+const visStyles = (theme) => ({
   root: {
     background: `rgba(255, 255, 255, 0.75)`,
     borderRadius: 3,
@@ -24,8 +23,8 @@ const visStyles = theme => ({
         bottom: -5,
         left: `calc(50% - 5px)`,
         marginTop: 0,
-        marginBottom: 0
-      }
+        marginBottom: 0,
+      },
     },
     '&[x-placement^= "bottom"]': {
       marginTop: 5,
@@ -37,8 +36,8 @@ const visStyles = theme => ({
         top: -5,
         left: `calc(50% - 5px)`,
         marginTop: 0,
-        marginBottom: 0
-      }
+        marginBottom: 0,
+      },
     },
     '&[x-placement^= "right"]': {
       marginLeft: 5,
@@ -50,8 +49,8 @@ const visStyles = theme => ({
         left: -5,
         top: `calc(50% - 5px)`,
         marginLeft: 0,
-        marginRight: 0
-      }
+        marginRight: 0,
+      },
     },
     '&[x-placement^= "left"]': {
       marginRight: 5,
@@ -63,8 +62,8 @@ const visStyles = theme => ({
         right: -5,
         top: `calc(50% - 5px)`,
         marginLeft: 0,
-        marginRight: 0
-      }
+        marginRight: 0,
+      },
     },
   },
   arrow: {
@@ -74,9 +73,8 @@ const visStyles = theme => ({
     position: 'absolute',
     margin: 5,
     borderColor: 'black',
-  }
+  },
 });
-
 
 @observer
 class Tooltip extends React.Component {
@@ -87,21 +85,37 @@ class Tooltip extends React.Component {
     const { classes } = this.props;
 
     const hovered = store.hovered;
-    
+
     const open = hovered.node != null;
 
     // instead of a DOM fake the needed structure
     // see https://popper.js.org/popper-documentation.html#referenceObject
-    const anchorFake = open ? {
-      clientWidth: hovered.radius * 2,
-      clientHeight: hovered.radius * 2,
-      getBoundingClientRect: () => new DOMRect(hovered.position.x - hovered.radius, hovered.position.y - hovered.radius, hovered.radius * 2, hovered.radius * 2)
-    } : null;
+    const anchorFake = open
+      ? {
+          clientWidth: hovered.radius * 2,
+          clientHeight: hovered.radius * 2,
+          getBoundingClientRect: () =>
+            new DOMRect(
+              hovered.position.x - hovered.radius,
+              hovered.position.y - hovered.radius,
+              hovered.radius * 2,
+              hovered.radius * 2
+            ),
+        }
+      : null;
 
-    return <Popper open={open} placement="top" anchorEl={anchorFake} className={classes.root} disablePortal>
-      {hovered.node && store.template.tooltip(hovered.node, store)}
-      <div x-arrow="x" className={classes.arrow}/>
-    </Popper>;
+    return (
+      <Popper
+        open={open}
+        placement="top"
+        anchorEl={anchorFake}
+        className={classes.root}
+        disablePortal
+      >
+        {hovered.node && store.template.tooltip(hovered.node, store)}
+        <div x-arrow="x" className={classes.arrow} />
+      </Popper>
+    );
   }
 }
 

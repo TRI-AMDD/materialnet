@@ -1,19 +1,9 @@
-import React, {Component} from 'react';
-import {
-  FormControl,
-  FormControlLabel,
-  Checkbox
-} from '@material-ui/core';
+import React, { Component } from 'react';
+import { FormControl, FormControlLabel, Checkbox } from '@material-ui/core';
 
 class CheckboxControlComponent extends Component {
-
   render() {
-    const {
-      label,
-      value,
-      onChange,
-      className
-    } = this.props;
+    const { label, value, onChange, className } = this.props;
 
     return (
       <FormControl fullWidth className={className}>
@@ -21,7 +11,9 @@ class CheckboxControlComponent extends Component {
           control={
             <Checkbox
               checked={value}
-              onChange={(_e, val) => {onChange(val);}}
+              onChange={(_e, val) => {
+                onChange(val);
+              }}
             />
           }
           label={label}

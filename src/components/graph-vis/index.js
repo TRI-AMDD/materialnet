@@ -6,33 +6,35 @@ import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { debounce } from 'lodash-es';
 
-
 @observer
 class GraphVisComponent extends Component {
   static contextType = Store;
 
   visElement;
   scene = new GeoJSSceneManager({
-    onZoomChanged: (val) => this.context.zoom = val,
+    onZoomChanged: (val) => (this.context.zoom = val),
     picked: (node, modifiers) => {
       this.context.selectNode(node, modifiers);
     },
     onNodeSpacingChanged: (delta) => {
       const next = this.context.spacing + (delta > 0 ? -0.1 : 0.1);
-      this.context.spacing = Math.max(next, Math.min(this.context.spacingRange[1], this.context.spacingRange[0]));
+      this.context.spacing = Math.max(
+        next,
+        Math.min(this.context.spacingRange[1], this.context.spacingRange[0])
+      );
     },
     hovered: (node, position, radius) => {
       this.context.hovered = { node, position, radius };
     },
     hoveredLine: (node1, node2, position) => {
       this.context.hoveredLine = { node1, node2, position };
-    }
+    },
   });
 
   dragging = {
     status: false,
-    start: {x: 0, y: 0}
-  }
+    start: { x: 0, y: 0 },
+  };
   ro;
 
   autoRunListeners = [];
@@ -61,27 +63,44 @@ class GraphVisComponent extends Component {
       this.scene.hideAfter(store.year);
       this.scene.setNodeSize(store.nodeSizer.scale, store.zoomNodeSizeFactor);
     });
+    setAndObserve(
+      () => {
+        this.scene.setLinkOpacity(store.opacity);
+      },
+      { delay: 250 }
+    ); // debounce
+    setAndObserve(
+      () => {
+        if (store.showSubGraphOnly) {
+          this.scene.setData(store.subGraphNodeNames, store.subGraphEdges);
+        } else {
+          this.scene.setData(store.nodeNames, store.edges);
+        }
+      },
+      { delay: 250 }
+    ); // debounce
+    setAndObserve(
+      () => {
+        if (!store.showSubGraphOnly) {
+          this.scene.showSubGraph(
+            store.doesShowSubgraph ? store.subGraphNodeNames : []
+          );
+        }
+      },
+      { delay: 250 }
+    ); // debounce
     setAndObserve(() => {
-      this.scene.setLinkOpacity(store.opacity);
-    }, { delay: 250 }); // debounce
-    setAndObserve(() => {
-      if (store.showSubGraphOnly) {
-        this.scene.setData(store.subGraphNodeNames, store.subGraphEdges);
-      } else {
-        this.scene.setData(store.nodeNames, store.edges);
-      }
-    }, { delay: 250 }); // debounce
-    setAndObserve(() => {
-      if (!store.showSubGraphOnly) {
-        this.scene.showSubGraph(store.doesShowSubgraph ? store.subGraphNodeNames : []);
-      }
-    }, { delay: 250 }); // debounce
-    setAndObserve(() => {
-      this.scene.setSelected(store.selected ? store.selected.name : null, store.pinnedNodes.map((d) => d.node.name));
+      this.scene.setSelected(
+        store.selected ? store.selected.name : null,
+        store.pinnedNodes.map((d) => d.node.name)
+      );
     });
-    setAndObserve(() => {
-      this.scene.setPositions(store.subGraphLayout);
-    }, { delay: 300 });
+    setAndObserve(
+      () => {
+        this.scene.setPositions(store.subGraphLayout);
+      },
+      { delay: 300 }
+    );
     setAndObserve(() => {
       this.scene.linksVisible(store.showLinks);
     });
@@ -97,9 +116,11 @@ class GraphVisComponent extends Component {
   componentDidMount() {
     this.scene.parent = this.visElement;
     // debounce resize to await the animatiion
-    this.ro = new ResizeObserver(debounce(() => {
-      this.scene.resize();
-    }, 200));
+    this.ro = new ResizeObserver(
+      debounce(() => {
+        this.scene.resize();
+      }, 200)
+    );
 
     this.ro.observe(this.visElement);
 
@@ -122,7 +143,7 @@ class GraphVisComponent extends Component {
   onVisDrag = (event) => {
     event.preventDefault();
     this.dragging.status = true;
-    this.dragging.start = {x: event.clientX, y: event.clientY};
+    this.dragging.start = { x: event.clientX, y: event.clientY };
 
     const linksOn = this.context.showLinks;
     if (linksOn) {
@@ -141,12 +162,14 @@ class GraphVisComponent extends Component {
         this.scene.linksVisible(true);
       }
 
-      setTimeout(() => {this.dragging.status = false;}, 50);
+      setTimeout(() => {
+        this.dragging.status = false;
+      }, 50);
     };
 
     window.addEventListener('mousemove', mouseMoveListener);
     window.addEventListener('mouseup', mouseUpListener);
-  }
+  };
 
   onDrag = (e) => {
     if (!this.dragging.status) {
@@ -155,8 +178,8 @@ class GraphVisComponent extends Component {
     const dx = e.clientX - this.dragging.start.x;
     const dy = e.clientY - this.dragging.start.y;
     this.scene.moveCamera(dx, dy);
-    this.dragging.start = {x: e.clientX, y: e.clientY};
-  }
+    this.dragging.start = { x: e.clientX, y: e.clientY };
+  };
 
   render() {
     const store = this.context;
@@ -171,12 +194,16 @@ class GraphVisComponent extends Component {
       }
     }
 
-    return (<div
-          style={{width: '100%', height: '100%'}}
-          ref={ref => {this.visElement = ref}}
-          draggable
-          onDragStart={this.onVisDrag}
-    />);
+    return (
+      <div
+        style={{ width: '100%', height: '100%' }}
+        ref={(ref) => {
+          this.visElement = ref;
+        }}
+        draggable
+        onDragStart={this.onVisDrag}
+      />
+    );
   }
 }
 

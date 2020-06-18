@@ -7,8 +7,7 @@ import RotatedPin from './RotatedPin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
-
-const visStyles = theme => ({
+const visStyles = (theme) => ({
   root: {
     position: 'absolute',
     right: 0,
@@ -17,15 +16,15 @@ const visStyles = theme => ({
     maxHeight: '100%',
     padding: '1rem',
     minWidth: '15rem',
-    zIndex: theme.zIndex.modal
-  }
+    zIndex: theme.zIndex.modal,
+  },
 });
 
 @observer
 class InfoPanel extends React.Component {
   static contextType = Store;
 
-  onClear = () => this.context.selected = null;
+  onClear = () => (this.context.selected = null);
 
   toggleIncludeNeighbors = () => {
     const store = this.context;
@@ -36,7 +35,7 @@ class InfoPanel extends React.Component {
     }
 
     store.toggleIncludeNeighbors(node);
-  }
+  };
 
   toggleDefineSubspace = () => {
     const store = this.context;
@@ -47,7 +46,7 @@ class InfoPanel extends React.Component {
     }
 
     store.toggleDefineSubspace(node);
-  }
+  };
 
   togglePinned = () => {
     const store = this.context;
@@ -58,7 +57,7 @@ class InfoPanel extends React.Component {
     }
 
     store.togglePinned(node);
-  }
+  };
 
   render() {
     const store = this.context;
@@ -68,21 +67,56 @@ class InfoPanel extends React.Component {
     if (!node) {
       return null;
     }
-    return <Paper className={classes.root}>
-      <IconButton style={{ float: 'right' }} onClick={this.onClear} title="Clear Selection" size="small"><Close /></IconButton>
+    return (
+      <Paper className={classes.root}>
+        <IconButton
+          style={{ float: 'right' }}
+          onClick={this.onClear}
+          title="Clear Selection"
+          size="small"
+        >
+          <Close />
+        </IconButton>
 
-      <IconButton style={{ float: 'right' }} onClick={this.toggleDefineSubspace} title={store.isDefineSubspacePinned(node) ? 'Release Subspace Restriction' : 'Restrict Subspace'} size="small" color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}>
-        <FontAwesomeIcon icon={faFlask} />
-      </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.toggleIncludeNeighbors} title={store.isIncludeNeighborsPinned(node) ? 'Hide Neighbors' : 'Show Neighbors'} size="small" color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}>
-        <FontAwesomeIcon icon={faProjectDiagram} />
-      </IconButton>
-      <IconButton style={{ float: 'right' }} onClick={this.togglePinned} title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'} size="small" color={store.isPinned(node) ? 'primary' : 'default'}>
-        <RotatedPin />
-      </IconButton>
+        <IconButton
+          style={{ float: 'right' }}
+          onClick={this.toggleDefineSubspace}
+          title={
+            store.isDefineSubspacePinned(node)
+              ? 'Release Subspace Restriction'
+              : 'Restrict Subspace'
+          }
+          size="small"
+          color={store.isDefineSubspacePinned(node) ? 'primary' : 'default'}
+        >
+          <FontAwesomeIcon icon={faFlask} />
+        </IconButton>
+        <IconButton
+          style={{ float: 'right' }}
+          onClick={this.toggleIncludeNeighbors}
+          title={
+            store.isIncludeNeighborsPinned(node)
+              ? 'Hide Neighbors'
+              : 'Show Neighbors'
+          }
+          size="small"
+          color={store.isIncludeNeighborsPinned(node) ? 'primary' : 'default'}
+        >
+          <FontAwesomeIcon icon={faProjectDiagram} />
+        </IconButton>
+        <IconButton
+          style={{ float: 'right' }}
+          onClick={this.togglePinned}
+          title={store.isPinned(node) ? 'UnPin Selection' : 'Pin Selection'}
+          size="small"
+          color={store.isPinned(node) ? 'primary' : 'default'}
+        >
+          <RotatedPin />
+        </IconButton>
 
-      {store.template && store.template.render(node, store)}
-    </Paper>;
+        {store.template && store.template.render(node, store)}
+      </Paper>
+    );
   }
 }
 

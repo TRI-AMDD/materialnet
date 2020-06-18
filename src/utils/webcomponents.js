@@ -25,7 +25,7 @@ export function wc(customEvents = {}, props = {}) {
     Object.entries(customEvents).forEach(([name, value]) => {
       // If we have an element then add event listeners
       // otherwise remove the event listener
-      const action = (el) ? el.addEventListener : storedEl.removeEventListener;
+      const action = el ? el.addEventListener : storedEl.removeEventListener;
       if (typeof value === 'function') {
         action(name, value);
         return;

@@ -11,7 +11,7 @@ import lineVertShader from './shader/line-vert.glsl';
 import lineFragShader from './shader/line-frag.glsl';
 
 export class SceneManager {
-  constructor ({el, dp}) {
+  constructor({ el, dp }) {
     const width = el.clientWidth;
     const height = el.clientHeight;
     this.width = width;
@@ -21,7 +21,14 @@ export class SceneManager {
     this.scene = new three.Scene();
     this.scene.background = new three.Color(0xffffff);
 
-    this.camera = new three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -1, 1);
+    this.camera = new three.OrthographicCamera(
+      -width / 2,
+      width / 2,
+      height / 2,
+      -height / 2,
+      -1,
+      1
+    );
 
     this.raycaster = new three.Raycaster();
     this.threshold = 6;
@@ -34,7 +41,7 @@ export class SceneManager {
     this.attenuation = 0.02;
 
     this.renderer = new three.WebGLRenderer({
-      antialias: true
+      antialias: true,
     });
 
     this.el = this.renderer.domElement;
@@ -43,7 +50,7 @@ export class SceneManager {
     this.initScene(dp);
   }
 
-  initScene (dp) {
+  initScene(dp) {
     this.dp = dp;
 
     // Initialize edge geometry.
@@ -63,22 +70,31 @@ export class SceneManager {
     }
 
     this.edgeGeom = new three.BufferGeometry();
-    this.edgeGeom.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
-    this.edgeGeom.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
-    this.edgeGeom.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
+    this.edgeGeom.addAttribute(
+      'position',
+      new three.Float32BufferAttribute(positions, 3).setDynamic(true)
+    );
+    this.edgeGeom.addAttribute(
+      'focus',
+      new three.Float32BufferAttribute(focus, 1).setDynamic(true)
+    );
+    this.edgeGeom.addAttribute(
+      'hidden',
+      new three.Float32BufferAttribute(hidden, 1).setDynamic(true)
+    );
     this.edgeGeom.computeBoundingSphere();
 
     this.lineMaterial = new three.ShaderMaterial({
       uniforms: {
         opacity: {
-          value: 0.05
+          value: 0.05,
         },
         night: {
-          value: 0
-        }
+          value: 0,
+        },
       },
       vertexShader: lineVertShader,
-      fragmentShader: lineFragShader
+      fragmentShader: lineFragShader,
     });
     this.lineMaterial.transparent = true;
 
@@ -87,8 +103,7 @@ export class SceneManager {
     this.scene.add(this.lines);
 
     // Create a sequential colormap.
-    this.cmap = scaleSequential(interpolateViridis)
-      .domain([1945, 2015]);
+    this.cmap = scaleSequential(interpolateViridis).domain([1945, 2015]);
 
     // Initialize point geometry.
     positions.length = 0;
@@ -100,7 +115,7 @@ export class SceneManager {
 
     this.index = {};
 
-    this.dp.nodeNames().forEach(name => {
+    this.dp.nodeNames().forEach((name) => {
       const p = this.dp.nodePosition(name);
 
       positions.push(p.x, p.y, 0);
@@ -126,12 +141,30 @@ export class SceneManager {
     this.selected = null;
 
     this.geometry = new three.BufferGeometry();
-    this.geometry.addAttribute('position', new three.Float32BufferAttribute(positions, 3).setDynamic(true));
-    this.geometry.addAttribute('color', new three.Float32BufferAttribute(colors, 3).setDynamic(true));
-    this.geometry.addAttribute('size', new three.Float32BufferAttribute(sizes, 1).setDynamic(true));
-    this.geometry.addAttribute('selected', new three.Float32BufferAttribute(selected, 1).setDynamic(true));
-    this.geometry.addAttribute('focus', new three.Float32BufferAttribute(focus, 1).setDynamic(true));
-    this.geometry.addAttribute('hidden', new three.Float32BufferAttribute(hidden, 1).setDynamic(true));
+    this.geometry.addAttribute(
+      'position',
+      new three.Float32BufferAttribute(positions, 3).setDynamic(true)
+    );
+    this.geometry.addAttribute(
+      'color',
+      new three.Float32BufferAttribute(colors, 3).setDynamic(true)
+    );
+    this.geometry.addAttribute(
+      'size',
+      new three.Float32BufferAttribute(sizes, 1).setDynamic(true)
+    );
+    this.geometry.addAttribute(
+      'selected',
+      new three.Float32BufferAttribute(selected, 1).setDynamic(true)
+    );
+    this.geometry.addAttribute(
+      'focus',
+      new three.Float32BufferAttribute(focus, 1).setDynamic(true)
+    );
+    this.geometry.addAttribute(
+      'hidden',
+      new three.Float32BufferAttribute(hidden, 1).setDynamic(true)
+    );
     this.geometry.computeBoundingSphere();
 
     this.material = new three.ShaderMaterial({
@@ -139,11 +172,11 @@ export class SceneManager {
       uniforms: {
         color: new three.Color(1.0, 0.0, 0.0),
         zoom: {
-          value: this.zoom
-        }
+          value: this.zoom,
+        },
       },
       vertexShader: vertHighlightShader,
-      fragmentShader: fragHighlightShader
+      fragmentShader: fragHighlightShader,
     });
     this.material.transparent = true;
 
@@ -155,13 +188,13 @@ export class SceneManager {
     this.resize();
   }
 
-  clear () {
+  clear() {
     this.scene.remove.apply(this.scene, this.scene.children);
   }
 
   resize() {
-    const width = this.width = this.parent.clientWidth;
-    const height = this.height = this.parent.clientHeight;
+    const width = (this.width = this.parent.clientWidth);
+    const height = (this.height = this.parent.clientHeight);
     this.renderer.setSize(width, height);
 
     const mid = 0.5 * (this.camera.left + this.camera.right);
@@ -174,12 +207,12 @@ export class SceneManager {
     this.render();
   }
 
-  linksVisible (vis) {
+  linksVisible(vis) {
     this._linksVisible = vis;
     this.lines.visible = this._linksVisible;
   }
 
-  setNightMode (night) {
+  setNightMode(night) {
     if (night) {
       this.scene.background.setRGB(0, 0, 0);
       this.lineMaterial.uniforms.night.value = 1.0;
@@ -189,21 +222,21 @@ export class SceneManager {
     }
   }
 
-  setLinkOpacity (o) {
+  setLinkOpacity(o) {
     this.lineMaterial.uniforms.opacity.value = o;
   }
 
-  setConstSize (s) {
+  setConstSize(s) {
     this.degreeSize = false;
 
-    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+    for (let i = 0; i < this.geometry.attributes.size.array.length; i++) {
       this.setSize(i, s);
     }
 
     this.updateSize();
   }
 
-  setDegreeSize (year, level) {
+  setDegreeSize(year, level) {
     this.degreeSize = true;
 
     const degrees = this.dp.nodeDegrees(year);
@@ -227,30 +260,27 @@ export class SceneManager {
     this.updateSize();
   }
 
-  setConstColor (r, g, b) {
-    for(let i = 0; i < this.geometry.attributes.size.array.length; i++) {
+  setConstColor(r, g, b) {
+    for (let i = 0; i < this.geometry.attributes.size.array.length; i++) {
       this.setColor(i, r, g, b);
     }
 
     this.updateColor();
   }
 
-  propMinMax (prop) {
-    const props = this.dp.nodeNames()
-      .map(name => this.dp.nodeProperty(name, prop))
-      .filter(d => d !== undefined);
+  propMinMax(prop) {
+    const props = this.dp
+      .nodeNames()
+      .map((name) => this.dp.nodeProperty(name, prop))
+      .filter((d) => d !== undefined);
 
-    return [
-      Math.min.apply(null, props),
-      Math.max.apply(null, props)
-    ];
+    return [Math.min.apply(null, props), Math.max.apply(null, props)];
   }
 
-  setPropertyColor (prop) {
+  setPropertyColor(prop) {
     const [low, high] = this.propMinMax(prop);
 
-    this.cmap = scaleSequential(interpolateViridis)
-      .domain([low, high]);
+    this.cmap = scaleSequential(interpolateViridis).domain([low, high]);
 
     this.dp.nodeNames().forEach((name, i) => {
       const val = this.dp.nodeProperty(name, prop);
@@ -266,11 +296,10 @@ export class SceneManager {
     this.updateColor();
   }
 
-  setDiscoveryColor () {
+  setDiscoveryColor() {
     this.undiscoveredColor = false;
 
-    this.cmap = scaleSequential(interpolateViridis)
-      .domain([1945, 2015]);
+    this.cmap = scaleSequential(interpolateViridis).domain([1945, 2015]);
 
     this.dp.nodeNames().forEach((name, i) => {
       const discovery = this.dp.nodeProperty(name, 'discovery');
@@ -288,7 +317,7 @@ export class SceneManager {
     this.updateColor();
   }
 
-  setBooleanColor () {
+  setBooleanColor() {
     this.undiscoveredColor = false;
 
     this.dp.nodeNames().forEach((name, i) => {
@@ -301,11 +330,13 @@ export class SceneManager {
     this.updateColor();
   }
 
-  setUndiscoveredColor (year) {
+  setUndiscoveredColor(year) {
     this.undiscoveredColor = true;
 
     this.dp.nodeNames().forEach((name, i) => {
-      const existsYet = this.dp.nodeExists(name) && this.dp.nodeProperty(name, 'discovery') <= year;
+      const existsYet =
+        this.dp.nodeExists(name) &&
+        this.dp.nodeProperty(name, 'discovery') <= year;
       const color = existsYet ? d3Color('rgb(81,96,204)') : d3Color('#de2d26');
 
       this.setColor(i, color.r / 255, color.g / 255, color.b / 255);
@@ -314,25 +345,25 @@ export class SceneManager {
     this.updateColor();
   }
 
-  setColorYear (year) {
+  setColorYear(year) {
     if (this.undiscoveredColor) {
       this.setUndiscoveredColor(year);
     }
   }
 
-  on (eventType, cb) {
+  on(eventType, cb) {
     select(this.el).on(eventType, cb.bind(this));
   }
 
-  pick ({x, y}) {
+  pick({ x, y }) {
     const bbox = this.parent.getBoundingClientRect();
     const pixel = {
       x: x - bbox.left,
-      y: y - bbox.top
-    }
+      y: y - bbox.top,
+    };
 
     this.mouse.x = (pixel.x / this.parent.clientWidth) * 2 - 1;
-    this.mouse.y = - ((pixel.y / this.parent.clientHeight) * 2 - 1);
+    this.mouse.y = -((pixel.y / this.parent.clientHeight) * 2 - 1);
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const results = this.raycaster.intersectObject(this.points);
     if (results.length === 0) {
@@ -349,7 +380,7 @@ export class SceneManager {
     return this.pickName(name);
   }
 
-  pickName (name) {
+  pickName(name) {
     if (!this.index.hasOwnProperty(name)) {
       return null;
     }
@@ -364,13 +395,13 @@ export class SceneManager {
       eigenCent: this.dp.nodeProperty(name, 'eigen_cent'),
       degCent: this.dp.nodeProperty(name, 'deg_cent'),
       shortestPath: this.dp.nodeProperty(name, 'shortest_path'),
-      degNeigh: this.dp.nodeProperty(name, 'deg_neigh')
+      degNeigh: this.dp.nodeProperty(name, 'deg_neigh'),
     };
 
     return data;
   }
 
-  setColor (idx, r, g, b, update = true) {
+  setColor(idx, r, g, b, update = true) {
     this.geometry.attributes.color.array[3 * idx + 0] = r;
     this.geometry.attributes.color.array[3 * idx + 1] = g;
     this.geometry.attributes.color.array[3 * idx + 2] = b;
@@ -380,16 +411,16 @@ export class SceneManager {
     }
   }
 
-  updateColor () {
+  updateColor() {
     this.geometry.attributes.color.needsUpdate = true;
   }
 
-  getPosition (idx) {
+  getPosition(idx) {
     const pos = this.geometry.attributes.position.array;
     return new three.Vector2(pos[3 * idx + 0], pos[3 * idx + 1]);
   }
 
-  setPosition (idx, x, y, update = true) {
+  setPosition(idx, x, y, update = true) {
     this.geometry.attributes.position.array[3 * idx + 0] = x;
     this.geometry.attributes.position.array[3 * idx + 1] = y;
 
@@ -398,11 +429,11 @@ export class SceneManager {
     }
   }
 
-  updatePosition () {
+  updatePosition() {
     this.geometry.attributes.position.needsUpdate = true;
   }
 
-  setFocus (idx, focus, update = true) {
+  setFocus(idx, focus, update = true) {
     this.geometry.attributes.focus.array[idx] = focus ? 1.0 : this.attenuation;
 
     if (update) {
@@ -410,16 +441,19 @@ export class SceneManager {
     }
   }
 
-  updateFocus () {
+  updateFocus() {
     this.geometry.attributes.focus.needsUpdate = true;
   }
 
-  getEdgePosition (idx, which) {
+  getEdgePosition(idx, which) {
     const pos = this.edgeGeom.attributes.position.array;
-    return new three.Vector2(pos[3 * (2 * idx + which) + 0], pos[3 * (2 * idx + which) + 1]);
+    return new three.Vector2(
+      pos[3 * (2 * idx + which) + 0],
+      pos[3 * (2 * idx + which) + 1]
+    );
   }
 
-  setEdgePosition (idx, which, x, y, update = true) {
+  setEdgePosition(idx, which, x, y, update = true) {
     this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 0] = x;
     this.edgeGeom.attributes.position.array[3 * (2 * idx + which) + 1] = y;
 
@@ -428,24 +462,28 @@ export class SceneManager {
     }
   }
 
-  updateEdgePosition () {
+  updateEdgePosition() {
     this.edgeGeom.attributes.position.needsUpdate = true;
   }
 
-  setEdgeFocus (idx, focus, update = true) {
-    this.edgeGeom.attributes.focus.array[2 * idx + 0] = focus ? 1.0 : this.attenuation;
-    this.edgeGeom.attributes.focus.array[2 * idx + 1] = focus ? 1.0 : this.attenuation;
+  setEdgeFocus(idx, focus, update = true) {
+    this.edgeGeom.attributes.focus.array[2 * idx + 0] = focus
+      ? 1.0
+      : this.attenuation;
+    this.edgeGeom.attributes.focus.array[2 * idx + 1] = focus
+      ? 1.0
+      : this.attenuation;
 
     if (update) {
       this.updateEdgeFocus();
     }
   }
 
-  updateEdgeFocus () {
+  updateEdgeFocus() {
     this.edgeGeom.attributes.focus.needsUpdate = true;
   }
 
-  setSize (idx, s, update = true) {
+  setSize(idx, s, update = true) {
     this.geometry.attributes.size.array[idx] = s;
 
     if (update) {
@@ -453,11 +491,11 @@ export class SceneManager {
     }
   }
 
-  updateSize () {
+  updateSize() {
     this.geometry.attributes.size.needsUpdate = true;
   }
 
-  select (name, center = false) {
+  select(name, center = false) {
     if (this.selected != null) {
       this.geometry.attributes.selected.array[this.selected] = 0;
     }
@@ -475,14 +513,14 @@ export class SceneManager {
     }
   }
 
-  unselect () {
+  unselect() {
     this.geometry.attributes.selected.array[this.selected] = 0;
     this.geometry.attributes.selected.needsUpdate = true;
 
     this.selected = null;
   }
 
-  focus (name, edges = true) {
+  focus(name, edges = true) {
     const count = this.geometry.attributes.focus.count;
     for (let i = 0; i < count; i++) {
       this.setFocus(i, false, false);
@@ -516,7 +554,7 @@ export class SceneManager {
     this.updateFocus();
   }
 
-  unfocus () {
+  unfocus() {
     const count = this.geometry.attributes.focus.count;
     for (let i = 0; i < count; i++) {
       this.setFocus(i, true, false);
@@ -530,8 +568,8 @@ export class SceneManager {
     this.updateEdgeFocus();
   }
 
-  display (name, center=false) {
-    console.log("NAME", name);
+  display(name, center = false) {
+    console.log('NAME', name);
     if (!name || name.trim() === '') {
       this.undisplay();
       return;
@@ -540,18 +578,21 @@ export class SceneManager {
     this.focus(name);
   }
 
-  undisplay () {
+  undisplay() {
     this.unselect();
     this.unfocus();
   }
 
-  hideAfter (year) {
+  hideAfter(year) {
     // Collect all the nodes with discovery year after the specified year; these
     // will be hidden next.
-    const toHide = year < 2016 ? this.dp.nodeNames().filter(d => {
-      const discovery = this.dp.nodeProperty(d, 'discovery') || 2016;
-      return !this.dp.nodeExists(d) || discovery > year;
-    }) : [];
+    const toHide =
+      year < 2016
+        ? this.dp.nodeNames().filter((d) => {
+            const discovery = this.dp.nodeProperty(d, 'discovery') || 2016;
+            return !this.dp.nodeExists(d) || discovery > year;
+          })
+        : [];
 
     // Unhide all nodes.
     this.hideNodes([]);
@@ -560,12 +601,12 @@ export class SceneManager {
     this.hideNodes(toHide);
   }
 
-  hideNodes (nodes) {
+  hideNodes(nodes) {
     // Unhide all nodes.
-    this.dp.nodeNames().forEach(d => this.hideNode(d, false, false));
+    this.dp.nodeNames().forEach((d) => this.hideNode(d, false, false));
 
     // Hide just the nodes that are named in the list;
-    nodes.forEach(d => this.hideNode(d, true, false));
+    nodes.forEach((d) => this.hideNode(d, true, false));
     this.updateHideNode();
 
     // Hide all edges touching a hidden node.
@@ -577,18 +618,18 @@ export class SceneManager {
     this.updateHideEdge();
   }
 
-  hideNode (name, hide, update = true) {
+  hideNode(name, hide, update = true) {
     this.geometry.attributes.hidden.array[this.index[name]] = hide;
     if (update) {
       this.updateHideNode();
     }
   }
 
-  updateHideNode () {
+  updateHideNode() {
     this.geometry.attributes.hidden.needsUpdate = true;
   }
 
-  hideEdge (idx, hide, update = true) {
+  hideEdge(idx, hide, update = true) {
     this.edgeGeom.attributes.hidden.array[2 * idx + 0] = hide;
     this.edgeGeom.attributes.hidden.array[2 * idx + 1] = hide;
 
@@ -597,11 +638,11 @@ export class SceneManager {
     }
   }
 
-  updateHideEdge () {
+  updateHideEdge() {
     this.edgeGeom.attributes.hidden.needsUpdate = true;
   }
 
-  center () {
+  center() {
     // Compute the mean.
     const count = this.geometry.attributes.selected.count;
 
@@ -616,7 +657,7 @@ export class SceneManager {
     y /= count;
 
     for (let i = 0; i < count; i++) {
-      const pos = this.getPosition (i);
+      const pos = this.getPosition(i);
       this.setPosition(i, pos.x - x, pos.y - y, false);
     }
     this.updatePosition();
@@ -631,7 +672,7 @@ export class SceneManager {
     this.updateEdgePosition();
   }
 
-  expand (m) {
+  expand(m) {
     const factor = m / this.expansion;
     this.expansion = m;
 
@@ -660,7 +701,7 @@ export class SceneManager {
     this.camera.updateProjectionMatrix();
   }
 
-  setCamera (x, y) {
+  setCamera(x, y) {
     this.camera.left = x - this.width / 2;
     this.camera.right = x + this.width / 2;
     this.camera.bottom = y - this.height / 2;
@@ -668,15 +709,15 @@ export class SceneManager {
     this.camera.updateProjectionMatrix();
   }
 
-  render () {
+  render() {
     this.renderer.render(this.scene, this.camera);
   }
 
-  get zoom () {
+  get zoom() {
     return this.camera.zoom;
   }
 
-  set zoom (zoom) {
+  set zoom(zoom) {
     this.camera.zoom = zoom;
     this.camera.updateProjectionMatrix();
 
