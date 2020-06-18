@@ -9,8 +9,7 @@ import datasets from '../datasets';
 import { isEqual, camelCase, uniqueId } from 'lodash-es';
 import { createFormatter } from './format';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from 'worker-loader!../worker';
+import Worker from '../layout.worker.js';
 import { neighborsOf } from '../data-provider/graph';
 
 export class ApplicationStore {

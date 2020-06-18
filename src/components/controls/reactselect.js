@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import Select, { Async } from 'react-select';
+import Select from 'react-select';
+import Async from 'react-select/async';
 import { emphasize, makeStyles, useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
