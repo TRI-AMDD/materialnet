@@ -1,4 +1,4 @@
-import geo from 'geojs/geo.min.js';
+import geo from 'geojs/geo.min';
 import { debounce } from 'lodash-es';
 
 const FOCUS_OPACITY = 0.8; // selection or pinned
