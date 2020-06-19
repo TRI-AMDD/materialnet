@@ -22,6 +22,7 @@
     "deploy": "gh-pages -d build",
     "sample_data": "./scripts/sample_data.sh",
     "deploy_s3": "./scripts/deploy_s3.sh",
+    "lint": "eslint src",
     "prettier:check-staged": "pretty-quick --staged --check --pattern '**/*.{js,jsx,ts,tsx,css}'",
     "prettier:write-staged": "pretty-quick --staged --write --pattern '**/*.{js,jsx,ts,tsx,css}'",
     "prettier:check-modified": "pretty-quick --check --pattern '**/*.{js,jsx,ts,tsx,css}'",
