@@ -421,6 +421,10 @@ module.exports = {
           // Make sure to add the new loader(s) before the "file" loader.
         ],
       },
+      {
+        test: /\.worker\.js$/,
+        use: ['worker-loader']
+      }
     ],
   },
   plugins: [
@@ -482,9 +486,8 @@ module.exports = {
     new WorkboxWebpackPlugin.GenerateSW({
       clientsClaim: true,
       exclude: [/\.map$/, /asset-manifest\.json$/],
-      importWorkboxFrom: 'cdn',
       navigateFallback: publicUrl + '/index.html',
-      navigateFallbackBlacklist: [
+      navigateFallbackDenylist: [
         // Exclude URLs starting with /_, as they're likely an API call
         new RegExp('^/_'),
         // Exclude URLs containing a dot, as they're likely a resource in
