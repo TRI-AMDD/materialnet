@@ -35,7 +35,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged --check --bail"
+      "pre-commit": "yarn prettier:check-staged --bail"
     }
   },
   "browserslist": [
