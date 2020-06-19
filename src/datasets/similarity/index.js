@@ -1,4 +1,3 @@
-import templates_ from './templates';
 import React from 'react';
 import { Typography } from '@material-ui/core';
 import InfoBlock from '../../components/graph-vis/info-block';

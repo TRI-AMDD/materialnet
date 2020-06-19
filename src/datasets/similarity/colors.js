@@ -1,7 +1,4 @@
-import React from 'react';
-import { ApplicationStore } from '../../store';
-import { LegendGradient, LegendCircle } from '../../components/legend';
-import { propertyColorFactory, booleanColorFactory } from '../utils';
+import { propertyColorFactory } from '../utils';
 import defaultTemplate from '../default';
 
 export default [
