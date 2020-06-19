@@ -9,7 +9,7 @@ import datasets from '../datasets';
 import { isEqual, camelCase, uniqueId } from 'lodash-es';
 import { createFormatter } from './format';
 
-import Worker from '../layout.worker.js';
+import Worker from '../layout.worker';
 import { neighborsOf } from '../data-provider/graph';
 
 export class ApplicationStore {

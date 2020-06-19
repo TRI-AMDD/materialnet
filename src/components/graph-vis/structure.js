@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { wc } from '../../utils/webcomponents.js';
+import { wc } from '../../utils/webcomponents';
 
 const Structure = ({ cjson }) => (
   <oc-molecule
