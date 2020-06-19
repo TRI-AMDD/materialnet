@@ -23,6 +23,12 @@ jobs:
             - node_modules
           key: v1-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
       - run:
+          name: Lint
+          command: yarn lint
+      - run:
+          name: Prettier
+          command: yarn prettier:check-all
+      - run:
           name: Create build
           command: yarn build
       - deploy:
