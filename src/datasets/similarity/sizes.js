@@ -1,6 +1,6 @@
 import React from 'react';
 import { SizeLegend } from '../../components/legend';
-import { scalePow, scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
+import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 import defaultTemplate from '../default';
 
 function degreeFunction(createScale) {
