@@ -10,12 +10,14 @@ on:
       - master
 
 jobs:
-  yarn:
-    name: Install Yarn dependencies
+  lint:
+    name: Run lint tests
     runs-on: ubuntu-latest
     steps:
+      # Check out the repo.
       - uses: actions/checkout@v2
 
+      # Initiate caching for node_modules.
       - name: Cache node_modules
         uses: actions/cache@v2
         id: cache-node-modules
@@ -23,7 +25,12 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ hashFiles('package.json') }}
 
+      # Install the Yarn dependencies.
       - uses: actions/setup-node@v1
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
+
+      # Run the linting tests.
+      - run: yarn lint
+      - run: yarn prettier:check-all
