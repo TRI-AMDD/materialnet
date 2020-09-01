@@ -34,3 +34,11 @@ jobs:
       # Run the linting tests.
       - run: yarn lint
       - run: yarn prettier:check-all
+
+  deploy:
+    name: Placeholder job for web app deployment
+    runs-on: ubuntu-latest
+    needs: lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - run: echo "deployment job placeholder"
