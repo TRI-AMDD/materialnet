@@ -57,6 +57,15 @@ jobs:
 
       - run: yarn build
 
+      - name: Download the sample data pack
+        run: curl --output sample-data.tar.gz https://data.kitware.com/api/v1/file/5e5696b4af2e2eed35da2e44/download
+
+      - name: Unpack the sample data
+        run: tar xzvf sample-data.tar.gz -C build
+
+      - name: Remove the tarball
+        run: rm sample-data.tar.gz
+
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
