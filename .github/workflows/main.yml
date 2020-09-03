@@ -35,10 +35,16 @@ jobs:
       - run: yarn lint
       - run: yarn prettier:check-all
 
+      # Build the app (this step can reveal some "lint" failures as well).
+      - run: yarn build
+
   deploy:
-    name: Placeholder job for web app deployment
+    name: Deploy application to github.io
     runs-on: ubuntu-latest
     needs: lint
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
-      - run: echo "deployment job placeholder"
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
